@@ -1,7 +1,5 @@
 # Архитектура Проекта KONSPECTO
 
-Ниже представлена детальная структура папок и файлов проекта KONSPECTO. Каждая папка и файл описаны с указанием их назначения и содержимого.
-
 ## Структура Проекта
 
 ```plaintext
@@ -18,18 +16,19 @@ KONSPECTO/
 └── LICENSE
 ```
 
-### Описание Корневой Директории
+### Root Directory Description
 
-- **frontend/**: Содержит весь исходный код и конфигурацию фронтенд-части приложения.
-- **backend/**: Содержит исходный код и конфигурацию бэкенд-части приложения, включая API и взаимодействие с базой данных.
-- **agent/**: Содержит код и инструменты, связанные с AI агентом, включая модели, обработку запросов и интеграцию с другими сервисами.
-- **docs/**: Хранит техническую документацию, инструкции и другую сопутствующую документацию.
-- **docker/**: Содержит Docker-файлы и конфигурации для различных сервисов.
-- **tests/**: Содержит общие тесты, если применимо.
-- **.gitignore**: Файл, указывающий Git, какие файлы и папки игнорировать.
-- **docker-compose.yml**: Файл конфигурации Docker Compose для оркестрации сервисов.
-- **README.md**: Основная документация проекта с описанием, установкой и использованием.
-- **LICENSE**: Лицензионное соглашение проекта.
+- **frontend/**: Contains all the source code and configuration for the frontend part of the application.
+- **backend/**: Contains the source code and configuration for the backend part of the application, including the API and database interactions.
+- **agent/**: Contains the code and tools related to the AI agent, including models, request processing, and integration with other services.
+- **docs/**: Stores technical documentation, instructions, and other related documentation.
+- **docker/**: Contains Docker files and configurations for various services.
+- **tests/**: Contains general tests, if applicable.
+- **.gitignore**: File specifying which files and folders Git should ignore.
+- **docker-compose.yml**: Docker Compose configuration file for orchestrating services.
+- **README.md**: Main project documentation with descriptions, installation, and usage instructions.
+- **LICENSE**: Project license agreement.
+
 
 ---
 
@@ -55,32 +54,32 @@ frontend/
 └── vite.config.js
 ```
 
-### Описание Папок и Файлов
+### Description of Folders and Files
 
-- **public/**: Содержит статические файлы, такие как `index.html`, иконки и другие ресурсы, которые не обрабатываются сборщиком.
-  - `index.html`: Основной HTML-файл приложения.
-  - `favicon.ico`: Иконка сайта.
+- **public/**: Contains static files such as `index.html`, icons, and other resources that are not processed by the bundler.
+  - `index.html`: Main HTML file of the application.
+  - `favicon.ico`: Website icon.
 
-- **src/**: Основная директория с исходным кодом фронтенда.
-  - **assets/**: Содержит изображения, шрифты и другие медиафайлы.
-  - **components/**: Повторно используемые React-компоненты.
-  - **pages/**: Страницы приложения, представляющие различные маршруты.
-  - **services/**: Функции и модули для взаимодействия с API и другими сервисами.
-  - **styles/**: Стилизация приложения, включая TailwindCSS и дополнительные CSS/SCSS файлы.
-  - `App.jsx`: Главный компонент приложения, содержащий маршрутизацию и общие компоненты.
-  - `index.jsx`: Точка входа в приложение, рендеринг React-дерева.
+- **src/**: Main directory containing the frontend source code.
+  - **assets/**: Contains images, fonts, and other media files.
+  - **components/**: Reusable React components.
+  - **pages/**: Application pages representing different routes.
+  - **services/**: Functions and modules for interacting with APIs and other services.
+  - **styles/**: Application styling, including TailwindCSS and additional CSS/SCSS files.
+  - `App.jsx`: Main application component containing routing and common components.
+  - `index.jsx`: Entry point of the application, rendering the React tree.
 
-- **.env**: Файл окружения для настройки переменных среды (например, API URL).
+- **.env**: Environment file for setting up environment variables (e.g., API URL).
 
-- **.eslintrc.js**: Конфигурация ESLint для обеспечения соблюдения стилей кодирования.
+- **.eslintrc.js**: ESLint configuration to ensure coding style adherence.
 
-- **package.json**: Файл зависимостей и скриптов для фронтенда.
+- **package.json**: Dependency and script file for the frontend.
 
-- **tailwind.config.js**: Конфигурация TailwindCSS для настройки утилитарных классов.
+- **tailwind.config.js**: TailwindCSS configuration for setting up utility classes.
 
-- **postcss.config.js**: Конфигурация PostCSS для обработки CSS.
+- **postcss.config.js**: PostCSS configuration for processing CSS.
 
-- **vite.config.js**: Конфигурация Vite, используемого как сборщик и разработческий сервер.
+- **vite.config.js**: Vite configuration used as the bundler and development server.
 
 ---
 
@@ -133,63 +132,63 @@ backend/
 └── .env
 ```
 
-### Описание Папок и Файлов
+### Description of Folders and Files
 
-- **app/**: Основная директория бэкенда.
-  - **api/**: Реализация API приложения.
-    - **v1/**: Версия 1 API.
-      - **endpoints/**: Конечные точки API, разделенные по функциональным областям.
-        - `users.py`: Конечные точки, связанные с пользователями.
-        - `notes.py`: Конечные точки для работы с конспектами.
-        - `lectures.py`: Конечные точки для работы с видео-лекциями.
-      - `__init__.py`: Инициализация версии API.
-    - `__init__.py`: Инициализация API.
+- **app/**: Main backend directory.
+  - **api/**: Implementation of the application API.
+    - **v1/**: Version 1 of the API.
+      - **endpoints/**: API endpoints organized by functional areas.
+        - `users.py`: Endpoints related to users.
+        - `notes.py`: Endpoints for managing notes.
+        - `lectures.py`: Endpoints for managing video lectures.
+      - `__init__.py`: Initialization of the API version.
+    - `__init__.py`: API initialization.
 
-  - **core/**: Основные конфигурации и настройки приложения.
-    - `config.py`: Конфигурационные настройки приложения.
-    - `security.py`: Настройки безопасности и аутентификации.
-    - `__init__.py`: Инициализация core.
+  - **core/**: Core configurations and settings of the application.
+    - `config.py`: Application configuration settings.
+    - `security.py`: Security and authentication settings.
+    - `__init__.py`: Core initialization.
 
-  - **models/**: Определение моделей базы данных с использованием ORM.
-    - `user.py`: Модель пользователя.
-    - `note.py`: Модель конспекта.
-    - `lecture.py`: Модель видео-лекции.
+  - **models/**: Database models defined using ORM.
+    - `user.py`: User model.
+    - `note.py`: Note model.
+    - `lecture.py`: Video lecture model.
 
-  - **schemas/**: Определение Pydantic схем для валидации данных.
-    - `user.py`: Схемы пользователя.
-    - `note.py`: Схемы конспекта.
-    - `lecture.py`: Схемы видео-лекции.
+  - **schemas/**: Pydantic schemas for data validation.
+    - `user.py`: User schemas.
+    - `note.py`: Note schemas.
+    - `lecture.py`: Video lecture schemas.
 
-  - **services/**: Бизнес-логика и взаимодействие с внешними сервисами.
-    - `auth.py`: Логика аутентификации и авторизации.
-    - `api_search.py`: Логика поиска по конспектам через API.
-    - `__init__.py`: Инициализация services.
+  - **services/**: Business logic and interactions with external services.
+    - `auth.py`: Authentication and authorization logic.
+    - `api_search.py`: Logic for searching notes via the API.
+    - `__init__.py`: Services initialization.
 
-  - **utils/**: Вспомогательные функции и утилиты.
-    - `helpers.py`: Общие вспомогательные функции.
-    - `__init__.py`: Инициализация utils.
+  - **utils/**: Helper functions and utilities.
+    - `helpers.py`: General helper functions.
+    - `__init__.py`: Utilities initialization.
 
-  - `main.py`: Точка входа в бэкенд-приложение, настройка FastAPI и запуск сервера.
+  - `main.py`: Entry point of the backend application, setting up FastAPI and running the server.
 
-  - `__init__.py`: Инициализация приложения.
+  - `__init__.py`: Application initialization.
 
-- **tests/**: Тесты для бэкенда.
-  - **api/**: Тесты для API конечных точек.
-  - **models/**: Тесты для моделей базы данных.
-  - **schemas/**: Тесты для Pydantic схем.
-  - `conftest.py`: Конфигурации и фикстуры для тестов.
+- **tests/**: Backend tests.
+  - **api/**: Tests for API endpoints.
+  - **models/**: Tests for database models.
+  - **schemas/**: Tests for Pydantic schemas.
+  - `conftest.py`: Test configurations and fixtures.
 
-- **alembic/**: Миграции базы данных с использованием Alembic.
-  - **versions/**: Файлы миграций.
-  - `env.py`: Конфигурация Alembic.
-  - `script.py.mako`: Шаблон скрипта миграции.
-  - `alembic.ini`: Основной конфигурационный файл Alembic.
+- **alembic/**: Database migrations using Alembic.
+  - **versions/**: Migration files.
+  - `env.py`: Alembic configuration.
+  - `script.py.mako`: Migration script template.
+  - `alembic.ini`: Main Alembic configuration file.
 
-- **requirements.txt**: Список зависимостей Python для бэкенда.
+- **requirements.txt**: List of Python dependencies for the backend.
 
-- **Dockerfile**: Инструкции для создания Docker-образа бэкенд-сервиса.
+- **Dockerfile**: Instructions for building the backend service Docker image.
 
-- **.env**: Файл окружения для настройки переменных среды (например, параметры базы данных, секретные ключи).
+- **.env**: Environment file for setting up environment variables (e.g., database parameters, secret keys).
 
 ---
 
@@ -217,34 +216,35 @@ agent/
 └── init.py
 ```
 
-### Описание Папок и Файлов
+### Description of Folders and Files
 
-- **models/**: Определение и инициализация моделей AI агента.
-  - `llm_model.py`: Модель локальной модели LLM (LLM Studio) для обработки текстов.
-  - `__init__.py`: Инициализация моделей.
+- **models/**: Definition and initialization of AI agent models.
+  - `llm_model.py`: Local LLM (LLM Studio) model for text processing.
+  - `__init__.py`: Models initialization.
 
-- **services/**: Сервисы и логика, связанные с функциональностью агента.
-  - `search_service.py`: Сервис для поиска информации по конспектам с использованием LLM.
-  - `merge_notes_service.py`: Сервис для объединения конспектов на основе тем и содержания.
-  - `video_processing_service.py`: Сервис для преобразования видео-лекций в слайды с использованием FFmpeg.
-  - `__init__.py`: Инициализация сервисов.
+- **services/**: Services and logic related to agent functionality.
+  - `search_service.py`: Service for searching information in notes using LLM.
+  - `merge_notes_service.py`: Service for merging notes based on topics and content.
+  - `video_processing_service.py`: Service for converting video lectures into slides using FFmpeg.
+  - `__init__.py`: Services initialization.
 
-- **tasks/**: Асинхронные задачи, обрабатываемые Celery, связанные с агентом.
-  - `video_tasks.py`: Задачи по обработке видео и созданию слайдов.
-  - `merge_tasks.py`: Задачи по объединению конспектов.
-  - `__init__.py`: Инициализация задач.
+- **tasks/**: Asynchronous tasks handled by Celery related to the agent.
+  - `video_tasks.py`: Tasks for video processing and slide creation.
+  - `merge_tasks.py`: Tasks for merging notes.
+  - `__init__.py`: Tasks initialization.
 
-- **utils/**: Вспомогательные функции и утилиты для агента.
-  - `llm_helpers.py`: Вспомогательные функции для работы с LLM.
-  - `__init__.py`: Инициализация утилит.
+- **utils/**: Helper functions and utilities for the agent.
+  - `llm_helpers.py`: Helper functions for working with LLM.
+  - `__init__.py`: Utilities initialization.
 
-- `config.py`: Конфигурационные настройки агента, включая параметры моделей и сервисов.
+- `config.py`: Agent configuration settings, including model and service parameters.
 
-- `main.py`: Точка входа для запуска AI агента, настройка сервисов и взаимодействие с другими компонентами.
+- `main.py`: Entry point to run the AI agent, setting up services and interacting with other components.
 
-- `__init__.py`: Инициализация агента.
+- `__init__.py`: Agent initialization.
 
 ---
+
 
 ## docs
 
@@ -259,15 +259,15 @@ docs/
 └── architecture_diagram.png
 ```
 
-### Описание Папок и Файлов
+### Description of Folders and Files
 
-- **architecture.md**: Подробное описание архитектуры системы, взаимодействия компонентов и используемых технологий.
-- **api_documentation.md**: Документация по API, включая описание конечных точек, методов, параметров и примеров запросов/ответов.
-- **installation.md**: Инструкции по установке и настройке проекта на локальной машине и в продакшн-среде.
-- **user_guide.md**: Руководство пользователя по использованию приложения, описание функциональности и примеры использования.
-- **developer_guide.md**: Руководство для разработчиков по внесению изменений в код, запуску локальной разработки и настройке окружения.
-- **images/**: Папка для хранения изображений и диаграмм, используемых в документации.
-  - `architecture_diagram.png`: Диаграмма архитектуры проекта.
+- **architecture.md**: Detailed description of the system architecture, component interactions, and technologies used.
+- **api_documentation.md**: API documentation, including endpoint descriptions, methods, parameters, and example requests/responses.
+- **installation.md**: Installation and setup instructions for the project on local machines and production environments.
+- **user_guide.md**: User guide for using the application, describing functionality and usage examples.
+- **developer_guide.md**: Developer guide for making code changes, running local development, and setting up the environment.
+- **images/**: Folder for storing images and diagrams used in documentation.
+  - `architecture_diagram.png`: Project architecture diagram.
 
 ---
 
@@ -287,15 +287,16 @@ docker/
 └── data/
 ```
 
-### Описание Папок и Файлов
+### Description of Folders and Files
 
-- **frontend/Dockerfile**: Инструкции для создания Docker-образа фронтенд-сервиса.
-- **backend/Dockerfile**: Инструкции для создания Docker-образа бэкенд-сервиса.
-- **agent/Dockerfile**: Инструкции для создания Docker-образа AI агента.
-- **nginx/nginx.conf**: Конфигурационный файл Nginx для проксирования запросов и обслуживания статических файлов.
-- **volumes/data/**: Папка для хранения данных, используемых Docker-контейнерами, например, базы данных.
+- **frontend/Dockerfile**: Instructions for building the frontend service Docker image.
+- **backend/Dockerfile**: Instructions for building the backend service Docker image.
+- **agent/Dockerfile**: Instructions for building the AI agent Docker image.
+- **nginx/nginx.conf**: Nginx configuration file for proxying requests and serving static files.
+- **volumes/data/**: Folder for storing data used by Docker containers, such as the database.
 
 ---
+
 
 ## tests
 
@@ -317,24 +318,24 @@ tests/
 └── fixtures/
 ```
 
-### Описание Папок и Файлов
+### Description of Folders and Files
 
-- **frontend/**: Тесты для фронтенд-части.
-  - **unit/**: Модульные тесты для отдельных компонентов и функций.
-  - **integration/**: Интеграционные тесты для проверки взаимодействия компонентов.
-  - **e2e/**: End-to-End тесты для проверки полного функционала приложения.
+- **frontend/**: Tests for the frontend part.
+  - **unit/**: Unit tests for individual components and functions.
+  - **integration/**: Integration tests for verifying component interactions.
+  - **e2e/**: End-to-End tests for verifying the complete application functionality.
 
-- **backend/**: Тесты для бэкенд-части.
-  - **unit/**: Модульные тесты для отдельных модулей и функций.
-  - **integration/**: Интеграционные тесты для проверки взаимодействия компонентов (например, API и база данных).
-  - **e2e/**: End-to-End тесты для проверки полного функционала API.
+- **backend/**: Tests for the backend part.
+  - **unit/**: Unit tests for individual modules and functions.
+  - **integration/**: Integration tests for verifying component interactions (e.g., API and database).
+  - **e2e/**: End-to-End tests for verifying the complete API functionality.
 
-- **agent/**: Тесты для AI агента.
-  - **unit/**: Модульные тесты для отдельных сервисов и функций агента.
-  - **integration/**: Интеграционные тесты для проверки взаимодействия агента с другими компонентами.
-  - **e2e/**: End-to-End тесты для проверки полного функционала агента.
+- **agent/**: Tests for the AI agent.
+  - **unit/**: Unit tests for individual agent services and functions.
+  - **integration/**: Integration tests for verifying agent interactions with other components.
+  - **e2e/**: End-to-End tests for verifying the complete agent functionality.
 
-- **shared/**: Общие ресурсы для тестов.
-  - **fixtures/**: Фикстуры и данные, используемые в тестах.
+- **shared/**: Shared resources for tests.
+  - **fixtures/**: Fixtures and data used in tests.
 
 ---

@@ -1,13 +1,12 @@
 [tool.poetry]
-name = "ds-project"
-version = "0.1.0"
-description = "Template repository to start your Data Science or Machine Learning project from"
-authors = ["Vladilav Goncharenko <vladislav.goncharenko@phystech.edu>"]
-maintainers = ["Vladislav Goncharenko <vladislav.goncharenko@phystech.edu>"]
+name = "KONSPECTO"
+version = "0.0.1"
+description = "LLM agent that provides tools for convenient work with personal documents using voice or text."
+authors = ["Roman Neronov"]
+maintainers = ["Roman Neronov"]
 readme = "README.md"
-repository = "https://github.com/v-goncharenko/data-science-template"
-documentation = "https://girafe.ai/"
-keywords = ["reproducibility", "data science", "machine learning", "template"]
+repository = "https://github.com/RomiconEZ/KONSPECTO"
+keywords = ["agent", "documents", "voice", "text"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
@@ -22,7 +21,7 @@ line-length = 90
 target-version = ["py311"]
 
 [tool.isort]
-src_paths = ["ds_project"]
+src_paths = ["KONSPECTO"]
 profile = "black"
 line_length = 90
 lines_after_imports = 2

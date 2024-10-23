@@ -1,115 +1,114 @@
-# Правила Разработки для Проекта KONSPECTO
+# Development Guidelines for the KONSPECTO Project
 
-Для обеспечения качества кода, консистентности и облегчения совместной работы в команде, установлены следующие правила разработки. Все участники проекта обязаны придерживаться данных стандартов при написании кода и ведении документации.
+## 1. General Rules
 
-## 1. Общие Правила
+### 1.1. Project Structure
+- **Directory Organization:** Clearly structure the project by separating the frontend, backend, documentation, and other components.
+- **File and Folder Naming:** Use clear and descriptive names, adhering to naming conventions (e.g., `snake_case` for Python, `kebab-case` for JavaScript).
 
-### 1.1. Структура Проекта
-- **Организация каталогов:** Четко структурируйте проект, разделяя фронтенд, бекенд, документацию и другие компоненты.
-- **Именование файлов и папок:** Используйте понятные и описательные имена, придерживаясь соглашений о наименовании (например, `snake_case` для Python, `kebab-case` для JavaScript).
-
-### 1.2. Комментарии и Документация
-- **Начало файла:** В начале каждого файла необходимо добавлять комментарий с указанием пути до текущего файла, начиная с корня проекта.
-  - **Пример для Python:**
+### 1.2. Comments and Documentation
+- **File Header:** At the beginning of each file, add a comment indicating the path to the current file, starting from the project root.
+  - **Example for Python:**
     ```python
     # /backend/app/api/users.py
     ```
-  - **Пример для JavaScript:**
+  - **Example for JavaScript:**
     ```javascript
     // /frontend/src/components/Header.jsx
     ```
-- **Документация функций и классов:**
-  - Пишите докстринги для всех функций, методов и классов.
-  - Используйте [Google Style](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) или [NumPy Style](https://numpydoc.readthedocs.io/en/latest/format.html) для оформления докстрингов.
+- **Function and Class Documentation:**
+  - Write docstrings for all functions, methods, and classes.
+  - Use [Google Style](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) or [NumPy Style](https://numpydoc.readthedocs.io/en/latest/format.html) for formatting docstrings.
 
-### 1.3. Контроль Версий
-- **Использование Git:** Следуйте принципам Git Flow для ветвления и слияния изменений.
-- **Сообщения коммитов:** Пишите информативные сообщения коммитов, описывающие внесенные изменения.
-  - **Формат:** `<тип>: <краткое описание>`
-  - **Примеры типов:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+### 1.3. Version Control
+- **Using Git:** Follow Git Flow principles for branching and merging changes.
+- **Commit Messages:** Write informative commit messages that describe the changes made.
+  - **Format:** `<type>: <short description>`
+  - **Example Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
-## 2. Версии Языков и Библиотек
+## 2. Language and Library Versions
 
-Для обеспечения совместимости и стабильности проекта используются следующие версии языков программирования и основных библиотек:
+To ensure compatibility and project stability, the following versions of programming languages and major libraries are used:
 
 ### 2.1. Python
-- **Версия:** Python 3.10
-- **Менеджер пакетов:** `poetry`
+- **Version:** Python 3.10
+- **Package Manager:** `poetry`
 
-### 2.2. Фронтенд
+### 2.2. Frontend
 - **React.js:** 18.2.0
 - **TailwindCSS:** 3.3.2
 - **Node.js:** 18.x
 - **npm:** 9.x
 
-### 2.3. Бекенд
+### 2.3. Backend
 - **FastAPI:** 0.95.1
 - **Celery:** 5.3.0
 - **Redis:** 6.2.6
 - **SQLAlchemy:** 1.4.41
 - **Alembic:** 1.10.4
 
-### 2.4. Обработка Голоса и Текстов
-- **Lightning Whisper-MLX:** Последняя стабильная версия из [репозитория](https://github.com/mustafaaljadery/lightning-whisper-mlx)
+### 2.4. Voice and Text Processing
+- **Lightning Whisper-MLX:** Latest stable version from [repository](https://github.com/mustafaaljadery/lightning-whisper-mlx)
 - **LLM Studio:** 1.2.3
 
-### 2.5. Преобразование Видео
+### 2.5. Video Processing
 - **FFmpeg:** 4.4.1
 
-### 2.6. Базы Данных
+### 2.6. Databases
 - **PostgreSQL:** 14.5
 
-### 2.7. Инфраструктура
+### 2.7. Infrastructure
 - **Docker:** 24.0.0
 - **Docker Compose:** 2.18.1
 
-## 3. Стандарты Кодирования
+## 3. Coding Standards
 
 ### 3.1. Python
-- **Стиль кода:** PEP 8
-- **Линтер:** `flake8`
-- **Форматтер:** `black` (версия 23.1.0)
-- **Типизация:** Используйте аннотации типов для всех функций и методов.
+- **Code Style:** PEP 8
+- **Linter:** `flake8`
+- **Formatter:** `black` (version 23.1.0)
+- **Typing:** Use type annotations for all functions and methods.
 
 ### 3.2. JavaScript/TypeScript
-- **Стиль кода:** Airbnb JavaScript Style Guide
-- **Линтер:** `ESLint` (версия 8.40.0)
-- **Форматтер:** `Prettier` (версия 2.8.8)
-- **Типизация:** Используйте TypeScript для всех новых компонентов.
+- **Code Style:** Airbnb JavaScript Style Guide
+- **Linter:** `ESLint` (version 8.40.0)
+- **Formatter:** `Prettier` (version 2.8.8)
+- **Typing:** Use TypeScript for all new components.
 
-## 4. Практики Разработки
+## 4. Development Practices
 
-### 4.1. Контейнеризация
-- **Docker:** Все сервисы (фронтенд, бекенд, базы данных и т.д.) должны быть контейнеризованы с использованием Docker.
-- **Docker Compose:** Используйте `docker-compose.yml` для оркестрации сервисов в локальной среде разработки.
+### 4.1. Containerization
+- **Docker:** All services (frontend, backend, databases, etc.) must be containerized using Docker.
+- **Docker Compose:** Use `docker-compose.yml` to orchestrate services in the local development environment.
 
-### 4.2. Тестирование
-- **Покрытие кода:** Стремитесь к покрытию кода тестами не менее 80%.
-- **Фреймворки для тестирования:**
-  - **Python:** `pytest` (версия 7.3.1)
-- **Типы тестов:** Пишите модульные, интеграционные и E2E тесты для всех критичных компонентов.
+### 4.2. Testing
+- **Code Coverage:** Aim for at least 80% code coverage with tests.
+- **Testing Frameworks:**
+  - **Python:** `pytest` (version 7.3.1)
+- **Types of Tests:** Write unit, integration, and E2E tests for all critical components.
 
 ### 4.3. CI/CD
-- **Интеграция:** Настройте CI/CD пайплайны для автоматического тестирования и деплоя.
-- **Инструменты:** GitHub Actions или GitLab CI/CD.
+- **Integration:** Set up CI/CD pipelines for automatic testing and deployment.
+- **Tools:** GitHub Actions or GitLab CI/CD.
 
-### 4.4. Безопасность
-- **Зависимости:** Регулярно обновляйте зависимости и проверяйте их на наличие уязвимостей.
-- **Переменные окружения:** Храните чувствительные данные в переменных окружения и не включайте их в репозиторий.
+### 4.4. Security
+- **Dependencies:** Regularly update dependencies and check for vulnerabilities.
+- **Environment Variables:** Store sensitive data in environment variables and do not include them in the repository.
 
-## 5. Работа с Документацией
+## 5. Documentation Management
 
-### 5.1. Техническая Документация
-- **Инструмент:** Sphinx для Python, Storybook для фронтенда.
-- **Хранение:** Документация должна храниться в каталоге `/docs`.
+### 5.1. Technical Documentation
+- **Tools:** Sphinx for Python, Storybook for frontend.
+- **Storage:** Documentation should be stored in the `/docs` directory.
 
-### 5.2. API Документация
-- **FastAPI:** Автоматически генерирует документацию Swagger UI.
-- **Поддержка:** Обновляйте документацию при изменении API.
+### 5.2. API Documentation
+- **FastAPI:** Automatically generates Swagger UI documentation.
+- **Maintenance:** Update documentation when API changes.
 
-## 6. Критерии Оценки
-- **Соответствие стандартам кодирования.**
-- **Наличие тестов для новых функций.**
-- **Документирование изменений.**
-- **Оптимизация и эффективность кода.**
+## 6. Evaluation Criteria
+- **Compliance with coding standards.**
+- **Presence of tests for new features.**
+- **Documentation of changes.**
+- **Code optimization and efficiency.**
+
 ---

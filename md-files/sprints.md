@@ -1,190 +1,186 @@
-# План Разработки Проекта KONSPECTO
+# KONSPECTO Project Development Plan
 
-## Обзор
-Проект KONSPECTO предполагает разработку интеллектуального агента на базе локальной модели LLM для работы с конспектами и видео-лекциями. Для успешной реализации проекта необходимо разбить задачи на спринты, обеспечивая структурированный и последовательный подход к разработке.
+## Overview
+The KONSPECTO project involves the development of an intelligent agent based on a local LLM model for working with notes and video lectures. To successfully implement the project, tasks need to be divided into sprints, ensuring a structured and sequential approach to development.
 
-## Спринт 1: Инициация и Подготовка
-**Продолжительность:** 2 недели
+## Sprint 1: Initiation and Preparation
+**Duration:** 2 weeks
 
-### Задачи:
-1. **Создание Репозитория и Настройка Контрольной Системы:**
-   - Создать репозиторий на GitHub.
-   - Настроить структуру каталогов для фронтенда, бекенда и документации.
-   - Настроить ветвление (например, main, develop).
+### Tasks:
+1. **Create Repository and Set Up Version Control:**
+   - Create a repository on GitHub.
+   - Set up the directory structure for frontend, backend, and documentation.
+   - Configure branching (e.g., main, develop).
 
-2. **Настройка Среды Разработки:**
-   - Установить необходимые инструменты и зависимости (Docker, Docker Compose, Python, Node.js).
-   - Настроить Docker контейнеры для фронтенда и бекенда.
-   - Проверить успешное развертывание базового приложения.
+2. **Set Up Development Environment:**
+   - Install necessary tools and dependencies (Docker, Docker Compose, Python, Node.js).
+   - Configure Docker containers for frontend and backend.
+   - Verify successful deployment of the basic application.
 
-3. **Разработка Устава Проекта и Документации:**
-   - Сформулировать Устав проекта.
-   - Подготовить начальную документацию (README, Contributing Guide).
+3. **Develop Project Charter and Documentation:**
+   - Formulate the Project Charter.
+   - Prepare initial documentation (README, Contributing Guide).
 
-4. **Определение Ролей и Ответственностей:**
-   - Назначить роли в команде разработки (frontend, backend, DevOps и т.д.).
-   - Определить основные точки взаимодействия между членами команды.
+4. **Define Roles and Responsibilities:**
+   - Assign roles within the development team (frontend, backend, DevOps, etc.).
+   - Determine key interaction points between team members.
 
-5. **Планирование Спринтов и Определение Инструментов Управления Проектом:**
-   - Выбрать инструменты для управления задачами (Jira, Trello).
-   - Создать доску спринтов и определить критерии приоритезации задач.
+5. **Sprint Planning and Project Management Tools Selection:**
+   - Choose tools for task management (Jira, Trello).
+   - Create a sprint board and define criteria for task prioritization.
 
-## Спринт 2: Разработка Архитектуры и Основного Фреймворка
-**Продолжительность:** 2 недели
+## Sprint 2: Architecture Development and Core Framework
+**Duration:** 2 weeks
 
-### Задачи:
-1. **Разработка Архитектуры Системы:**
-   - Подробно описать клиент-серверную архитектуру.
-   - Определить взаимодействие между компонентами через API.
+### Tasks:
+1. **Develop System Architecture:**
+   - Provide a detailed description of the client-server architecture.
+   - Define interactions between components via API.
 
-2. **Настройка Фронтенда:**
-   - Инициализировать проект на React.js.
-   - Настроить маршрутизацию (React Router).
-   - Реализовать базовую структуру интерфейса (главная страница, страницы авторизации и регистрации).
+2. **Set Up Frontend:**
+   - Initialize a React.js project.
+   - Configure routing (React Router).
+   - Implement the basic interface structure (homepage, login and registration pages).
 
-3. **Настройка Бекенда:**
-   - Инициализировать проект на FastAPI.
-   - Настроить базовые конечные точки API (например, /health).
-   - Настроить подключение к базе данных PostgreSQL через ORM (например, SQLAlchemy).
+3. **Set Up Backend:**
+   - Initialize a FastAPI project.
+   - Configure basic API endpoints (e.g., /health).
+   - Set up connection to PostgreSQL database via ORM (e.g., SQLAlchemy).
 
-4. **Настройка Базы Данных:**
-   - Создать начальные модели данных (пользователи, конспекты, запросы).
-   - Настроить миграции базы данных (Alembic).
+4. **Set Up Database:**
+   - Create initial data models (users, notes, queries).
+   - Configure database migrations (Alembic).
 
-5. **Контейнеризация Компонентов:**
-   - Создать Dockerfile для фронтенда и бекенда.
-   - Настроить Docker Compose для совместного запуска всех сервисов.
-   - Проверить успешное развертывание всех компонентов в контейнерах.
+5. **Containerize Components:**
+   - Create Dockerfile for frontend and backend.
+   - Configure Docker Compose for simultaneous service startup.
+   - Verify successful deployment of all components in containers.
 
-## Спринт 3: Реализация Основных Функциональностей Поиска
-**Продолжительность:** 2 недели
+## Sprint 3: Implementation of Core Search Functionalities
+**Duration:** 2 weeks
 
-### Задачи:
-1. **Разработка Функции Поиска по Конспектам:**
-   - Реализовать API для обработки поисковых запросов.
-   - Интегрировать локальную модель LLM (LLM Studio) для поиска релевантной информации.
-   - Настроить вывод результатов в полном и сокращенном форматах с указанием источников.
+### Tasks:
+1. **Develop Note Search Functionality:**
+   - Implement API to handle search queries.
+   - Integrate local LLM model (LLM Studio) for retrieving relevant information.
+   - Configure output of results in full and abbreviated formats with source references.
 
-2. **Разработка Интерфейса Поиска:**
-   - Создать компонент поиска на фронтенде с поддержкой текстового ввода.
-   - Реализовать отображение результатов поиска (полный и сокращенный варианты).
+2. **Develop Search Interface:**
+   - Create a search component on the frontend with text input support.
+   - Implement display of search results (full and abbreviated versions).
 
-3. **Тестирование Функции Поиска:**
-   - Написать юнит-тесты для бекенд API.
-   - Провести интеграционное тестирование взаимодействия фронтенда и бекенда.
+3. **Test Search Functionality:**
+   - Write unit tests for backend API.
+   - Conduct integration testing of frontend and backend interactions.
 
-4. **Документация:**
-   - Обновить техническую документацию с описанием новой функциональности.
-   - Обновить API документацию с описанием конечных точек поиска.
+4. **Documentation:**
+   - Update technical documentation with descriptions of the new functionality.
+   - Update API documentation with descriptions of search endpoints.
 
-## Спринт 4: Реализация Функциональности Объединения Конспектов
-**Продолжительность:** 2 недели
+## Sprint 4: Implementation of Note Merging Functionality
+**Duration:** 2 weeks
 
-### Задачи:
-1. **Разработка Функции Объединения Конспектов:**
-   - Реализовать API для приема и обработки двух конспектов.
-   - Интегрировать модель LLM для сравнения и объединения информации на основе тем и содержания.
-   - Настроить создание единого документа из объединенных конспектов.
+### Tasks:
+1. **Develop Note Merging Functionality:**
+   - Implement API to accept and process two notes.
+   - Integrate LLM model to compare and merge information based on topics and content.
+   - Configure the creation of a unified document from merged notes.
 
-2. **Разработка Интерфейса Объединения:**
-   - Создать пользовательский интерфейс для загрузки и выбора двух конспектов.
-   - Реализовать отображение объединенного конспекта.
+2. **Develop Merging Interface:**
+   - Create a user interface for uploading and selecting two notes.
+   - Implement display of the merged note.
 
-3. **Асинхронная Обработка Задач:**
-   - Настроить Celery и Redis для асинхронной обработки задач объединения конспектов.
-   - Обеспечить уведомление пользователя о завершении процесса.
+3. **Asynchronous Task Processing:**
+   - Set up Celery and Redis for asynchronous processing of note merging tasks.
+   - Ensure user notification upon process completion.
 
-4. **Тестирование Функциональности:**
-   - Написать юнит-тесты и интеграционные тесты для функции объединения.
-   - Провести нагрузочное тестирование для оценки производительности.
+4. **Functionality Testing:**
+   - Write unit tests and integration tests for the merging function.
+   - Conduct load testing to assess performance.
 
-5. **Документация:**
-   - Обновить документацию с описанием функции объединения конспектов.
-   - Обновить API документацию.
+5. **Documentation:**
+   - Update documentation with descriptions of the note merging functionality.
+   - Update API documentation.
 
-## Спринт 5: Реализация Функциональности Преобразования Видео в Слайды
-**Продолжительность:** 2 недели
+## Sprint 5: Implementation of Video-to-Slides Conversion Functionality
+**Duration:** 2 weeks
 
-### Задачи:
-1. **Разработка Функции Преобразования Видео:**
-   - Реализовать API для загрузки видео-лекций.
-   - Интегрировать FFmpeg для извлечения ключевых кадров из видео через заданные интервалы времени.
-   - Настроить сохранение извлеченных изображений (слайдов).
+### Tasks:
+1. **Develop Video Conversion Functionality:**
+   - Implement API for uploading video lectures.
+   - Integrate FFmpeg to extract keyframes from videos at specified time intervals.
+   - Configure saving of extracted images (slides).
 
-2. **Разработка Интерфейса Преобразования Видео:**
-   - Создать компонент для загрузки видео-лекций.
-   - Реализовать отображение и скачивание полученных слайдов.
+2. **Develop Video Conversion Interface:**
+   - Create a component for uploading video lectures.
+   - Implement display and download of generated slides.
 
-3. **Асинхронная Обработка Задач:**
-   - Настроить Celery для асинхронной обработки задач преобразования видео.
-   - Обеспечить уведомление пользователя о завершении процесса.
+3. **Asynchronous Task Processing:**
+   - Set up Celery for asynchronous processing of video conversion tasks.
+   - Ensure user notification upon process completion.
 
-4. **Тестирование Функциональности:**
-   - Написать юнит-тесты для обработки видео.
-   - Провести интеграционное тестирование процесса преобразования.
+4. **Functionality Testing:**
+   - Write unit tests for video processing.
+   - Conduct integration testing of the conversion process.
 
-5. **Документация:**
-   - Обновить техническую документацию с описанием функции преобразования видео.
-   - Обновить API документацию.
+5. **Documentation:**
+   - Update technical documentation with descriptions of the video conversion functionality.
+   - Update API documentation.
 
-## Спринт 6: Реализация Голосового Ввода и Финальные Штрихи
-**Продолжительность:** 2 недели
+## Sprint 6: Implementation of Voice Input and Final Touches
+**Duration:** 2 weeks
 
-### Задачи:
-1. **Разработка Функции Голосового Ввода:**
-   - Интегрировать модель Lightning Whisper-MLX для распознавания голосовых запросов.
-   - Реализовать API для приема аудиофайлов и их преобразования в текст.
+### Tasks:
+1. **Develop Voice Input Functionality:**
+   - Integrate the Lightning Whisper-MLX model for recognizing voice queries.
+   - Implement API to accept audio files and convert them to text.
 
-2. **Разработка Интерфейса Голосового Ввода:**
-   - Создать компонент для записи и загрузки голосовых запросов.
-   - Обеспечить взаимодействие голосовых запросов с существующими функциями поиска и обработки.
+2. **Develop Voice Input Interface:**
+   - Create a component for recording and uploading voice queries.
+   - Ensure interaction of voice queries with existing search and processing functions.
 
-3. **Улучшение Пользовательского Интерфейса:**
-   - Провести UX/UI улучшения на основе обратной связи.
-   - Обеспечить адаптивный дизайн для разных устройств (мобильные, планшеты, ПК).
+3. **Enhance User Interface:**
+   - Perform UX/UI improvements based on feedback.
+   - Ensure responsive design for various devices (mobile, tablets, PCs).
 
-4. **Тестирование Голосового Ввода:**
-   - Написать юнит-тесты для функции распознавания голоса.
-   - Провести пользовательское тестирование для оценки точности и удобства.
+4. **Test Voice Input:**
+   - Write unit tests for voice recognition functionality.
+   - Conduct user testing to evaluate accuracy and usability.
 
-5. **Оптимизация Производительности:**
-   - Оптимизировать обработку запросов для повышения скорости и эффективности.
-   - Провести нагрузочное тестирование всей системы.
+5. **Performance Optimization:**
+   - Optimize request processing for increased speed and efficiency.
+   - Conduct load testing of the entire system.
 
-6. **Финальная Документация и Подготовка к Развертыванию:**
-   - Завершить техническую документацию.
-   - Подготовить руководство пользователя.
-   - Провести финальное тестирование и исправить выявленные ошибки.
+6. **Final Documentation and Deployment Preparation:**
+   - Complete technical documentation.
+   - Prepare user guide.
+   - Perform final testing and fix identified bugs.
 
-## Спринт 7: Развертывание и Поддержка
-**Продолжительность:** 2 недели
+## Sprint 7: Deployment and Support
+**Duration:** 2 weeks
 
-### Задачи:
-1. **Развертывание Приложения на Сервере:**
-   - Настроить серверную инфраструктуру (например, AWS, DigitalOcean).
-   - Развернуть Docker контейнеры на продакшн-сервере.
-   - Настроить CI/CD пайплайны для автоматического развертывания.
+### Tasks:
+1. **Deploy Application to Server:**
+   - Set up server infrastructure (e.g., AWS, DigitalOcean).
+   - Deploy Docker containers to the production server.
+   - Configure CI/CD pipelines for automatic deployment.
 
-2. **Мониторинг и Логирование:**
-   - Настроить системы мониторинга (например, Prometheus, Grafana).
-   - Настроить логирование для отслеживания ошибок и производительности.
+2. **Monitoring and Logging:**
+   - Set up monitoring systems (e.g., Prometheus, Grafana).
+   - Configure logging to track errors and performance.
 
-3. **Обучение и Поддержка Пользователей:**
-   - Провести обучение для конечных пользователей (студентов, преподавателей).
-   - Организовать канал поддержки (например, email, чат).
+3. **User Training and Support:**
+   - Conduct training sessions for end-users (students, instructors).
+   - Establish a support channel (e.g., email, chat).
 
-4. **Сбор Обратной Связи и Улучшения:**
-   - Собирать и анализировать обратную связь от пользователей.
-   - Планировать будущие улучшения и исправления на основе полученной информации.
+4. **Collect Feedback and Improvements:**
+   - Gather and analyze user feedback.
+   - Plan future enhancements and fixes based on the received information.
 
-5. **Закрытие Проекта:**
-   - Провести финальный аудит проекта.
-   - Завершить документацию и передать её заинтересованным сторонам.
-   - Провести ретроспективу команды для анализа успешных практик и областей для улучшения.
+5. **Project Closure:**
+   - Conduct a final project audit.
+   - Complete documentation and hand it over to stakeholders.
+   - Hold a team retrospective to analyze successful practices and areas for improvement.
 
-## Итог
-Данный план разработки разбивает проект KONSPECTO на семь спринтов по две недели каждый, 
-обеспечивая детальное и последовательное выполнение всех необходимых задач. 
-Такой подход позволит эффективно управлять процессом разработки, 
-своевременно выявлять и решать возникающие проблемы, 
-а также обеспечивать высокое качество конечного продукта.
+## Conclusion
+This development plan breaks down the KONSPECTO project into seven sprints, each lasting two weeks, ensuring detailed and sequential execution of all necessary tasks. This approach will enable effective management of the development process, timely identification and resolution of emerging issues, and the delivery of a high-quality final product.

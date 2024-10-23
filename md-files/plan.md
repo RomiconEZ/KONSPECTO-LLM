@@ -1,130 +1,130 @@
-# Планирование проекта KONSPECTO
+# Project Planning for KONSPECTO
 
-## 1. Определение Видения и Целей Проекта
+## 1. Defining the Vision and Goals of the Project
 
-### Видение
-Создать интеллектуального агента на базе локальной модели LLM, способного эффективно искать, анализировать и преобразовывать информацию из конспектов и видео-лекций, обеспечивая пользователям удобные инструменты для управления и обработки учебного материала.
+### Vision
+Create an intelligent agent based on a local LLM model capable of efficiently searching, analyzing, and transforming information from notes and video lectures, providing users with convenient tools for managing and processing educational materials.
 
-### Цели
-- **Цели проекта:**
-  - Разработка агента для поиска информации по конспектам с возможностью вывода полного и сокращенного результатов.
-  - Создание функционала для объединения нескольких конспектов в единый документ.
-  - Реализация преобразования видео-лекций в набор слайдов для использования в презентациях.
-  - Обеспечение поддержки ввода запросов как через текст, так и через голос.
-  
-- **Целевые результаты:**
-  - Повышение эффективности работы студентов и преподавателей с учебными материалами.
-  - Улучшение доступности информации и удобства её использования.
-  - Сокращение времени на подготовку и анализ учебных материалов.
+### Goals
+- **Project Objectives:**
+  - Develop an agent for searching information within notes with the ability to output full and summarized results.
+  - Create functionality to merge multiple notes into a single document.
+  - Implement the transformation of video lectures into a set of slides for use in presentations.
+  - Ensure support for input queries via both text and voice.
 
-- **Потребности пользователей и бизнес-ценность:**
-  - Пользователи нуждаются в быстром доступе к релевантной информации из конспектов и видео-лекций.
-  - Бизнес-ценность заключается в создании продукта, который может использоваться в образовательных учреждениях для улучшения качества обучения и преподавания.
+- **Target Outcomes:**
+  - Increase the efficiency of students and teachers in working with educational materials.
+  - Improve the accessibility of information and ease of use.
+  - Reduce the time required for preparing and analyzing educational materials.
 
-## 2. Создание Детальных Спецификаций
+- **User Needs and Business Value:**
+  - Users need quick access to relevant information from notes and video lectures.
+  - The business value lies in creating a product that can be used in educational institutions to enhance the quality of teaching and learning.
 
-### Функциональные Требования
-- **Поиск информации по конспектам:**
-  - Возможность ввода текстовых и голосовых запросов.
-  - Поиск релевантной информации в конспектах.
-  - Вывод результатов в полном и сокращенном формате с указанием источников.
-  
-- **Объединение конспектов:**
-  - Сравнение содержания двух конспектов.
-  - Объединение информации на основе тем и содержания.
-  - Создание единого документа из объединённых конспектов.
+## 2. Creating Detailed Specifications
 
-- **Преобразование видео-лекций в слайды:**
-  - Загрузка видео-лекций.
-  - Извлечение ключевых кадров через заданные интервалы времени.
-  - Генерация набора изображений (слайдов) без текста.
+### Functional Requirements
+- **Information Search within Notes:**
+  - Ability to input text and voice queries.
+  - Search for relevant information within the notes.
+  - Output results in both full and summarized formats with source references.
 
-- **Поддержка ввода через голос и текст:**
-  - Распознавание голосовых запросов.
-  - Обработка текстовых запросов.
+- **Merging Notes:**
+  - Compare the content of two notes.
+  - Combine information based on topics and content.
+  - Create a single document from the merged notes.
 
-### Нефункциональные Требования
-- **Производительность:**
-  - Быстрая обработка запросов и генерация результатов.
-  - Обработка асинхронных задач без задержек для пользователя.
+- **Video Lecture to Slides Conversion:**
+  - Upload video lectures.
+  - Extract key frames at specified time intervals.
+  - Generate a set of images (slides) without text.
 
-- **Безопасность:**
-  - Защита данных пользователей.
-  - Безопасное хранение конспектов и результатов обработки.
+- **Support for Voice and Text Input:**
+  - Recognize voice queries.
+  - Process text queries.
 
-- **Удобство использования:**
-  - Интуитивно понятный интерфейс.
-  - Адаптивный дизайн для разных устройств.
+### Nonfunctional Requirements
+- **Performance:**
+  - Fast processing of queries and generation of results.
+  - Handle asynchronous tasks without delays for the user.
 
-### Технические Спецификации
-- **Технологический стек:**
+- **Security:**
+  - Protect user data.
+  - Secure storage of notes and processing results.
+
+- **Usability:**
+  - Intuitive interface.
+  - Responsive design for various devices.
+
+### Technical Specifications
+- **Technology Stack:**
   - **Frontend:** React.js, HTML/CSS, TailwindCSS.
   - **Backend:** Python, FastAPI, Celery, Redis.
-  - **Обработка Голоса:** Lightning Whisper-MLX.
-  - **Модель обработки текста:** LLM Studio.
-  - **Преобразование видео в слайды:** FFmpeg.
-  - **База данных:** PostgreSQL.
-  - **Инфраструктура:** Docker.
+  - **Voice Processing:** Lightning Whisper-MLX.
+  - **Text Processing Model:** LLM Studio.
+  - **Video to Slides Conversion:** FFmpeg.
+  - **Database:** PostgreSQL.
+  - **Infrastructure:** Docker.
 
-- **Архитектура:**
-  - Клиент-серверная архитектура с разделением на фронтенд и бекенд.
-  - Использование контейнеризации для развертывания всех компонентов.
-  - Взаимодействие компонентов через API.
+- **Architecture:**
+  - Client-server architecture with separation of frontend and backend.
+  - Use of containerization for deploying all components.
+  - Interaction between components via API.
 
-- **Модели данных:**
-  - Хранение конспектов, запросов и результатов обработки в PostgreSQL.
-  
-- **Интеграционные точки:**
-  - Интеграция фронтенда с бекендом через FastAPI.
-  - Использование Celery и Redis для управления очередями задач.
+- **Data Models:**
+  - Store notes, queries, and processing results in PostgreSQL.
 
-### Критерии Приемки
-- Агент успешно обрабатывает текстовые и голосовые запросы.
-- Поиск по конспектам возвращает релевантные результаты в двух форматах.
-- Функция объединения конспектов корректно создает единый документ.
-- Преобразование видео-лекций в слайды работает без ошибок.
-- Пользовательский интерфейс отвечает требованиям удобства и адаптивности.
-- Все компоненты корректно работают в контейнеризированной среде Docker.
+- **Integration Points:**
+  - Integrate frontend with backend via FastAPI.
+  - Use Celery and Redis for managing task queues.
 
-## 3. Разработка Начальной Документации
+### Acceptance Criteria
+- The agent successfully processes text and voice queries.
+- Search within notes returns relevant results in both formats.
+- The note merging function correctly creates a unified document.
+- Video lecture to slides conversion works without errors.
+- The user interface meets usability and responsiveness requirements.
+- All components function correctly in a containerized Docker environment.
 
-### Устав Проекта
-**Название проекта:** KONSPECTO (LLM Агент для работы с конспектами)
+## 3. Developing Initial Documentation
 
-**Цель проекта:** Разработка интеллектуального агента на базе локальной модели LLM для поиска, анализа и преобразования информации из конспектов и видео-лекций.
+### Project Charter
+**Project Name:** KONSPECTO (LLM Agent for Working with Notes)
 
-**Объем проекта:**
-- Создание функционала поиска, объединения конспектов, преобразования видео в слайды.
-- Разработка пользовательского интерфейса для взаимодействия с агентом.
-- Обеспечение поддержки голосового и текстового ввода запросов.
+**Project Objective:** Develop an intelligent agent based on a local LLM model for searching, analyzing, and transforming information from notes and video lectures.
 
-**Заинтересованные стороны:**
-- **Клиенты:** Студенты, преподаватели, образовательные учреждения.
-- **Команда разработки:** Frontend и Backend разработчики, специалисты по обработке голоса, DevOps инженеры.
-- **Пользователи:** Конечные пользователи продукта.
+**Project Scope:**
+- Create functionality for searching, merging notes, and converting videos to slides.
+- Develop a user interface for interacting with the agent.
+- Ensure support for voice and text input queries.
 
-### Документ Требований
-**Функциональные требования:**
-- Описание функций поиска, объединения конспектов, преобразования видео и поддержки ввода запросов.
+**Stakeholders:**
+- **Clients:** Students, teachers, educational institutions.
+- **Development Team:** Frontend and Backend developers, voice processing specialists, DevOps engineers.
+- **Users:** End-users of the product.
 
-**Нефункциональные требования:**
-- Производительность, безопасность, удобство использования.
+### Requirements Document
+**Functional Requirements:**
+- Description of search, merging notes, video conversion, and query input support functions.
 
-**Ограничения:**
-- Использование только локальной модели LLM.
-- Контейнеризация всех компонентов через Docker.
+**Nonfunctional Requirements:**
+- Performance, security, and usability.
 
-### Техническая Документация
-**Описание архитектуры:**
-- Детальное описание компонентов фронтенда, бекенда, моделей обработки и инфраструктуры.
+**Constraints:**
+- Use only a local LLM model.
+- Containerize all components using Docker.
 
-**API документация:**
-- Описание конечных точек FastAPI, методов и форматов данных.
+### Technical Documentation
+**Architecture Description:**
+- Detailed description of frontend, backend, processing models, and infrastructure components.
 
-**Инструкции по развертыванию:**
-- Подробные шаги для клонирования репозитория, установки зависимостей и запуска через Docker.
+**API Documentation:**
+- Description of FastAPI endpoints, methods, and data formats.
 
-**Руководство разработчика:**
-- Описание структуры кода, стандартов кодирования и процессов разработки.
+**Deployment Instructions:**
+- Step-by-step guide for cloning the repository, installing dependencies, and running via Docker.
+
+**Developer Guide:**
+- Description of code structure, coding standards, and development processes.
 
 ---

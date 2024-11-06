@@ -19,7 +19,7 @@ KONSPECTO/
 ### Root Directory Description
 
 - **frontend/**: Contains all the source code and configuration for the frontend part of the application.
-- **backend/**: Contains the source code and configuration for the backend part of the application, including the API and database interactions.
+- **backend/**: Contains the source code and configuration for the backend part of the application, including the API.
 - **agent/**: Contains the code and tools related to the AI agent, including models, request processing, and integration with other services.
 - **docs/**: Stores technical documentation, instructions, and other related documentation.
 - **docker/**: Contains Docker files and configurations for various services.
@@ -43,9 +43,9 @@ frontend/
 │   ├── components/
 │   ├── pages/
 │   ├── services/
+│   ├── styles/
 │   ├── App.jsx
-│   ├── index.jsx
-│   └── styles/
+│   └── index.jsx
 ├── .env
 ├── .eslintrc.js
 ├── package.json
@@ -94,43 +94,30 @@ backend/
 │   │   │   │   ├── users.py
 │   │   │   │   ├── notes.py
 │   │   │   │   └── lectures.py
-│   │   │   └── init.py
-│   │   └── init.py
+│   │   │   └── __init__.py
+│   │   └── __init__.py
 │   ├── core/
 │   │   ├── config.py
-│   │   ├── security.py
-│   │   └── init.py
-│   ├── models/
-│   │   ├── user.py
-│   │   ├── note.py
-│   │   └── lecture.py
-│   ├── schemas/
-│   │   ├── user.py
-│   │   ├── note.py
-│   │   └── lecture.py
+│   │   └── __init__.py
 │   ├── services/
-│   │   ├── auth.py
 │   │   ├── api_search.py
-│   │   └── init.py
+│   │   └── __init__.py
 │   ├── utils/
 │   │   ├── helpers.py
-│   │   └── init.py
+│   │   └── __init__.py
 │   ├── main.py
-│   └── init.py
+│   └── __init__.py
 ├── tests/
 │   ├── api/
 │   ├── models/
 │   ├── schemas/
 │   └── conftest.py
-├── alembic/
-│   ├── versions/
-│   ├── env.py
-│   ├── script.py.mako
-│   └── alembic.ini
 ├── requirements.txt
 ├── Dockerfile
 └── .env
 ```
+
+### Description of Folders and Files
 
 ### Description of Folders and Files
 
@@ -146,21 +133,9 @@ backend/
 
   - **core/**: Core configurations and settings of the application.
     - `config.py`: Application configuration settings.
-    - `security.py`: Security and authentication settings.
     - `__init__.py`: Core initialization.
 
-  - **models/**: Database models defined using ORM.
-    - `user.py`: User model.
-    - `note.py`: Note model.
-    - `lecture.py`: Video lecture model.
-
-  - **schemas/**: Pydantic schemas for data validation.
-    - `user.py`: User schemas.
-    - `note.py`: Note schemas.
-    - `lecture.py`: Video lecture schemas.
-
   - **services/**: Business logic and interactions with external services.
-    - `auth.py`: Authentication and authorization logic.
     - `api_search.py`: Logic for searching notes via the API.
     - `__init__.py`: Services initialization.
 
@@ -174,21 +149,15 @@ backend/
 
 - **tests/**: Backend tests.
   - **api/**: Tests for API endpoints.
-  - **models/**: Tests for database models.
+  - **models/**: Tests for application models.
   - **schemas/**: Tests for Pydantic schemas.
   - `conftest.py`: Test configurations and fixtures.
-
-- **alembic/**: Database migrations using Alembic.
-  - **versions/**: Migration files.
-  - `env.py`: Alembic configuration.
-  - `script.py.mako`: Migration script template.
-  - `alembic.ini`: Main Alembic configuration file.
 
 - **requirements.txt**: List of Python dependencies for the backend.
 
 - **Dockerfile**: Instructions for building the backend service Docker image.
 
-- **.env**: Environment file for setting up environment variables (e.g., database parameters, secret keys).
+- **.env**: Environment file for setting up environment variables.
 
 ---
 
@@ -198,22 +167,22 @@ backend/
 agent/
 ├── models/
 │   ├── llm_model.py
-│   └── init.py
+│   └── __init__.py
 ├── services/
 │   ├── search_service.py
 │   ├── merge_notes_service.py
 │   ├── video_processing_service.py
-│   └── init.py
+│   └── __init__.py
 ├── tasks/
 │   ├── video_tasks.py
 │   ├── merge_tasks.py
-│   └── init.py
+│   └── __init__.py
 ├── utils/
 │   ├── llm_helpers.py
-│   └── init.py
+│   └── __init__.py
 ├── config.py
 ├── main.py
-└── init.py
+└── __init__.py
 ```
 
 ### Description of Folders and Files
@@ -256,7 +225,7 @@ docs/
 ├── user_guide.md
 ├── developer_guide.md
 └── images/
-└── architecture_diagram.png
+    └── architecture_diagram.png
 ```
 
 ### Description of Folders and Files
@@ -284,7 +253,7 @@ docker/
 ├── nginx/
 │   └── nginx.conf
 └── volumes/
-└── data/
+    └── data/
 ```
 
 ### Description of Folders and Files
@@ -293,7 +262,7 @@ docker/
 - **backend/Dockerfile**: Instructions for building the backend service Docker image.
 - **agent/Dockerfile**: Instructions for building the AI agent Docker image.
 - **nginx/nginx.conf**: Nginx configuration file for proxying requests and serving static files.
-- **volumes/data/**: Folder for storing data used by Docker containers, such as the database.
+- **volumes/data/**: Folder for storing data used by Docker containers.
 
 ---
 
@@ -315,7 +284,7 @@ tests/
 │   ├── integration/
 │   └── e2e/
 └── shared/
-└── fixtures/
+    └── fixtures/
 ```
 
 ### Description of Folders and Files
@@ -327,13 +296,13 @@ tests/
 
 - **backend/**: Tests for the backend part.
   - **unit/**: Unit tests for individual modules and functions.
-  - **integration/**: Integration tests for verifying component interactions (e.g., API and database).
-  - **e2e/**: End-to-End tests for verifying the complete API functionality.
+  - **integration/**: Integration tests for verifying component interactions (e.g., API and services).
+  - **e2e/**: End-To-End tests for verifying the complete API functionality.
 
 - **agent/**: Tests for the AI agent.
   - **unit/**: Unit tests for individual agent services and functions.
   - **integration/**: Integration tests for verifying agent interactions with other components.
-  - **e2e/**: End-to-End tests for verifying the complete agent functionality.
+  - **e2e/**: End-To-End tests for verifying the complete agent functionality.
 
 - **shared/**: Shared resources for tests.
   - **fixtures/**: Fixtures and data used in tests.

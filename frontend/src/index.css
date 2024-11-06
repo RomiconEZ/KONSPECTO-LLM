@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Добавим некоторые базовые стили */
+body {
+  @apply antialiased text-gray-900;
+}

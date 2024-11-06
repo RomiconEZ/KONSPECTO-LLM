@@ -46,26 +46,28 @@ repos:
         types_or: [markdown, yaml, toml, json, dockerfile, shell]
         additional_dependencies: ["prettier@3.1.0", "prettier-plugin-sh@0.13.1"]
         args: [--print-width=80, --prose-wrap=always]
-#
-# more to come (from https://dev.funkwhale.audio/funkwhale/funkwhale/-/blob/develop/.pre-commit-config.yaml)
-# - repo: https://github.com/python-poetry/poetry
-#   rev: 1.4.2
-#   hooks:
-#     - id: poetry-check
-#       files: ^api/pyproject.toml$
-#       args: [--directory=api]
 
-#     - id: poetry-lock
-#       files: ^api/pyproject.toml$
-#       args: [--directory=api, --check]
+  - repo: local
+    hooks:
+      - id: frontend-lint
+        name: Frontend Lint
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: ^frontend/.*\.(js|jsx)$
+        pass_filenames: false
 
-# - repo: https://github.com/codespell-project/codespell
-#   rev: v2.2.2
-#   hooks:
-#     - id: codespell
-#       additional_dependencies: [tomli]
+      - id: frontend-test
+        name: Frontend Tests
+        entry: bash -c 'cd frontend && npm run test'
+        language: system
+        files: ^frontend/.*\.(js|jsx)$
+        pass_filenames: false
+        stages: [push]
 
-# - repo: https://github.com/shellcheck-py/shellcheck-py
-#   rev: v0.8.0.4
-#   hooks:
-#     - id: shellcheck
+      - id: backend-test
+        name: Backend Tests
+        entry: bash -c 'cd backend && pytest'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [push]

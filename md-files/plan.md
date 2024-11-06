@@ -63,7 +63,6 @@ Create an intelligent agent based on a local LLM model capable of efficiently se
   - **Voice Processing:** Lightning Whisper-MLX.
   - **Text Processing Model:** LLM Studio.
   - **Video to Slides Conversion:** FFmpeg.
-  - **Database:** PostgreSQL.
   - **Infrastructure:** Docker.
 
 - **Architecture:**
@@ -72,7 +71,7 @@ Create an intelligent agent based on a local LLM model capable of efficiently se
   - Interaction between components via API.
 
 - **Data Models:**
-  - Store notes, queries, and processing results in PostgreSQL.
+  - Store notes, queries, and processing results using file-based storage or alternative lightweight storage solutions as needed.
 
 - **Integration Points:**
   - Integrate frontend with backend via FastAPI.

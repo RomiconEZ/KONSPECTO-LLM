@@ -31,7 +31,7 @@
 To ensure compatibility and project stability, the following versions of programming languages and major libraries are used:
 
 ### 2.1. Python
-- **Version:** Python 3.10
+- **Version:** Python 3.11
 - **Package Manager:** `poetry`
 
 ### 2.2. Frontend
@@ -44,8 +44,6 @@ To ensure compatibility and project stability, the following versions of program
 - **FastAPI:** 0.95.1
 - **Celery:** 5.3.0
 - **Redis:** 6.2.6
-- **SQLAlchemy:** 1.4.41
-- **Alembic:** 1.10.4
 
 ### 2.4. Voice and Text Processing
 - **Lightning Whisper-MLX:** Latest stable version from [repository](https://github.com/mustafaaljadery/lightning-whisper-mlx)
@@ -54,8 +52,10 @@ To ensure compatibility and project stability, the following versions of program
 ### 2.5. Video Processing
 - **FFmpeg:** 4.4.1
 
-### 2.6. Databases
-- **PostgreSQL:** 14.5
+### 2.6. Search Functionality
+- **Options for Document Search:**
+  - **LlamaIndex:** Utilize [LlamaIndex](https://github.com/jerryjliu/llama_index) for building and querying indices over document collections.
+  - **ElasticSearch:** Implement search capabilities using [ElasticSearch](https://www.elastic.co/elasticsearch/) for scalable and efficient full-text search.
 
 ### 2.7. Infrastructure
 - **Docker:** 24.0.0
@@ -78,7 +78,7 @@ To ensure compatibility and project stability, the following versions of program
 ## 4. Development Practices
 
 ### 4.1. Containerization
-- **Docker:** All services (frontend, backend, databases, etc.) must be containerized using Docker.
+- **Docker:** All services (frontend, backend) must be containerized using Docker.
 - **Docker Compose:** Use `docker-compose.yml` to orchestrate services in the local development environment.
 
 ### 4.2. Testing

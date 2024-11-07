@@ -1,3 +1,4 @@
+# backend/Dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -5,6 +6,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Install poetry
@@ -15,6 +17,7 @@ COPY backend/pyproject.toml backend/poetry.lock* ./
 
 # Configure poetry and install dependencies
 RUN poetry config virtualenvs.create false \
+    && poetry lock --no-update \
     && poetry install --no-interaction --no-ansi
 
 # Copy backend application code

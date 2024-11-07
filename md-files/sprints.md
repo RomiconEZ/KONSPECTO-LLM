@@ -57,7 +57,7 @@ The KONSPECTO project involves the development of an intelligent agent based on 
 1. **Set Up Frontend Framework:**
    - Initialize a React.js project in the `frontend/` directory using Vite.
    - Configure routing with React Router.
-   - Implement basic pages: Homepage, Login, Registration.
+   - Implement a basic page for interacting with the agent through a text field.
    - Ensure all frontend dependencies adhere to specified versions (React.js 18.2.0, TailwindCSS 3.3.2).
 
 2. **Set Up Backend Framework:**
@@ -77,9 +77,6 @@ The KONSPECTO project involves the development of an intelligent agent based on 
      - Ensure `ESLint` is properly configured for JavaScript/TypeScript code in the frontend.
      - Integrate `black` (version 23.1.0) for Python code formatting.
      - Integrate `Prettier` (version 2.8.8) for JavaScript/TypeScript code formatting.
-   - **Version Control Practices:**
-     - Adhere to Git Flow principles for branching and merging.
-     - Ensure all commit messages follow the specified format.
 
 5. **Initial Testing Setup:**
    - Set up testing frameworks for frontend (`Jest`, `React Testing Library`) and backend (`pytest` 7.3.1).
@@ -113,10 +110,6 @@ The KONSPECTO project involves the development of an intelligent agent based on 
    - Write unit tests for the search API endpoint.
    - Develop integration tests to verify frontend and backend interactions.
    - Achieve at least 80% code coverage for search functionality.
-
-5. **Update Documentation:**
-   - Document the search endpoint in `docs/api_documentation.md`.
-   - Update user guide with search functionality details in `docs/user_guide.md`.
 
 ---
     

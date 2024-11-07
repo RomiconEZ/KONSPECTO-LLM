@@ -1,11 +1,11 @@
-# docker/frontend/Dockerfile
+# frontend/Dockerfile
 FROM node:18-alpine
 
 WORKDIR /app
 
 # Установка зависимостей
 COPY frontend/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Копирование исходного кода
 COPY frontend/ .

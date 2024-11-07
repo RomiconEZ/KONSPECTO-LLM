@@ -1,8 +1,8 @@
-# app/main.py
+# backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.v1.api import api_router
 from app.services.redis_service import redis_service
-
 
 app = FastAPI(
     title="KONSPECTO API",
@@ -31,3 +31,5 @@ async def health_check() -> dict:
         "version": app.version,
         "redis_connected": redis_ok
     }
+
+app.include_router(api_router)

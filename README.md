@@ -62,8 +62,8 @@
 ### Шаг 1: Клонируйте репозиторий
 
 ```bash
-git clone https://github.com/your_repo/LLM-agent
-cd LLM-agent
+git clone https://github.com/RomiconEZ/KONSPECTO
+cd KONSPECTO
 ```
 
 ### Шаг 2: Запуск приложения

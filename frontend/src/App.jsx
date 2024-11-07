@@ -1,14 +1,39 @@
-// App.jsx
-import PropTypes from 'prop-types';
-import { Routes, Route } from 'react-router-dom';
+// src/App.jsx
+import React from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import AgentInteraction from './pages/AgentInteraction';
+import Search from './pages/Search';
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-100">
+      <nav className="bg-white shadow">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-gray-900">KONSPECTO</h1>
+          <div className="space-x-4">
+            <Link
+              to="/"
+              className="text-gray-700 hover:text-gray-900 transition duration-200"
+            >
+              Home
+            </Link>
+            <Link
+              to="/agent"
+              className="text-gray-700 hover:text-gray-900 transition duration-200"
+            >
+              Agent Interaction
+            </Link>
+            <Link
+              to="/search"
+              className="text-gray-700 hover:text-gray-900 transition duration-200"
+            >
+              Search
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
-          Welcome to KONSPECTO
-        </h1>
         <Routes>
           <Route
             path="/"
@@ -21,7 +46,18 @@ function App() {
               </div>
             }
           />
-          {/* Добавьте здесь другие маршруты по мере необходимости */}
+          <Route path="/agent" element={<AgentInteraction />} />
+          <Route path="/search" element={<Search />} />
+          {/* Обработка несуществующих маршрутов */}
+          <Route
+            path="*"
+            element={
+              <div className="text-center text-gray-700">
+                <h2 className="text-2xl font-bold mb-4">404 - Not Found</h2>
+                <p>The page you are looking for does not exist.</p>
+              </div>
+            }
+          />
         </Routes>
       </div>
     </div>

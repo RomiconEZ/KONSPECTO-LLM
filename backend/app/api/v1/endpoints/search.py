@@ -1,7 +1,11 @@
 # backend/app/api/v1/endpoints/search.py
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+import logging
+from ....services.index_service import query_engine
+
+# Настройка логирования
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -18,20 +22,21 @@ class SearchResult(BaseModel):
 
 @router.post("/search", response_model=SearchResult)
 async def search_documents(request: SearchRequest):
-    # Загрузка документов и создание индекса
-    documents = SimpleDirectoryReader('path/to/documents').load_data()
-    index = VectorStoreIndex.from_documents(documents)
+    try:
+        # Выполнение поиска
+        response = query_engine.query(request.query)
 
-    # Выполнение поиска
-    response = index.query(request.query)
+        search_result = SearchResult(
+            full_result=str(response),
+            abbreviated_result=str(response),
+            source=""
+        )
 
-    # Формирование результатов
-    full_result = response['full_result']
-    abbreviated_result = response['abbreviated_result']
-    source = response['source']
+        # Логирование результатов поиска
+        logger.info(f"Search query: {request.query}")
+        logger.info(f"Search result: {search_result}")
 
-    return SearchResult(
-        full_result=full_result,
-        abbreviated_result=abbreviated_result,
-        source=source
-    )
+        return search_result
+    except Exception as e:
+        logger.error(f"Search failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

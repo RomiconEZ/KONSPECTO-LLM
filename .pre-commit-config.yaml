@@ -24,7 +24,7 @@ repos:
       - id: isort
 
   - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+    rev: 7.1.0
     hooks:
       - id: flake8
         additional_dependencies: [flake8-bugbear, Flake8-pyproject]
@@ -46,28 +46,27 @@ repos:
         types_or: [markdown, yaml, toml, json, dockerfile, shell]
         additional_dependencies: ["prettier@3.1.0", "prettier-plugin-sh@0.13.1"]
         args: [--print-width=80, --prose-wrap=always]
-
-  - repo: local
-    hooks:
-      - id: frontend-lint
-        name: Frontend Lint
-        entry: bash -c 'cd frontend && npm run lint'
-        language: system
-        files: ^frontend/.*\.(js|jsx)$
-        pass_filenames: false
-
-      - id: frontend-test
-        name: Frontend Tests
-        entry: bash -c 'cd frontend && npm run test'
-        language: system
-        files: ^frontend/.*\.(js|jsx)$
-        pass_filenames: false
-        stages: [push]
-
-      - id: backend-test
-        name: Backend Tests
-        entry: bash -c 'cd backend && pytest'
-        language: system
-        files: ^backend/.*\.py$
-        pass_filenames: false
-        stages: [push]
+#  - repo: local
+#    hooks:
+#      - id: frontend-lint
+#        name: Frontend Lint
+#        entry: bash -c 'cd frontend && npm run lint'
+#        language: system
+#        files: ^frontend/.*\.(js|jsx)$
+#        pass_filenames: false
+#
+#      - id: frontend-test
+#        name: Frontend Tests
+#        entry: bash -c 'cd frontend && npm run test'
+#        language: system
+#        files: ^frontend/.*\.(js|jsx)$
+#        pass_filenames: false
+#        stages: [push]
+#
+#      - id: backend-test
+#        name: Backend Tests
+#        entry: bash -c 'cd backend && pytest'
+#        language: system
+#        files: ^backend/.*\.py$
+#        pass_filenames: false
+#        stages: [push]

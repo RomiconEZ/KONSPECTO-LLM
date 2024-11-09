@@ -1,5 +1,6 @@
 services:
   frontend:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: docker/frontend/Dockerfile
@@ -15,7 +16,19 @@ services:
     depends_on:
       - backend
 
+  chroma:
+    platform: linux/arm64
+    image: chromadb/chroma
+    ports:
+      - "8001:8000"  # Пробрасываем порт 8000 контейнера на 8001 хоста, чтобы избежать конфликта с backend
+    volumes:
+      - chroma_data:/data
+    environment:
+      - CHROMA_SETTINGS=default  # Если требуются дополнительные переменные окружения
+    restart: unless-stopped
+
   backend:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
@@ -23,6 +36,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - ./logs:/app/logs
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 30s
@@ -31,10 +45,13 @@ services:
     environment:
       - PYTHON_ENV=development
       - PYTHONPATH=/app
+      - CHROMA_URL=http://chroma:8000  # Указываем URL для подключения к chroma внутри сети Docker
     depends_on:
       - redis
+      - chroma
 
   redis:
+    platform: linux/arm64
     image: redis:6.2.6-alpine
     ports:
       - "6379:6379"
@@ -43,3 +60,4 @@ services:
 
 volumes:
   redis_data:
+  chroma_data:

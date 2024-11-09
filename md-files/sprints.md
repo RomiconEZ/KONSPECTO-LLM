@@ -112,6 +112,16 @@ The KONSPECTO project involves the development of an intelligent agent based on 
    - Achieve at least 80% code coverage for search functionality.
 
 ---
+
+## Sprint 3.x: Manual correction of errors from past sprints
+**Duration:** x weeks  
+**MVP:** Working functionality from past sprints
+
+### Sprint 3.1:
+1. **Correct Search API:**
+   - Fix any issues with the `/v1/search` endpoint.
+
+---
     
 ## Sprint 4: Note Merging Functionality
 **Duration:** 2 weeks  

@@ -1,39 +1,77 @@
 // src/App.jsx
-import React from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import AgentInteraction from './pages/AgentInteraction';
-import Search from './pages/Search';
+import React, { useState } from 'react';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import Chat from './pages/Chat';
 
 function App() {
+  const [chats, setChats] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const navigate = useNavigate();
+
+  const addChat = () => {
+    const newChat = { id: Date.now(), name: `Chat ${chats.length + 1}`, messages: [] };
+    setChats([...chats, newChat]);
+    setSelectedChat(newChat);
+    navigate(`/chat/${newChat.id}`);
+  };
+
+  const deleteChat = (chatId) => {
+    setChats(chats.filter(chat => chat.id !== chatId));
+    if (selectedChat && selectedChat.id === chatId) {
+      setSelectedChat(null);
+      navigate('/');
+    }
+  };
+
+  const renameChat = (chatId, newName) => {
+    setChats(chats.map(chat => chat.id === chatId ? { ...chat, name: newName } : chat));
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900">KONSPECTO</h1>
-          <div className="space-x-4">
-            <Link
-              to="/"
-              className="text-gray-700 hover:text-gray-900 transition duration-200"
-            >
-              Home
-            </Link>
-            <Link
-              to="/agent"
-              className="text-gray-700 hover:text-gray-900 transition duration-200"
-            >
-              Agent Interaction
-            </Link>
-            <Link
-              to="/search"
-              className="text-gray-700 hover:text-gray-900 transition duration-200"
-            >
-              Search
-            </Link>
-          </div>
-        </div>
+    <div className="flex min-h-screen bg-gray-100">
+      <nav className="w-64 bg-white shadow-lg p-4">
+        <h1 className="text-xl font-bold text-gray-900 mb-4">KONSPECTO</h1>
+        <button
+          onClick={addChat}
+          className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 mb-4"
+        >
+          Add Chat
+        </button>
+        <ul>
+          {chats.map(chat => (
+            <li key={chat.id} className="mb-2">
+              <div className="flex justify-between items-center">
+                <Link
+                  to={`/chat/${chat.id}`}
+                  className="text-gray-700 hover:text-gray-900 transition duration-200"
+                  onClick={() => setSelectedChat(chat)}
+                >
+                  {chat.name}
+                </Link>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => {
+                      const newName = prompt('Enter new chat name:', chat.name);
+                      if (newName) renameChat(chat.id, newName);
+                    }}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    Rename
+                  </button>
+                  <button
+                    onClick={() => deleteChat(chat.id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
       </nav>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="flex-1 p-8">
         <Routes>
           <Route
             path="/"
@@ -42,12 +80,11 @@ function App() {
                 <p className="mb-4">
                   Intelligent agent for working with notes and video lectures
                 </p>
-                <p>Please select an option to begin</p>
+                <p>Please select a chat to begin</p>
               </div>
             }
           />
-          <Route path="/agent" element={<AgentInteraction />} />
-          <Route path="/search" element={<Search />} />
+          <Route path="/chat/:chatId" element={<Chat chats={chats} setChats={setChats} />} />
           {/* Обработка несуществующих маршрутов */}
           <Route
             path="*"

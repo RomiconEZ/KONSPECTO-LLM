@@ -16,17 +16,6 @@ services:
     depends_on:
       - backend
 
-  chroma:
-    platform: linux/arm64
-    image: chromadb/chroma
-    ports:
-      - "8001:8000"  # Пробрасываем порт 8000 контейнера на 8001 хоста, чтобы избежать конфликта с backend
-    volumes:
-      - chroma_data:/data
-    environment:
-      - CHROMA_SETTINGS=default  # Если требуются дополнительные переменные окружения
-    restart: unless-stopped
-
   backend:
     platform: linux/arm64
     build:
@@ -36,7 +25,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - ./logs:/app/logs
+      - ./backend/logs:/app/logs
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 30s
@@ -45,19 +35,25 @@ services:
     environment:
       - PYTHON_ENV=development
       - PYTHONPATH=/app
-      - CHROMA_URL=http://chroma:8000  # Указываем URL для подключения к chroma внутри сети Docker
+      - REDIS_URL=redis://redis-stack:6379  # Обновлено на redis-stack
     depends_on:
-      - redis
-      - chroma
+      redis-stack:
+        condition: service_healthy
 
-  redis:
+  redis-stack:
     platform: linux/arm64
-    image: redis:6.2.6-alpine
+    image: redis/redis-stack:latest
     ports:
-      - "6379:6379"
+      - "6379:6379"   # Стандартный порт Redis
+      - "8001:8001"   # Переназначенный порт для веб-интерфейса Redis Stack
     volumes:
-      - redis_data:/data
+      - redis_stack_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  redis_data:
-  chroma_data:
+  redis_stack_data:

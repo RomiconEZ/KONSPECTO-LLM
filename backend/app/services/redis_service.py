@@ -1,11 +1,11 @@
 # backend/app/services/redis_service.py
 from redis.asyncio import Redis
 from typing import Optional
-
+import os
 
 class RedisService:
-    def __init__(self, host: str = "redis", port: int = 6379, db: int = 0):
-        self.redis_client = Redis(host=host, port=port, db=db, decode_responses=True)
+    def __init__(self, url: str = os.getenv("REDIS_URL", "redis://localhost:6379")):
+        self.redis_client = Redis.from_url(url, decode_responses=True)
 
     async def connect(self):
         """Connect to Redis"""

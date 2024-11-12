@@ -121,6 +121,11 @@ The KONSPECTO project involves the development of an intelligent agent based on 
 1. **Correct Search API:**
    - Fix any issues with the `/v1/search` endpoint.
 
+### Sprint 3.2:
+1. **Upgrade RAG and Search API:**
+   - Implement RAG Pipeline over Google Drive Files
+   - Current vector store - RedisVectorStore
+
 ---
     
 ## Sprint 4: Note Merging Functionality

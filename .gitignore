@@ -128,3 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /backend/poetry.lock
+/backend/app/documents/
+/backend/app/config/

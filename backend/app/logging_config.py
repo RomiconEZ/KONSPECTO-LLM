@@ -27,7 +27,7 @@ LOGGING_CONFIG = {
     "loggers": {
         "": {
             "handlers": ["console", "file"],
-            "level": "INFO",
+            "level": "DEBUG",
         },
     },
 }

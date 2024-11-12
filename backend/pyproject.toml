@@ -22,6 +22,9 @@ torch = "2.5.1"
 docx2txt = "0.8"
 chromadb = "^0.5.18"
 sentence-transformers = "^3.2.1"
+llama-index-storage-docstore-redis = "^0.2.0"
+llama-index-vector-stores-redis = "^0.3.4"
+llama-index-readers-google = "^0.4.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.3.1"

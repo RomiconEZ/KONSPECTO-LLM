@@ -1,4 +1,5 @@
 // src/pages/Chat.jsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -6,20 +7,44 @@ import PropTypes from 'prop-types';
 
 function Chat({ chats, setChats, onOpenDoc }) {
   const { chatId } = useParams();
-  const chat = chats.find(c => c.id === parseInt(chatId, 10));
+  const chat = chats.find((c) => c.id === parseInt(chatId, 10));
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+      // Submit the form
+      e.preventDefault();
+      handleQuerySubmit(e);
+    } else if (e.key === 'Enter' && (e.ctrlKey || e.shiftKey)) {
+      // Insert newline
+      e.preventDefault();
+      const { selectionStart, selectionEnd } = e.target;
+      const newValue =
+        query.substring(0, selectionStart) + '\n' + query.substring(selectionEnd);
+      setQuery(newValue);
+      // Move cursor to the new position
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
+            selectionStart + 1;
+        }
+      }, 0);
+    }
+  };
+
   const handleQuerySubmit = async (e) => {
     e.preventDefault();
     if (loading) return; // Prevent multiple submissions
+    if (!query.trim()) return; // Do not submit empty messages
     setLoading(true);
     setError(null);
 
@@ -35,13 +60,13 @@ function Chat({ chats, setChats, onOpenDoc }) {
     const userMessage = {
       sender: 'user',
       text: query,
-      timestamp
+      timestamp,
     };
     const updatedChat = {
       ...chat,
       messages: [...chat.messages, userMessage],
     };
-    setChats(chats.map(c => c.id === chat.id ? updatedChat : c));
+    setChats(chats.map((c) => (c.id === chat.id ? updatedChat : c)));
     setQuery('');
 
     try {
@@ -65,7 +90,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
       }
 
       // Create agent messages
-      const agentMessages = data.results.map(item => ({
+      const agentMessages = data.results.map((item) => ({
         sender: 'agent',
         text: item.text,
         file_id: item.file_id,
@@ -77,11 +102,10 @@ function Chat({ chats, setChats, onOpenDoc }) {
         ...updatedChat,
         messages: [...updatedChat.messages, ...agentMessages],
       };
-      setChats(chats.map(c => c.id === chat.id ? updatedChatWithResponse : c));
+      setChats(chats.map((c) => (c.id === chat.id ? updatedChatWithResponse : c)));
 
       // Scroll to bottom after new messages
       scrollToBottom();
-
     } catch (err) {
       console.error(err);
       setError('Произошла ошибка при обработке вашего запроса.');
@@ -99,6 +123,18 @@ function Chat({ chats, setChats, onOpenDoc }) {
   useEffect(() => {
     scrollToBottom();
   }, [chat]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      // Reset height
+      textareaRef.current.style.height = 'auto';
+      // Set height (max 6 lines)
+      textareaRef.current.style.height = `${Math.min(
+        textareaRef.current.scrollHeight,
+        6 * 24
+      )}px`; // Assuming line-height is 24px
+    }
+  }, [query]);
 
   if (!chat) {
     return (
@@ -118,7 +154,9 @@ function Chat({ chats, setChats, onOpenDoc }) {
         {chat.messages.map((message, index) => (
           <div
             key={index}
-            className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`mb-4 flex ${
+              message.sender === 'user' ? 'justify-end' : 'justify-start'
+            }`}
           >
             <div
               className={`max-w-1/2 p-3 rounded-lg ${
@@ -157,18 +195,22 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
       {/* Input Field */}
       <div className="mt-4">
-        <form onSubmit={handleQuerySubmit} className="flex">
-          <input
-            type="text"
-            value={query}
-            onChange={handleQueryChange}
-            className="border border-dark-600 p-2 flex-1 rounded bg-dark-700 text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg"
-            placeholder="Введите ваш запрос"
-            required
-          />
+        <form onSubmit={handleQuerySubmit} className="flex items-end">
+          <div className="flex-1 relative">
+            <textarea
+              ref={textareaRef}
+              value={query}
+              onChange={handleQueryChange}
+              onKeyDown={handleKeyDown}
+              className="textarea-custom"
+              placeholder="Введите ваш запрос"
+              rows={1}
+              style={{ maxHeight: '144px' }} // 6 lines * approx line-height 24px
+            />
+          </div>
           <button
             type="submit"
-            className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 ml-2 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+            className="ml-2 bg-orange-500 text-dark-900 px-3 py-2 rounded hover:bg-orange-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-shrink-0"
             disabled={loading}
           >
             {loading ? 'Отправка...' : 'Отправить'}
@@ -176,9 +218,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
         </form>
         {/* Display error message */}
         {error && (
-          <div className="mt-4 text-red-500 text-center text-lg">
-            {error}
-          </div>
+          <div className="mt-4 text-red-500 text-center text-lg">{error}</div>
         )}
       </div>
     </div>

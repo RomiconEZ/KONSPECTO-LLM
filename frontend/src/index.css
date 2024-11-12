@@ -74,13 +74,17 @@ body,
   scroll-behavior: smooth;
 }
 
-/* Optional: Hide scrollbar for Firefox if desired */
-/*
-.messages-container {
-  scrollbar-width: none;
-}
-
-.messages-container::-webkit-scrollbar {
+/* Hide scrollbar in textarea */
+textarea::-webkit-scrollbar {
   display: none;
 }
-*/
+
+textarea {
+  scrollbar-width: none; /* For Firefox */
+}
+
+/* Textarea styling */
+.textarea-custom {
+  @apply w-full resize-none overflow-y-auto bg-dark-700 text-white border border-dark-600 rounded py-4 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-inset text-lg;
+  max-height: calc(1.5em * 6 + 1rem); /* Adjust as needed for 6 lines */
+}

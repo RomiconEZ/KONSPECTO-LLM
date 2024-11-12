@@ -1,4 +1,5 @@
 // src/App.jsx
+
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaEdit, FaTrash } from 'react-icons/fa';
@@ -56,27 +57,27 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-dark-900 text-dark-50">
+    <div className="flex h-screen bg-dark-900 text-dark-50 overflow-hidden">
       {/* Sidebar */}
       <nav
-        className={`bg-dark-800 shadow-lg p-6 flex flex-col transition-all duration-300 ease-in-out ${
+        className={`bg-dark-800 shadow-lg p-4 flex flex-col transition-all duration-300 ease-in-out ${
           isSidebarOpen ? 'w-64' : 'w-16'
         }`}
       >
         {/* Toggle Sidebar Button */}
         <button
           onClick={toggleSidebar}
-          className="mb-6 text-orange-400 focus:outline-none"
+          className="mb-4 text-orange-400 focus:outline-none"
           aria-label={isSidebarOpen ? 'Скрыть меню' : 'Показать меню'}
         >
           {isSidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
         </button>
         {isSidebarOpen && (
           <>
-            <h1 className="text-2xl font-bold text-orange-400 mb-6">KONSPECTO</h1>
+            <h1 className="text-2xl font-bold text-orange-400 mb-4">KONSPECTO</h1>
             <button
               onClick={addChat}
-              className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 mb-6"
+              className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 mb-4"
             >
               Добавить чат
             </button>
@@ -120,7 +121,7 @@ function App() {
       {/* Main Content Area (Chat and Document Viewer) */}
       <div className="flex-1 flex overflow-hidden">
         {/* Chat Area */}
-        <main className="flex-1 p-8 bg-dark-700 flex flex-col">
+        <main className="flex-1 p-4 bg-dark-700 flex flex-col overflow-hidden">
           <Routes>
             <Route
               path="/"

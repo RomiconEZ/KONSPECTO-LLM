@@ -1,3 +1,4 @@
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
@@ -28,6 +29,9 @@ export default {
           800: '#9a3412',
           900: '#7c2d12',
         },
+      },
+      maxWidth: {
+        '1/2': '50%',
       },
     },
   },

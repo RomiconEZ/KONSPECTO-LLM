@@ -1,13 +1,27 @@
 // src/App.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaEdit, FaTrash } from 'react-icons/fa'; // Добавление иконок
+import { FaChevronLeft, FaChevronRight, FaEdit, FaTrash } from 'react-icons/fa';
 import Chat from './pages/Chat';
+import GoogleDocViewer from './components/GoogleDocViewer';
+import { ResizableBox } from 'react-resizable';
+import 'react-resizable/css/styles.css';
 
 function App() {
   const [chats, setChats] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Состояние для скрытия/показа меню
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [docFileId, setDocFileId] = useState('');
+  const [docViewerWidth, setDocViewerWidth] = useState(400); // Initial width in pixels
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const addChat = () => {
     const newChat = { id: Date.now(), name: `Чат ${chats.length + 1}`, messages: [] };
@@ -28,11 +42,28 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleOpenDocViewer = (fileId) => {
+    setDocFileId(fileId);
+  };
+
+  const handleCloseDocViewer = () => {
+    setDocFileId('');
+  };
+
+  // Handle resizing by updating the width state
+  const handleResize = (event, { size }) => {
+    setDocViewerWidth(size.width);
+  };
+
   return (
-    <div className="flex min-h-screen bg-dark-900 text-dark-50">
+    <div className="flex h-screen bg-dark-900 text-dark-50">
       {/* Sidebar */}
-      <nav className={`bg-dark-800 shadow-lg p-6 flex flex-col transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-16'}`}>
-        {/* Кнопка для скрытия/показа меню */}
+      <nav
+        className={`bg-dark-800 shadow-lg p-6 flex flex-col transition-all duration-300 ease-in-out ${
+          isSidebarOpen ? 'w-64' : 'w-16'
+        }`}
+      >
+        {/* Toggle Sidebar Button */}
         <button
           onClick={toggleSidebar}
           className="mb-6 text-orange-400 focus:outline-none"
@@ -54,7 +85,7 @@ function App() {
                 <li key={chat.id} className="flex justify-between items-center">
                   <Link
                     to={`/chat/${chat.id}`}
-                    className="text-orange-300 hover:text-orange-400 transition duration-200 font-medium flex-1"
+                    className="text-orange-300 hover:text-orange-400 transition duration-200 font-medium flex-1 truncate"
                   >
                     {chat.name}
                   </Link>
@@ -86,37 +117,65 @@ function App() {
         )}
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-1 p-8 bg-dark-700">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <div className="flex items-center justify-center h-full text-center">
-                <div className="text-orange-300">
-                  <p className="mb-4 text-xl">
-                    Интеллектуальный агент для работы с заметками и видео лекциями
-                  </p>
-                  <p>Пожалуйста, выберите чат для начала</p>
+      {/* Main Content Area (Chat and Document Viewer) */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Chat Area */}
+        <main className="flex-1 p-8 bg-dark-700 flex flex-col">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div className="flex items-center justify-center h-full text-center">
+                  <div className="text-orange-300">
+                    <p className="mb-4 text-xl">
+                      Интеллектуальный агент для работы с заметками и видео лекциями
+                    </p>
+                    <p>Пожалуйста, выберите чат для начала</p>
+                  </div>
                 </div>
-              </div>
-            }
-          />
-          <Route path="/chat/:chatId" element={<Chat chats={chats} setChats={setChats} />} />
-          {/* Обработка несуществующих маршрутов */}
-          <Route
-            path="*"
-            element={
-              <div className="flex items-center justify-center h-full text-center">
-                <div className="text-red-500">
-                  <h2 className="text-2xl font-bold mb-4">404 - Не найдено</h2>
-                  <p>Страница, которую вы ищете, не существует.</p>
+              }
+            />
+            <Route
+              path="/chat/:chatId"
+              element={<Chat chats={chats} setChats={setChats} onOpenDoc={handleOpenDocViewer} />}
+            />
+            {/* Handle Non-Existent Routes */}
+            <Route
+              path="*"
+              element={
+                <div className="flex items-center justify-center h-full text-center">
+                  <div className="text-red-500">
+                    <h2 className="text-2xl font-bold mb-4">404 - Не найдено</h2>
+                    <p>Страница, которую вы ищете, не существует.</p>
+                  </div>
                 </div>
-              </div>
+              }
+            />
+          </Routes>
+        </main>
+
+        {/* Document Viewer Area */}
+        {docFileId && (
+          <ResizableBox
+            width={docViewerWidth}
+            height={windowHeight}
+            minConstraints={[300, windowHeight]}
+            maxConstraints={[window.innerWidth / 2, windowHeight]}
+            axis="x"
+            resizeHandles={['w']} // Resize from the west (left) side
+            handle={
+              <span
+                className="react-resizable-handle react-resizable-handle-w"
+                aria-label="Resize document viewer"
+              />
             }
-          />
-        </Routes>
-      </main>
+            onResize={handleResize}
+            className="bg-dark-800 shadow-lg z-50 flex flex-col"
+          >
+            <GoogleDocViewer fileId={docFileId} onClose={handleCloseDocViewer} />
+          </ResizableBox>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,16 +1,17 @@
 // src/pages/Chat.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import GoogleDocViewer from '../components/GoogleDocViewer';
+import PropTypes from 'prop-types';
 
-function Chat({ chats, setChats }) {
+function Chat({ chats, setChats, onOpenDoc }) {
   const { chatId } = useParams();
   const chat = chats.find(c => c.id === parseInt(chatId, 10));
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [docFileId, setDocFileId] = useState('');
+
+  const messagesEndRef = useRef(null);
 
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
@@ -18,7 +19,7 @@ function Chat({ chats, setChats }) {
 
   const handleQuerySubmit = async (e) => {
     e.preventDefault();
-    if (loading) return; // Предотвращаем множественные отправки
+    if (loading) return; // Prevent multiple submissions
     setLoading(true);
     setError(null);
 
@@ -30,7 +31,7 @@ function Chat({ chats, setChats }) {
 
     const timestamp = new Date().toISOString();
 
-    // Создаем сообщение от пользователя
+    // Create user message
     const userMessage = {
       sender: 'user',
       text: query,
@@ -58,12 +59,12 @@ function Chat({ chats, setChats }) {
 
       const data = await res.json();
 
-      // Проверяем формат ответа API
+      // Validate API response format
       if (!data.results || !Array.isArray(data.results)) {
         throw new Error('Неверный формат ответа от API.');
       }
 
-      // Создаем сообщения от агента
+      // Create agent messages
       const agentMessages = data.results.map(item => ({
         sender: 'agent',
         text: item.text,
@@ -77,6 +78,10 @@ function Chat({ chats, setChats }) {
         messages: [...updatedChat.messages, ...agentMessages],
       };
       setChats(chats.map(c => c.id === chat.id ? updatedChatWithResponse : c));
+
+      // Scroll to bottom after new messages
+      scrollToBottom();
+
     } catch (err) {
       console.error(err);
       setError('Произошла ошибка при обработке вашего запроса.');
@@ -85,13 +90,15 @@ function Chat({ chats, setChats }) {
     }
   };
 
-  const handleOpenDocViewer = (fileId) => {
-    setDocFileId(fileId);
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
-  const handleCloseDocViewer = () => {
-    setDocFileId('');
-  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [chat]);
 
   if (!chat) {
     return (
@@ -105,76 +112,83 @@ function Chat({ chats, setChats }) {
   }
 
   return (
-    <div className="flex flex-col h-full relative">
-      <div className="flex-1 overflow-y-auto p-4 bg-dark-800 rounded shadow mb-16">
+    <div className="flex flex-col h-full">
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-4 bg-dark-800 rounded shadow messages-container">
         {chat.messages.map((message, index) => (
           <div
             key={index}
             className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-md p-3 rounded-lg ${
+              className={`max-w-1/2 p-3 rounded-lg ${
                 message.sender === 'user'
                   ? 'bg-orange-500 text-white'
                   : 'bg-dark-600 text-dark-50'
-              }`}
+              } break-words text-lg`}
             >
-              {/* Отображение названия файла, если есть */}
+              {/* Display file name if present */}
               {message.file_name && (
                 <div className="font-semibold mb-1">{message.file_name}</div>
               )}
               <pre className="whitespace-pre-wrap">{message.text}</pre>
-              {/* Кнопка для просмотра документа */}
+              {/* Button to view document */}
               {message.sender === 'agent' && message.file_id && (
                 <button
-                  onClick={() => handleOpenDocViewer(message.file_id)}
+                  onClick={() => onOpenDoc(message.file_id)}
                   className="mt-2 bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 transition duration-200"
                 >
                   Просмотреть документ
                 </button>
               )}
-              {/* Время отправки сообщения */}
-              <div className="text-xs text-dark-400 mt-1 text-right">
+              {/* Message timestamp */}
+              <div
+                className={`text-xs mt-1 text-right ${
+                  message.sender === 'user' ? 'text-gray-900' : 'text-gray-100'
+                }`}
+              >
                 {dayjs(message.timestamp).format('HH:mm DD.MM.YYYY')}
               </div>
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Строка ввода текста */}
-      <div className="fixed bottom-0 left-0 w-full bg-dark-800 p-4 border-t border-dark-600">
-        <form onSubmit={handleQuerySubmit} className="flex items-center">
+      {/* Input Field */}
+      <div className="mt-4">
+        <form onSubmit={handleQuerySubmit} className="flex">
           <input
             type="text"
             value={query}
             onChange={handleQueryChange}
-            className="border border-dark-600 p-2 flex-1 rounded bg-dark-700 text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="border border-dark-600 p-2 flex-1 rounded bg-dark-700 text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg"
             placeholder="Введите ваш запрос"
             required
           />
           <button
             type="submit"
-            className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 ml-2 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
             disabled={loading}
           >
             {loading ? 'Отправка...' : 'Отправить'}
           </button>
         </form>
-        {/* Отображение сообщения об ошибке */}
+        {/* Display error message */}
         {error && (
-          <div className="mt-4 text-red-500 text-center">
+          <div className="mt-4 text-red-500 text-center text-lg">
             {error}
           </div>
         )}
       </div>
-
-      {/* Просмотр документа Google */}
-      {docFileId && (
-        <GoogleDocViewer fileId={docFileId} onClose={handleCloseDocViewer} />
-      )}
     </div>
   );
 }
+
+Chat.propTypes = {
+  chats: PropTypes.array.isRequired,
+  setChats: PropTypes.func.isRequired,
+  onOpenDoc: PropTypes.func.isRequired,
+};
 
 export default Chat;

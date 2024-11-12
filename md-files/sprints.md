@@ -131,6 +131,9 @@ The KONSPECTO project involves the development of an intelligent agent based on 
    - Implement chat format for search results
    - Add functionality to view Google Drive files
 
+### Sprint 3.4:
+**Upgrade UI**
+   - Improving the design of the UI
 ---
     
 ## Sprint 4: Note Merging Functionality

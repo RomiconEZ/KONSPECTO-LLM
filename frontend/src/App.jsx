@@ -1,86 +1,104 @@
 // src/App.jsx
 import React, { useState } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { FaChevronLeft, FaChevronRight, FaEdit, FaTrash } from 'react-icons/fa'; // Добавление иконок
 import Chat from './pages/Chat';
 
 function App() {
   const [chats, setChats] = useState([]);
-  const [selectedChat, setSelectedChat] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Состояние для скрытия/показа меню
   const navigate = useNavigate();
 
   const addChat = () => {
-    const newChat = { id: Date.now(), name: `Chat ${chats.length + 1}`, messages: [] };
+    const newChat = { id: Date.now(), name: `Чат ${chats.length + 1}`, messages: [] };
     setChats([...chats, newChat]);
-    setSelectedChat(newChat);
     navigate(`/chat/${newChat.id}`);
   };
 
   const deleteChat = (chatId) => {
     setChats(chats.filter(chat => chat.id !== chatId));
-    if (selectedChat && selectedChat.id === chatId) {
-      setSelectedChat(null);
-      navigate('/');
-    }
+    navigate('/');
   };
 
   const renameChat = (chatId, newName) => {
     setChats(chats.map(chat => chat.id === chatId ? { ...chat, name: newName } : chat));
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <nav className="w-64 bg-white shadow-lg p-4">
-        <h1 className="text-xl font-bold text-gray-900 mb-4">KONSPECTO</h1>
+    <div className="flex min-h-screen bg-dark-900 text-dark-50">
+      {/* Sidebar */}
+      <nav className={`bg-dark-800 shadow-lg p-6 flex flex-col transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-16'}`}>
+        {/* Кнопка для скрытия/показа меню */}
         <button
-          onClick={addChat}
-          className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 mb-4"
+          onClick={toggleSidebar}
+          className="mb-6 text-orange-400 focus:outline-none"
+          aria-label={isSidebarOpen ? 'Скрыть меню' : 'Показать меню'}
         >
-          Add Chat
+          {isSidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
         </button>
-        <ul>
-          {chats.map(chat => (
-            <li key={chat.id} className="mb-2">
-              <div className="flex justify-between items-center">
-                <Link
-                  to={`/chat/${chat.id}`}
-                  className="text-gray-700 hover:text-gray-900 transition duration-200"
-                  onClick={() => setSelectedChat(chat)}
-                >
-                  {chat.name}
-                </Link>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => {
-                      const newName = prompt('Enter new chat name:', chat.name);
-                      if (newName) renameChat(chat.id, newName);
-                    }}
-                    className="text-gray-500 hover:text-gray-700"
+        {isSidebarOpen && (
+          <>
+            <h1 className="text-2xl font-bold text-orange-400 mb-6">KONSPECTO</h1>
+            <button
+              onClick={addChat}
+              className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 mb-6"
+            >
+              Добавить чат
+            </button>
+            <ul className="flex-1 space-y-4 overflow-y-auto">
+              {chats.map(chat => (
+                <li key={chat.id} className="flex justify-between items-center">
+                  <Link
+                    to={`/chat/${chat.id}`}
+                    className="text-orange-300 hover:text-orange-400 transition duration-200 font-medium flex-1"
                   >
-                    Rename
-                  </button>
-                  <button
-                    onClick={() => deleteChat(chat.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+                    {chat.name}
+                  </Link>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        const newName = prompt('Введите новое название чата:', chat.name);
+                        if (newName) renameChat(chat.id, newName);
+                      }}
+                      className="text-orange-300 hover:text-orange-400 focus:outline-none"
+                      aria-label="Изменить название чата"
+                      title="Изменить название чата"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => deleteChat(chat.id)}
+                      className="text-red-500 hover:text-red-600 focus:outline-none"
+                      aria-label="Удалить чат"
+                      title="Удалить чат"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </nav>
 
-      <div className="flex-1 p-8">
+      {/* Main Content */}
+      <main className="flex-1 p-8 bg-dark-700">
         <Routes>
           <Route
             path="/"
             element={
-              <div className="text-center text-gray-700">
-                <p className="mb-4">
-                  Intelligent agent for working with notes and video lectures
-                </p>
-                <p>Please select a chat to begin</p>
+              <div className="flex items-center justify-center h-full text-center">
+                <div className="text-orange-300">
+                  <p className="mb-4 text-xl">
+                    Интеллектуальный агент для работы с заметками и видео лекциями
+                  </p>
+                  <p>Пожалуйста, выберите чат для начала</p>
+                </div>
               </div>
             }
           />
@@ -89,14 +107,16 @@ function App() {
           <Route
             path="*"
             element={
-              <div className="text-center text-gray-700">
-                <h2 className="text-2xl font-bold mb-4">404 - Not Found</h2>
-                <p>The page you are looking for does not exist.</p>
+              <div className="flex items-center justify-center h-full text-center">
+                <div className="text-red-500">
+                  <h2 className="text-2xl font-bold mb-4">404 - Не найдено</h2>
+                  <p>Страница, которую вы ищете, не существует.</p>
+                </div>
               </div>
             }
           />
         </Routes>
-      </div>
+      </main>
     </div>
   );
 }

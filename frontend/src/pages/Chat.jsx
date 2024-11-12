@@ -1,7 +1,7 @@
 // src/pages/Chat.jsx
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import dayjs from 'dayjs'; // Убедитесь, что dayjs установлен и импортирован правильно
+import dayjs from 'dayjs';
 import GoogleDocViewer from '../components/GoogleDocViewer';
 
 function Chat({ chats, setChats }) {
@@ -18,18 +18,19 @@ function Chat({ chats, setChats }) {
 
   const handleQuerySubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Предотвращаем множественные отправки
     setLoading(true);
     setError(null);
 
     if (!chat) {
-      setError('Chat not found.');
+      setError('Чат не найден.');
       setLoading(false);
       return;
     }
 
     const timestamp = new Date().toISOString();
 
-    // Создание сообщения от пользователя
+    // Создаем сообщение от пользователя
     const userMessage = {
       sender: 'user',
       text: query,
@@ -52,17 +53,17 @@ function Chat({ chats, setChats }) {
       });
 
       if (!res.ok) {
-        throw new Error(`Error: ${res.status} ${res.statusText}`);
+        throw new Error(`Ошибка: ${res.status} ${res.statusText}`);
       }
 
       const data = await res.json();
 
-      // Проверяем, что data.results существует и является массивом
+      // Проверяем формат ответа API
       if (!data.results || !Array.isArray(data.results)) {
-        throw new Error('Invalid response format from API.');
+        throw new Error('Неверный формат ответа от API.');
       }
 
-      // Создаем сообщения от агента для каждого SearchItem
+      // Создаем сообщения от агента
       const agentMessages = data.results.map(item => ({
         sender: 'agent',
         text: item.text,
@@ -78,7 +79,7 @@ function Chat({ chats, setChats }) {
       setChats(chats.map(c => c.id === chat.id ? updatedChatWithResponse : c));
     } catch (err) {
       console.error(err);
-      setError('An error occurred while processing your request.');
+      setError('Произошла ошибка при обработке вашего запроса.');
     } finally {
       setLoading(false);
     }
@@ -94,65 +95,81 @@ function Chat({ chats, setChats }) {
 
   if (!chat) {
     return (
-      <div className="text-center text-gray-700">
-        <h2 className="text-2xl font-bold mb-4">Chat not found</h2>
-        <p>Please select a valid chat.</p>
+      <div className="flex items-center justify-center h-full text-center text-dark-700">
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Чат не найден</h2>
+          <p>Пожалуйста, выберите действительный чат.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full relative">
-      <div className="flex-1 overflow-y-auto p-4 bg-white rounded shadow mb-4">
+    <div className="flex flex-col h-full relative">
+      <div className="flex-1 overflow-y-auto p-4 bg-dark-800 rounded shadow mb-16">
         {chat.messages.map((message, index) => (
-          <div key={index} className={`mb-4 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
-            <div className={`inline-block p-2 rounded ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-900'}`}>
-              {/* Отображение названия файла, если оно есть */}
+          <div
+            key={index}
+            className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-md p-3 rounded-lg ${
+                message.sender === 'user'
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-dark-600 text-dark-50'
+              }`}
+            >
+              {/* Отображение названия файла, если есть */}
               {message.file_name && (
                 <div className="font-semibold mb-1">{message.file_name}</div>
               )}
               <pre className="whitespace-pre-wrap">{message.text}</pre>
-              {/* Отображение кнопки для просмотра документа */}
+              {/* Кнопка для просмотра документа */}
               {message.sender === 'agent' && message.file_id && (
                 <button
                   onClick={() => handleOpenDocViewer(message.file_id)}
-                  className="mt-2 bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition duration-200"
+                  className="mt-2 bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 transition duration-200"
                 >
-                  View Document
+                  Просмотреть документ
                 </button>
               )}
-              {/* Отображение времени отправки сообщения */}
-              <div className="text-xs text-gray-500 mt-1">
+              {/* Время отправки сообщения */}
+              <div className="text-xs text-dark-400 mt-1 text-right">
                 {dayjs(message.timestamp).format('HH:mm DD.MM.YYYY')}
               </div>
             </div>
           </div>
         ))}
       </div>
-      <div className="fixed bottom-0 left-0 w-full bg-white p-4 border-t border-gray-300">
+
+      {/* Строка ввода текста */}
+      <div className="fixed bottom-0 left-0 w-full bg-dark-800 p-4 border-t border-dark-600">
         <form onSubmit={handleQuerySubmit} className="flex items-center">
           <input
             type="text"
             value={query}
             onChange={handleQueryChange}
-            className="border border-gray-300 p-2 flex-1 rounded"
-            placeholder="Enter your query"
+            className="border border-dark-600 p-2 flex-1 rounded bg-dark-700 text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            placeholder="Введите ваш запрос"
             required
           />
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 ml-2"
+            className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loading}
           >
-            {loading ? 'Sending...' : 'Send'}
+            {loading ? 'Отправка...' : 'Отправить'}
           </button>
         </form>
+        {/* Отображение сообщения об ошибке */}
         {error && (
           <div className="mt-4 text-red-500 text-center">
             {error}
           </div>
         )}
       </div>
+
+      {/* Просмотр документа Google */}
       {docFileId && (
         <GoogleDocViewer fileId={docFileId} onClose={handleCloseDocViewer} />
       )}

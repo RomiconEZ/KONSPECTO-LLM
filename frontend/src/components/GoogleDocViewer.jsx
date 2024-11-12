@@ -7,34 +7,39 @@ const GoogleDocViewer = ({ fileId, onClose }) => {
     return null; // Не отображаем ничего, если нет fileId
   }
 
-  // Используем 'preview' для встроенного просмотра
+  // Конструируем URL для встраивания и просмотра документа
   const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
   const docLink = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
 
   return (
     <>
       {/* Overlay */}
-      <div className="google-doc-viewer-overlay" onClick={onClose}></div>
+      <div
+        className="google-doc-viewer-overlay"
+        onClick={onClose}
+        aria-label="Закрыть просмотр документа"
+      ></div>
 
       {/* Viewer */}
-      <div id="doc-viewer">
+      <div id="doc-viewer" className="transition-transform duration-300 ease-in-out">
         <div className="google-doc-viewer-content">
           <button
             onClick={onClose}
-            className="google-doc-viewer-close"
+            className="google-doc-viewer-close focus:outline-none"
+            aria-label="Закрыть"
           >
-            Close
+            Закрыть
           </button>
           <a
             href={docLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 m-4 inline-block"
+            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-200 m-4 inline-block"
           >
-            Open Document in Google Drive
+            Открыть документ в Google Drive
           </a>
           <iframe
-            title="Google Document Viewer"
+            title="Просмотр документа Google"
             src={embedUrl}
             className="google-doc-viewer-iframe"
           />

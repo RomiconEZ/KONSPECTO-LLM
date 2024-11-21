@@ -7,12 +7,12 @@ authors = ["Your Name <your.email@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.100.0"
-uvicorn = {extras = ["standard"], version = "^0.22.0"}
+uvicorn = { extras = ["standard"], version = "^0.22.0" }
 celery = "5.3.0"
 redis = "^5.0.1"
-pydantic = {extras = ["email"], version = "^2.7.0"}
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pydantic = { extras = ["email"], version = "^2.9.2" }
+python-jose = { extras = ["cryptography"], version = "^3.3.0" }
+passlib = { extras = ["bcrypt"], version = "^1.7.4" }
 python-multipart = "^0.0.6"
 python-dotenv = "^1.0.0"
 llama-index = "0.11.22"
@@ -25,6 +25,7 @@ sentence-transformers = "^3.2.1"
 llama-index-storage-docstore-redis = "^0.2.0"
 llama-index-vector-stores-redis = "^0.3.4"
 llama-index-readers-google = "^0.4.2"
+pydantic-settings = "^2.6.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.3.1"

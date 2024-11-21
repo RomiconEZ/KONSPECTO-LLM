@@ -5,6 +5,9 @@
   "singleQuote": true,
   "trailingComma": "es5",
   "jsxBracketSameLine": false,
-  "arrowParens": "avoid",
-  "endOfLine": "auto"
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "bracketSpacing": true,
+  "jsxSingleQuote": false,
+  "proseWrap": "preserve"
 }

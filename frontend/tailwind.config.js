@@ -1,7 +1,10 @@
-// tailwind.config.js
-/** @type {import('tailwindcss').Config} */
+// frontend/tailwind.config.js
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  content: [
+    './index.html',
+    './src/**/*.{js,jsx,ts,tsx}',
+  ],
+  darkMode: 'class', // Enables dark mode
   theme: {
     extend: {
       colors: {
@@ -35,5 +38,8 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+  ],
 };

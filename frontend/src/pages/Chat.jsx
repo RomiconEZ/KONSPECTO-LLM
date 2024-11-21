@@ -1,13 +1,16 @@
-// src/pages/Chat.jsx
+// frontend/src/pages/Chat.jsx
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 
 function Chat({ chats, setChats, onOpenDoc }) {
   const { chatId } = useParams();
-  const chat = chats.find((c) => c.id === parseInt(chatId, 10));
+  console.log('Navigated to chat ID:', chatId); // Логирование chatId
+  const chat = chats.find((c) => c.id === Number(chatId));
+  console.log('Found chat:', chat); // Логирование найденного чата
+
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -15,81 +18,52 @@ function Chat({ chats, setChats, onOpenDoc }) {
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
-  const handleQueryChange = (e) => {
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const handleQueryChange = useCallback((e) => {
     setQuery(e.target.value);
-  };
+  }, []);
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
-      // Submit the form
-      e.preventDefault();
-      handleQuerySubmit(e);
-    } else if (e.key === 'Enter' && (e.ctrlKey || e.shiftKey)) {
-      // Insert newline
-      e.preventDefault();
-      const { selectionStart, selectionEnd } = e.target;
-      const newValue =
-        query.substring(0, selectionStart) + '\n' + query.substring(selectionEnd);
-      setQuery(newValue);
-      // Move cursor to the new position
-      setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
-            selectionStart + 1;
-        }
-      }, 0);
-    }
-  };
+  // Изменение здесь: добавление параметра event и вызов preventDefault()
+  const handleQuerySubmit = useCallback(async (e) => {
+    e.preventDefault(); // Предотвращение перезагрузки страницы
 
-  const handleQuerySubmit = async (e) => {
-    e.preventDefault();
-    if (loading) return; // Prevent multiple submissions
-    if (!query.trim()) return; // Do not submit empty messages
+    if (loading || !query.trim() || !chat) return;
+
     setLoading(true);
     setError(null);
 
-    if (!chat) {
-      setError('Чат не найден.');
-      setLoading(false);
-      return;
-    }
-
     const timestamp = new Date().toISOString();
-
-    // Create user message
     const userMessage = {
       sender: 'user',
       text: query,
       timestamp,
     };
-    const updatedChat = {
-      ...chat,
-      messages: [...chat.messages, userMessage],
-    };
-    setChats(chats.map((c) => (c.id === chat.id ? updatedChat : c)));
+    const updatedChat = { ...chat, messages: [...chat.messages, userMessage] };
+    setChats((prevChats) =>
+      prevChats.map((c) => (c.id === chat.id ? updatedChat : c)),
+    );
     setQuery('');
 
     try {
-      const res = await fetch('http://localhost:8000/v1/search', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/v1/search`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
       });
 
-      if (!res.ok) {
-        throw new Error(`Ошибка: ${res.status} ${res.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
       }
 
-      const data = await res.json();
+      const data = await response.json();
 
-      // Validate API response format
       if (!data.results || !Array.isArray(data.results)) {
         throw new Error('Неверный формат ответа от API.');
       }
 
-      // Create agent messages
       const agentMessages = data.results.map((item) => ({
         sender: 'agent',
         text: item.text,
@@ -98,45 +72,56 @@ function Chat({ chats, setChats, onOpenDoc }) {
         timestamp: new Date().toISOString(),
       }));
 
-      const updatedChatWithResponse = {
+      const finalChat = {
         ...updatedChat,
         messages: [...updatedChat.messages, ...agentMessages],
       };
-      setChats(chats.map((c) => (c.id === chat.id ? updatedChatWithResponse : c)));
 
-      // Scroll to bottom after new messages
+      setChats((prevChats) =>
+        prevChats.map((c) => (c.id === chat.id ? finalChat : c)),
+      );
       scrollToBottom();
     } catch (err) {
-      console.error(err);
+      console.error('API Error:', err);
       setError('Произошла ошибка при обработке вашего запроса.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, query, chat, setChats, scrollToBottom]);
 
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+        e.preventDefault();
+        handleQuerySubmit(e); // Передача события в функцию отправки
+      } else if (e.key === 'Enter' && (e.ctrlKey || e.shiftKey)) {
+        e.preventDefault();
+        const { selectionStart, selectionEnd } = e.target;
+        const newValue = query.slice(0, selectionStart) + '\n' + query.slice(selectionEnd);
+        setQuery(newValue);
+        setTimeout(() => {
+          if (textareaRef.current) {
+            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = selectionStart + 1;
+          }
+        }, 0);
+      }
+    },
+    [handleQuerySubmit, query],
+  );
 
   useEffect(() => {
     scrollToBottom();
-  }, [chat]);
+  }, [chat, scrollToBottom]);
 
   useEffect(() => {
     if (textareaRef.current) {
-      // Reset height
       textareaRef.current.style.height = 'auto';
-      // Set height (max 6 lines)
-      textareaRef.current.style.height = `${Math.min(
-        textareaRef.current.scrollHeight,
-        6 * 24
-      )}px`; // Assuming line-height is 24px
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 144)}px`;
     }
   }, [query]);
 
   if (!chat) {
+    console.warn(`Чат с ID ${chatId} не найден.`);
     return (
       <div className="flex items-center justify-center h-full text-center text-dark-700">
         <div>
@@ -154,23 +139,15 @@ function Chat({ chats, setChats, onOpenDoc }) {
         {chat.messages.map((message, index) => (
           <div
             key={index}
-            className={`mb-4 flex ${
-              message.sender === 'user' ? 'justify-end' : 'justify-start'
-            }`}
+            className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
               className={`max-w-1/2 p-3 rounded-lg ${
-                message.sender === 'user'
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-dark-600 text-dark-50'
+                message.sender === 'user' ? 'bg-orange-500 text-white' : 'bg-dark-600 text-dark-50'
               } break-words text-lg`}
             >
-              {/* Display file name if present */}
-              {message.file_name && (
-                <div className="font-semibold mb-1">{message.file_name}</div>
-              )}
+              {message.file_name && <div className="font-semibold mb-1">{message.file_name}</div>}
               <pre className="whitespace-pre-wrap">{message.text}</pre>
-              {/* Button to view document */}
               {message.sender === 'agent' && message.file_id && (
                 <button
                   onClick={() => onOpenDoc(message.file_id)}
@@ -179,7 +156,6 @@ function Chat({ chats, setChats, onOpenDoc }) {
                   Просмотреть документ
                 </button>
               )}
-              {/* Message timestamp */}
               <div
                 className={`text-xs mt-1 text-right ${
                   message.sender === 'user' ? 'text-gray-900' : 'text-gray-100'
@@ -205,7 +181,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
               className="textarea-custom"
               placeholder="Введите ваш запрос"
               rows={1}
-              style={{ maxHeight: '144px' }} // 6 lines * approx line-height 24px
+              maxLength={500} // Опционально: ограничение ввода
             />
           </div>
           <button
@@ -216,10 +192,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
             {loading ? 'Отправка...' : 'Отправить'}
           </button>
         </form>
-        {/* Display error message */}
-        {error && (
-          <div className="mt-4 text-red-500 text-center text-lg">{error}</div>
-        )}
+        {error && <div className="mt-4 text-red-500 text-center text-lg">{error}</div>}
       </div>
     </div>
   );

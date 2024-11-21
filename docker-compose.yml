@@ -1,59 +1,60 @@
 services:
   frontend:
-    platform: linux/arm64
     build:
       context: .
       dockerfile: docker/frontend/Dockerfile
+      args:
+        VITE_API_URL: /api
     ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "80:80"
     environment:
-      - NODE_ENV=development
-      - VITE_API_URL=http://localhost:8000
-      - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=production
     depends_on:
       - backend
+    restart: unless-stopped
 
   backend:
-    platform: linux/arm64
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
       - ./backend/logs:/app/logs
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      - ./backend/app/config:/app/config
+      - huggingface_cache:/app/.cache/huggingface  # Add this line
+    environment:
+      - PYTHON_ENV=production
+      - PYTHONPATH=/app
+      - REDIS_URL=redis://redis-stack:6379
+      - CHROMA_URL=http://chroma:8000
+      - HF_HOME=/app/.cache/huggingface  # Add this line
+      # Remove or comment out TRANSFORMERS_CACHE if present
+      # - TRANSFORMERS_CACHE=/app/.cache/huggingface/hub
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-    environment:
-      - PYTHON_ENV=development
-      - PYTHONPATH=/app
-      - REDIS_URL=redis://redis-stack:6379  # Обновлено на redis-stack
     depends_on:
       redis-stack:
         condition: service_healthy
+    restart: unless-stopped
 
   redis-stack:
-    platform: linux/arm64
     image: redis/redis-stack:latest
     ports:
-      - "6379:6379"   # Стандартный порт Redis
-      - "8001:8001"   # Переназначенный порт для веб-интерфейса Redis Stack
+      - "6379:6379"
+      - "8001:8001"
     volumes:
       - redis_stack_data:/data
-    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
 volumes:
   redis_stack_data:
+  huggingface_cache:

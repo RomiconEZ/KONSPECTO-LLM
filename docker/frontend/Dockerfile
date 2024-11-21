@@ -1,19 +1,42 @@
-# frontend/Dockerfile
-FROM node:18-alpine
+# docker/frontend/Dockerfile
+
+# Stage 1: Build the React application
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Установка зависимостей
+# Define a build argument for VITE_API_URL с дефолтным значением
+ARG VITE_API_URL=/api
+
+# Set the environment variable for the build
+ENV VITE_API_URL=${VITE_API_URL}
+
+# Копирование файлов package.json и package-lock.json
 COPY frontend/package*.json ./
-RUN npm install --legacy-peer-deps
+
+# Установка зависимостей
+RUN npm ci
 
 # Копирование исходного кода
-COPY frontend/ .
+COPY frontend/ ./
 
-EXPOSE 3000
+# Сборка приложения
+RUN npm run build
 
-ENV HOST=0.0.0.0
-ENV PORT=3000
+# Stage 2: Serve the built app with Nginx
+FROM nginx:alpine
 
-# Использование команды dev для разработки
-CMD ["npm", "run", "dev", "--", "--host"]
+# Удаление стандартного сайта Nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Копирование построенных файлов из предыдущей сборки
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Копирование пользовательской конфигурации Nginx
+COPY docker/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Открытие порта 80
+EXPOSE 80
+
+# Запуск Nginx
+CMD ["nginx", "-g", "daemon off;"]

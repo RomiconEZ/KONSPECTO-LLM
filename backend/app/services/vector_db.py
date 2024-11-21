@@ -1,11 +1,9 @@
+# backend/app/services/vector_db.py
 import json
 import logging
-import os
 from pathlib import Path
 
 import torch
-from dotenv import load_dotenv
-from redisvl.schema import IndexSchema
 from llama_index.core import VectorStoreIndex, Settings
 from llama_index.core.ingestion import (
     DocstoreStrategy,
@@ -18,15 +16,16 @@ from llama_index.readers.google import GoogleDriveReader
 from llama_index.storage.docstore.redis import RedisDocumentStore
 from llama_index.storage.kvstore.redis import RedisKVStore as RedisCache
 from llama_index.vector_stores.redis import RedisVectorStore
+from redisvl.schema import IndexSchema
 
-# Настройка логирования
-logger = logging.getLogger(__name__)
+from ..core.config import settings
+
+logger = logging.getLogger("app.services.vector_db")
 
 class IndexManager:
     """
     Singleton class to manage the VectorStoreIndex.
     """
-
     _instance = None
 
     def __new__(cls):
@@ -44,40 +43,11 @@ class IndexManager:
     def initialize_index(self):
         """
         Initializes the VectorStoreIndex, vector store, and ingestion pipeline.
-        Raises:
-            FileNotFoundError: If the configuration directory is not found.
-            Exception: If any part of the initialization fails.
         """
         try:
-            # Получаем URL Chroma из переменных окружения или используем значение по умолчанию
-            CHROMA_URL = os.getenv("CHROMA_URL", "http://chroma:8000")
+            logger.info("Initializing VectorStoreIndex...")
 
-            # Определяем путь директории конфигурации
-            config_path = Path(__file__).parent.parent / 'config'
-            if config_path.exists() and config_path.is_dir():
-                logger.info(f"Директория конфигурации '{config_path}' существует.")
-            else:
-                logger.error(f"Директория конфигурации '{config_path}' не найдена.")
-                raise FileNotFoundError(f"Директория конфигурации '{config_path}' не найдена.")
-
-            # Пути к файлам
-            env_path = config_path / '.env'
-            google_creds_path = config_path / 'service_account_key.json'
-
-            # Логгирование найденных путей
-            logger.info(f"Путь к .env: {env_path}")
-            logger.info(f"Путь к service_account_key.json: {google_creds_path}")
-
-            # Загружаем переменные окружения из локального .env файла, не переопределяя уже существующие
-            load_dotenv(dotenv_path=env_path, override=False)
-
-            FOLDER_ID = os.getenv('FOLDER_ID')
-            logger.info(f"ID папки на диске: {FOLDER_ID}")
-
-            # Обновляем REDIS_URL для использования имени хоста Redis в Docker Compose
-            REDIS_URL = os.getenv("REDIS_URL", "redis://redis-stack:6379")
-
-            # Определяем устройство (MPS, CUDA или CPU)
+            # Device configuration
             device = (
                 torch.device("mps")
                 if torch.backends.mps.is_available()
@@ -85,19 +55,20 @@ class IndexManager:
             )
             logger.info(f"Using device: {device}")
 
-            # Настраиваем модель в Settings
+            # Embedding model setup
             embed_model = HuggingFaceEmbedding(
                 model_name="sentence-transformers/all-MiniLM-L12-v2",
                 device=device,
                 parallel_process=False,
                 embed_batch_size=16
             )
-            logger.info("HuggingFaceEmbedding initialized successfully")
+            logger.info("HuggingFaceEmbedding initialized successfully.")
 
+            # LLM settings
             Settings.llm = None
-            logger.info("LLM initialized successfully")
+            logger.info("LLM settings configured.")
 
-            # Настройка схемы индекса
+            # Custom schema for RedisVectorStore
             custom_schema = IndexSchema.from_dict(
                 {
                     "index": {"name": "gdrive", "prefix": "doc"},
@@ -118,17 +89,20 @@ class IndexManager:
                 }
             )
 
+            # Initialize RedisVectorStore
             vector_store = RedisVectorStore(
                 schema=custom_schema,
-                redis_url=REDIS_URL,
+                redis_url=settings.REDIS_URL,
             )
+            logger.info("RedisVectorStore initialized.")
 
-            # Set up the ingestion cache layer
+            # Ingestion cache setup
             cache = IngestionCache(
                 cache=RedisCache.from_host_and_port("redis-stack", 6379),
                 collection="redis_cache",
             )
 
+            # Ingestion pipeline setup
             pipeline = IngestionPipeline(
                 transformations=[
                     SentenceSplitter(),
@@ -141,62 +115,61 @@ class IndexManager:
                 cache=cache,
                 docstore_strategy=DocstoreStrategy.UPSERTS,
             )
+            logger.info("Ingestion pipeline configured.")
 
+            # Initialize VectorStoreIndex
             self.index = VectorStoreIndex.from_vector_store(
                 pipeline.vector_store, embed_model=embed_model
             )
+            logger.info("VectorStoreIndex created from vector store.")
 
-            google_creds_json = google_creds_path.read_text().replace('\n', '')
-            google_creds_dict = json.loads(google_creds_json)
+            # Load documents from Google Drive
+            service_account_path = Path(settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH)
+            if not service_account_path.exists():
+                logger.error(f"Service account key file not found at {service_account_path}")
+                raise FileNotFoundError(f"Service account key file not found at {service_account_path}")
 
-            loader = GoogleDriveReader(service_account_key=google_creds_dict, folder_id=FOLDER_ID)
+            with service_account_path.open('r') as f:
+                google_creds_dict = json.load(f)
 
-            # Load data with additional logging
-            try:
-                docs = loader.load_data()
-                if not docs:
-                    logger.warning("No documents were loaded from Google Drive.")
-                else:
-                    logger.info(f"Loaded {len(docs)} documents from Google Drive.")
-                nodes = pipeline.run(documents=docs)
-                logger.info(f"Ingested {len(nodes)} Nodes")
-            except Exception as e:
-                logger.error(f"Failed to load documents: {e}")
-                raise
+            loader = GoogleDriveReader(service_account_key=google_creds_dict, folder_id=settings.FOLDER_ID)
+            logger.info("GoogleDriveReader initialized.")
 
+            docs = loader.load_data()
+            if not docs:
+                logger.warning("No documents were loaded from Google Drive.")
+            else:
+                logger.info(f"Loaded {len(docs)} documents from Google Drive.")
+
+            # Run ingestion pipeline
+            nodes = pipeline.run(documents=docs)
+            logger.info(f"Ingested {len(nodes)} nodes into VectorStoreIndex.")
+
+            # Verify index existence
             if vector_store.index_exists():
                 logger.info("Index 'gdrive' exists after ingestion.")
             else:
                 logger.error("Index 'gdrive' does not exist after ingestion.")
 
         except Exception as e:
-            logger.error(f"Failed to set up the ingestion pipeline: {e}")
+            logger.exception("Failed to set up the ingestion pipeline.")
             raise
 
-    def get_index(self):
+    def get_index(self) -> VectorStoreIndex:
         """
         Returns the VectorStoreIndex. Initializes it if not already done.
-
-        Returns:
-            VectorStoreIndex: The initialized index.
         """
         if self.index is None:
-            logger.info("Index is not initialized. Initializing now...")
+            logger.info("Index not initialized. Initializing now...")
             self.initialize_index()
         else:
             logger.info("Index already initialized. Returning existing index.")
         return self.index
 
-
-# Singleton instance of IndexManager
 _index_manager = IndexManager()
 
-
-def get_index():
+def get_index() -> VectorStoreIndex:
     """
     Retrieves the VectorStoreIndex instance.
-
-    Returns:
-        VectorStoreIndex: The initialized index.
     """
     return _index_manager.get_index()

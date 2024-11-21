@@ -1,122 +1,90 @@
-// src/App.jsx
-
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaEdit, FaTrash } from 'react-icons/fa';
+// frontend/src/App.jsx
+import React, { useState, useCallback, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Chat from './pages/Chat';
 import GoogleDocViewer from './components/GoogleDocViewer';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
+import Sidebar from './components/Sidebar';
 
 function App() {
-  const [chats, setChats] = useState([]);
+  // Загрузка чатов из localStorage при инициализации
+  const [chats, setChats] = useState(() => {
+    const storedChats = localStorage.getItem('chats');
+    const parsedChats = storedChats ? JSON.parse(storedChats) : [];
+    console.log('Loaded chats from localStorage:', parsedChats);
+    return parsedChats;
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [docFileId, setDocFileId] = useState('');
-  const [docViewerWidth, setDocViewerWidth] = useState(400); // Initial width in pixels
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const [docViewerWidth, setDocViewerWidth] = useState(400);
   const navigate = useNavigate();
 
+  // Сохранение чатов в localStorage при их изменении
   useEffect(() => {
-    const handleResize = () => {
-      setWindowHeight(window.innerHeight);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    console.log('Saving chats to localStorage:', chats);
+    localStorage.setItem('chats', JSON.stringify(chats));
+  }, [chats]);
+
+  const addChat = useCallback(() => {
+    const newChat = { id: Date.now(), name: `Чат ${chats.length + 1}`, messages: [] };
+    console.log('Adding new chat:', newChat);
+    setChats((prevChats) => [...prevChats, newChat]);
+    navigate(`/chat/${newChat.id}`);
+  }, [chats.length, navigate]);
+
+  const deleteChat = useCallback(
+    (chatId) => {
+      console.log(`Deleting chat with ID: ${chatId}`);
+      setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+      navigate('/');
+    },
+    [navigate],
+  );
+
+  const renameChat = useCallback(
+    (chatId, newName) => {
+      console.log(`Renaming chat ID ${chatId} to ${newName}`);
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === chatId ? { ...chat, name: newName } : chat,
+        ),
+      );
+    },
+    [],
+  );
+
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen((prev) => !prev);
   }, []);
 
-  const addChat = () => {
-    const newChat = { id: Date.now(), name: `Чат ${chats.length + 1}`, messages: [] };
-    setChats([...chats, newChat]);
-    navigate(`/chat/${newChat.id}`);
-  };
-
-  const deleteChat = (chatId) => {
-    setChats(chats.filter(chat => chat.id !== chatId));
-    navigate('/');
-  };
-
-  const renameChat = (chatId, newName) => {
-    setChats(chats.map(chat => chat.id === chatId ? { ...chat, name: newName } : chat));
-  };
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const handleOpenDocViewer = (fileId) => {
+  const handleOpenDocViewer = useCallback((fileId) => {
+    console.log(`Opening document viewer for file ID: ${fileId}`);
     setDocFileId(fileId);
-  };
+  }, []);
 
-  const handleCloseDocViewer = () => {
+  const handleCloseDocViewer = useCallback(() => {
+    console.log('Closing document viewer.');
     setDocFileId('');
-  };
+  }, []);
 
-  // Handle resizing by updating the width state
-  const handleResize = (event, { size }) => {
+  const handleResize = useCallback((event, { size }) => {
+    console.log(`Resizing document viewer to width: ${size.width}`);
     setDocViewerWidth(size.width);
-  };
+  }, []);
 
   return (
     <div className="flex h-screen bg-dark-900 text-dark-50 overflow-hidden">
       {/* Sidebar */}
-      <nav
-        className={`bg-dark-800 shadow-lg p-4 flex flex-col transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? 'w-64' : 'w-16'
-        }`}
-      >
-        {/* Toggle Sidebar Button */}
-        <button
-          onClick={toggleSidebar}
-          className="mb-4 text-orange-400 focus:outline-none"
-          aria-label={isSidebarOpen ? 'Скрыть меню' : 'Показать меню'}
-        >
-          {isSidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
-        </button>
-        {isSidebarOpen && (
-          <>
-            <h1 className="text-2xl font-bold text-orange-400 mb-4">KONSPECTO</h1>
-            <button
-              onClick={addChat}
-              className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 mb-4"
-            >
-              Добавить чат
-            </button>
-            <ul className="flex-1 space-y-4 overflow-y-auto">
-              {chats.map(chat => (
-                <li key={chat.id} className="flex justify-between items-center">
-                  <Link
-                    to={`/chat/${chat.id}`}
-                    className="text-orange-300 hover:text-orange-400 transition duration-200 font-medium flex-1 truncate"
-                  >
-                    {chat.name}
-                  </Link>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => {
-                        const newName = prompt('Введите новое название чата:', chat.name);
-                        if (newName) renameChat(chat.id, newName);
-                      }}
-                      className="text-orange-300 hover:text-orange-400 focus:outline-none"
-                      aria-label="Изменить название чата"
-                      title="Изменить название чата"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => deleteChat(chat.id)}
-                      className="text-red-500 hover:text-red-600 focus:outline-none"
-                      aria-label="Удалить чат"
-                      title="Удалить чат"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </nav>
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        chats={chats}
+        addChat={addChat}
+        deleteChat={deleteChat}
+        renameChat={renameChat}
+      />
 
       {/* Main Content Area (Chat and Document Viewer) */}
       <div className="flex-1 flex overflow-hidden">
@@ -159,11 +127,11 @@ function App() {
         {docFileId && (
           <ResizableBox
             width={docViewerWidth}
-            height={windowHeight}
-            minConstraints={[300, windowHeight]}
-            maxConstraints={[window.innerWidth / 2, windowHeight]}
+            height={document.body.clientHeight}
+            minConstraints={[300, 300]}
+            maxConstraints={[window.innerWidth / 2, window.innerHeight]}
             axis="x"
-            resizeHandles={['w']} // Resize from the west (left) side
+            resizeHandles={['w']}
             handle={
               <span
                 className="react-resizable-handle react-resizable-handle-w"

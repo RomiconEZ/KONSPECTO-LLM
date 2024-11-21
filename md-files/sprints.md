@@ -134,6 +134,11 @@ The KONSPECTO project involves the development of an intelligent agent based on 
 ### Sprint 3.4:
 **Upgrade UI**
    - Improving the design of the UI
+
+### Sprint 3.5:
+**Improving project structure**
+   - Improving the structure of the backend and frontend
+
 ---
     
 ## Sprint 4: Note Merging Functionality

@@ -1,43 +1,71 @@
-# backend/Dockerfile
+# docker/backend/Dockerfile
 
-# Используем базовый образ с Debian Bookworm
-FROM python:3.11-slim-bookworm
+# Stage 1: Builder
+FROM python:3.11-slim-bookworm AS builder
 
-# Установить рабочую директорию
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+   build-essential \
+   gcc \
+   && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
 WORKDIR /app
 
-# Установка системных зависимостей
-RUN echo "Step 1: Updating package list and installing system dependencies" \
-    && apt-get update && apt-get install -y --no-install-recommends \
-        gcc \
-        ca-certificates \
-        libsqlite3-dev \
-        sqlite3 \
-    && rm -rf /var/lib/apt/lists/*
+# Install Poetry
+RUN pip install poetry==1.7.1
 
-# Установка Poetry
-RUN echo "Step 2: Installing poetry" \
-    && pip install poetry==1.7.1
+# Copy dependency files
+COPY backend/pyproject.toml backend/poetry.lock ./
 
-# Копирование файлов зависимостей Poetry
-COPY backend/pyproject.toml ./
-COPY backend/poetry.lock ./
+# Install dependencies
+RUN poetry config virtualenvs.create false \
+   && poetry install --no-interaction --no-ansi --only main
 
-# Конфигурация Poetry и установка зависимостей
-RUN echo "Step 3: Configuring poetry and installing dependencies" \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+# Stage 2: Production
+FROM python:3.11-slim-bookworm
 
-# Копирование кода бэкенда
+# Set work directory
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+   libsqlite3-dev \
+   && rm -rf /var/lib/apt/lists/*
+
+# Copy dependencies from builder
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application code
 COPY backend/ .
 
-# Создание директории для логов
-RUN echo "Step 4: Creating logs directory" \
-    && mkdir -p /app/logs
+# Copy configuration files
+COPY backend/app/config ./config
 
-# Экспонирование порта
+# Set HF_HOME environment variable (replacing TRANSFORMERS_CACHE)
+ENV HF_HOME=/app/.cache/huggingface
+
+# Create the cache directory
+RUN mkdir -p /app/.cache/huggingface
+
+# Create non-root user
+RUN adduser --disabled-password --no-create-home appuser
+
+# Change ownership of the application directory to appuser
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Create logs directory
+RUN mkdir -p /app/logs
+
+# Expose port
 EXPOSE 8000
 
-# Команда для запуска приложения
-CMD echo "Step 5: Starting Uvicorn server" \
-    && uvicorn app.main:app --host 0.0.0.0 --port 8000
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+# Start the application
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

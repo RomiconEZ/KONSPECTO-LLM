@@ -3,16 +3,23 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
+import { FaMicrophone, FaMicrophoneSlash, FaCircle } from 'react-icons/fa'; // Добавлен FaCircle для анимации записи
 
 function Chat({ chats, setChats, onOpenDoc }) {
   const { chatId } = useParams();
-  console.log('Navigated to chat ID:', chatId); // Логирование chatId
+  console.log('Navigated to chat ID:', chatId); // Debugging
   const chat = chats.find((c) => c.id === Number(chatId));
-  console.log('Found chat:', chat); // Логирование найденного чата
+  console.log('Found chat:', chat); // Debugging
 
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [isRecording, setIsRecording] = useState(false); // Recording state
+  const [isTranscribing, setIsTranscribing] = useState(false); // Transcription state
+  const [recordError, setRecordError] = useState(false); // Recording error state
+
+  const mediaRecorderRef = useRef(null); // MediaRecorder reference
+  const audioChunksRef = useRef([]); // Store audio chunks
+  const recordingStartTimeRef = useRef(null); // Recording start time
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -25,14 +32,13 @@ function Chat({ chats, setChats, onOpenDoc }) {
     setQuery(e.target.value);
   }, []);
 
-  // Изменение здесь: добавление параметра event и вызов preventDefault()
   const handleQuerySubmit = useCallback(async (e) => {
-    e.preventDefault(); // Предотвращение перезагрузки страницы
+    e.preventDefault(); // Prevent page reload
 
-    if (loading || !query.trim() || !chat) return;
+    if (loading || !query.trim() || !chat || isTranscribing) return;
 
     setLoading(true);
-    setError(null);
+    setIsTranscribing(true);
 
     const timestamp = new Date().toISOString();
     const userMessage = {
@@ -42,12 +48,12 @@ function Chat({ chats, setChats, onOpenDoc }) {
     };
     const updatedChat = { ...chat, messages: [...chat.messages, userMessage] };
     setChats((prevChats) =>
-      prevChats.map((c) => (c.id === chat.id ? updatedChat : c)),
+      prevChats.map((c) => (c.id === chat.id ? updatedChat : c))
     );
     setQuery('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/v1/search`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
@@ -77,22 +83,24 @@ function Chat({ chats, setChats, onOpenDoc }) {
       };
 
       setChats((prevChats) =>
-        prevChats.map((c) => (c.id === chat.id ? finalChat : c)),
+        prevChats.map((c) => (c.id === chat.id ? finalChat : c))
       );
       scrollToBottom();
     } catch (err) {
       console.error('API Error:', err);
-      setError('Произошла ошибка при обработке вашего запроса.');
+      // Здесь мы не устанавливаем setError, вместо этого показываем красную рамку
+      triggerRecordError();
     } finally {
       setLoading(false);
+      setIsTranscribing(false);
     }
-  }, [loading, query, chat, setChats, scrollToBottom]);
+  }, [loading, query, chat, setChats, scrollToBottom, isTranscribing]);
 
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
         e.preventDefault();
-        handleQuerySubmit(e); // Передача события в функцию отправки
+        handleQuerySubmit(e);
       } else if (e.key === 'Enter' && (e.ctrlKey || e.shiftKey)) {
         e.preventDefault();
         const { selectionStart, selectionEnd } = e.target;
@@ -105,8 +113,91 @@ function Chat({ chats, setChats, onOpenDoc }) {
         }, 0);
       }
     },
-    [handleQuerySubmit, query],
+    [handleQuerySubmit, query]
   );
+
+  // Recording Handlers
+  const startRecording = useCallback(async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      triggerRecordError();
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      recordingStartTimeRef.current = Date.now();
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const recordingEndTime = Date.now();
+        const duration = (recordingEndTime - recordingStartTimeRef.current) / 1000; // in seconds
+
+        if (duration < 0.2) {
+          console.warn('Запись слишком короткая, не отправляем на сервер.');
+          // Здесь можно добавить эффект для слишком короткой записи
+          triggerRecordError();
+          return;
+        }
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/mp3' });
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'recording.mp3');
+
+        // Отправка аудио файла на сервер
+        try {
+          setLoading(true);
+          setIsTranscribing(true);
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/transcribe`, {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error('Ошибка при транскрипции аудио.');
+          }
+
+          const data = await response.json();
+          setQuery((prev) => prev + data.transcription);
+          scrollToBottom();
+        } catch (err) {
+          console.error('Transcription Error:', err);
+          triggerRecordError();
+        } finally {
+          setLoading(false);
+          setIsTranscribing(false);
+        }
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Recording Error:', err);
+      triggerRecordError();
+    }
+  }, [scrollToBottom]);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
+      setIsRecording(false);
+    }
+  }, [isRecording]);
+
+  const triggerRecordError = useCallback(() => {
+    setRecordError(true);
+    setTimeout(() => {
+      setRecordError(false);
+    }, 2000); // Красная рамка исчезнет через 2 секунды
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -138,14 +229,20 @@ function Chat({ chats, setChats, onOpenDoc }) {
         {chat.messages.map((message, index) => (
           <div
             key={index}
-            className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`mb-4 flex ${
+              message.sender === 'user' ? 'justify-end' : 'justify-start'
+            }`}
           >
             <div
               className={`max-w-1/2 p-3 rounded-lg ${
-                message.sender === 'user' ? 'bg-blue-500 text-gray-50' : 'bg-dark-700 text-gray-50'
+                message.sender === 'user'
+                  ? 'bg-blue-500 text-gray-50'
+                  : 'bg-dark-700 text-gray-50'
               } break-words text-lg`}
             >
-              {message.file_name && <div className="font-semibold mb-1">{message.file_name}</div>}
+              {message.file_name && (
+                <div className="font-semibold mb-1">{message.file_name}</div>
+              )}
               <pre className="whitespace-pre-wrap">{message.text}</pre>
               {message.sender === 'agent' && message.file_id && (
                 <button
@@ -157,7 +254,9 @@ function Chat({ chats, setChats, onOpenDoc }) {
               )}
               <div
                 className={`text-xs mt-1 text-right ${
-                  message.sender === 'user' ? 'text-gray-200' : 'text-gray-100'
+                  message.sender === 'user'
+                    ? 'text-gray-200'
+                    : 'text-gray-100'
                 }`}
               >
                 {dayjs(message.timestamp).format('HH:mm DD.MM.YYYY')}
@@ -169,8 +268,8 @@ function Chat({ chats, setChats, onOpenDoc }) {
       </div>
 
       {/* Input Field */}
-      <div className="mt-4">
-        <form onSubmit={handleQuerySubmit} className="flex items-center"> {/* Изменено с items-end на items-center */}
+      <div className="mt-4 flex items-center">
+        <form onSubmit={handleQuerySubmit} className="flex-1 flex items-center">
           <div className="flex-1 relative">
             <textarea
               ref={textareaRef}
@@ -180,18 +279,39 @@ function Chat({ chats, setChats, onOpenDoc }) {
               className="textarea-custom"
               placeholder="Введите ваш запрос"
               rows={1}
-              maxLength={500} // Опционально: ограничение ввода
+              maxLength={500} // Optional: Input limit
+              disabled={isTranscribing} // Отключение при транскрипции
             />
           </div>
+          {/* Microphone Button */}
+          <button
+            type="button"
+            onMouseDown={!isTranscribing ? startRecording : null}
+            onMouseUp={!isTranscribing ? stopRecording : null}
+            onTouchStart={!isTranscribing ? startRecording : null}
+            onTouchEnd={!isTranscribing ? stopRecording : null}
+            className={`ml-2 p-2 rounded-full flex items-center justify-center transition duration-200 ${
+              isRecording
+                ? 'bg-red-500 animate-pulse border-2 border-red-600'
+                : 'bg-blue-500'
+            } ${
+              recordError ? 'border-2 border-red-500' : ''
+            } text-gray-50 hover:bg-red-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`}
+            aria-label={isRecording ? 'Запись...' : 'Начать запись'}
+            disabled={isTranscribing || loading} // Отключение при транскрипции или загрузке
+          >
+            {isRecording ? <FaCircle className="text-white animate-pulse" /> : <FaMicrophone />}
+          </button>
+          {/* Send Button */}
           <button
             type="submit"
-            className="ml-2 bg-blue-500 text-gray-50 px-4 py-2 rounded hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-shrink-0 h-12" // Добавлено h-12 для согласованности высоты
-            disabled={loading}
+            className="ml-2 bg-blue-500 text-gray-50 px-4 py-2 rounded hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-shrink-0 h-12"
+            disabled={loading || isTranscribing}
           >
             {loading ? 'Отправка...' : 'Отправить'}
           </button>
         </form>
-        {error && <div className="mt-4 text-red-400 text-center text-lg">{error}</div>}
+        {/* Удалено сообщение об ошибке */}
       </div>
     </div>
   );

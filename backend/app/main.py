@@ -2,6 +2,9 @@
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from faster_whisper import WhisperModel  # Import WhisperModel
+import torch
+
 
 from .core.config import settings
 from .core.logging_config import setup_logging
@@ -35,6 +38,19 @@ def create_application() -> FastAPI:
     async def startup_event():
         logger.info("Starting up: Connecting to Redis...")
         await redis_service.connect()
+        logger.info("Starting up: Loading Whisper model...")
+        try:
+            device = "cuda:0" if torch.cuda.is_available() else "cpu"
+            compute_type = "float16" if torch.cuda.is_available() else "float32"
+            cpu_threads = 8
+            app.state.whisper_model = WhisperModel("large-v3",
+                                                   device=device,
+                                                   compute_type=compute_type,
+                                                   cpu_threads=cpu_threads)
+            logger.info("Whisper model loaded successfully.")
+        except Exception as e:
+            logger.exception("Failed to load Whisper model.")
+            raise
 
     @app.on_event("shutdown")
     async def shutdown_event():
@@ -66,7 +82,6 @@ def create_application() -> FastAPI:
 
     # Include API Router
     app.include_router(api_router, prefix="/api")
-
     logger.info("KONSPECTO API initialized successfully.")
     return app
 

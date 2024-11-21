@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/frontend/Dockerfile
       args:
-        VITE_API_URL: /api
+        VITE_API_URL: /api/v1
     ports:
       - "80:80"
     environment:

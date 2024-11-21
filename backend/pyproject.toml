@@ -26,6 +26,8 @@ llama-index-storage-docstore-redis = "^0.2.0"
 llama-index-vector-stores-redis = "^0.3.4"
 llama-index-readers-google = "^0.4.2"
 pydantic-settings = "^2.6.1"
+faster-whisper = "^1.0.3"
+aiofiles = "^24.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.3.1"

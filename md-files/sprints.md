@@ -145,7 +145,47 @@ The KONSPECTO project involves the development of an intelligent agent based on 
 
 ---
     
-## Sprint 4: Note Merging Functionality
+## Sprint 4: Audio Transcription Functionality
+**Duration:** 2 weeks  
+**MVP:** Functional transcription API endpoint and corresponding frontend component for processing audio files.
+
+### Implemented Features:
+- **API Endpoint `/v1/transcribe`:**
+  - Accepts uploaded audio files (MP3 and WAV).
+  - Utilizes the Whisper model for transcribing audio to text.
+  - Returns the transcribed text in the response.
+- **Frontend Transcription Component:**
+  - Allows users to upload audio files.
+  - Displays the transcribed text after processing.
+  - Integrated into the main application routing.
+
+### Tasks:
+1. **Implement Transcription API:**
+   - Develop the `/v1/transcribe` endpoint to handle audio file uploads.
+   - Integrate the `WhisperModel` for audio transcription.
+   - Ensure support for MP3 and WAV formats.
+   - Implement asynchronous request processing to enhance performance.
+   - Adhere to FastAPI coding standards and type annotations.
+
+2. **Develop Frontend Transcription Component:**
+   - Create a component for users to upload audio files.
+   - Implement functionality to display the transcribed text after successful processing.
+   - Integrate the transcription component into the main application routing.
+   - Ensure React components adhere to the Airbnb JavaScript Style Guide.
+
+3. **Enforce Development Standards:**
+   - Run `flake8` and `black` for backend code.
+   - Run `ESLint` and `Prettier` for frontend code.
+   - Ensure all dependencies are at specified versions.
+
+4. **Testing Transcription Functionality:**
+   - Write unit tests for the `/v1/transcribe` API endpoint.
+   - Develop integration tests to verify interactions between frontend and backend during audio transcription.
+   - Achieve at least 80% code coverage for transcription functionality.
+
+---
+
+## Sprint 5: Note Merging Functionality
 **Duration:** 2 weeks  
 **MVP:** Functional note merging API endpoint and corresponding frontend component for merging notes.
 
@@ -178,17 +218,17 @@ The KONSPECTO project involves the development of an intelligent agent based on 
 
 6. **Update Documentation:**
    - Document the merge endpoint in `docs/api_documentation.md`.
-   - Update user guide with note merging functionality details in `docs/user_guide.md`.
+   - Update the user guide with note merging functionality details in `docs/user_guide.md`.
 
 ---
-    
-## Sprint 5: Video-to-Slides Conversion Functionality
+
+## Sprint 6: Video-to-Slides Conversion Functionality
 **Duration:** 2 weeks  
 **MVP:** Functional video upload API endpoint and frontend component for converting videos to slides.
 
 ### Tasks:
 1. **Implement Video Conversion API:**
-   - Develop `/v1/convert` endpoint for uploading video lectures.
+   - Develop the `/v1/convert` endpoint for uploading video lectures.
    - Integrate FFmpeg (version 4.4.1) to extract keyframes from uploaded videos at specified intervals.
    - Ensure extracted images (slides) are saved and accessible.
    - Adhere to FastAPI coding standards and type annotations.
@@ -215,50 +255,7 @@ The KONSPECTO project involves the development of an intelligent agent based on 
 
 6. **Update Documentation:**
    - Document the video conversion endpoint in `docs/api_documentation.md`.
-   - Update user guide with video-to-slides conversion functionality details in `docs/user_guide.md`.
-
----
-    
-## Sprint 6: Voice Input Functionality and UI Enhancements
-**Duration:** 2 weeks  
-**MVP:** Functional voice input API endpoint and frontend component for processing voice queries, along with enhanced user interface.
-
-### Tasks:
-1. **Implement Voice Input API:**
-   - Develop `/v1/voice` endpoint to accept audio files and convert them to text using Lightning Whisper-MLX (latest stable version).
-   - Ensure accurate transcription of voice queries.
-   - Adhere to FastAPI coding standards and type annotations.
-
-2. **Develop Frontend Voice Input Component:**
-   - Create a component for recording and uploading voice queries.
-   - Display transcribed text and integrate it with existing search and processing functionalities.
-   - Integrate the voice input component into the main application routing.
-   - Ensure React components follow the Airbnb JavaScript Style Guide.
-
-3. **Enhance User Interface:**
-   - Perform UX/UI improvements based on initial feedback.
-   - Ensure responsive design across various devices using TailwindCSS (version 3.3.2).
-   - Update styles and layouts in `frontend/src/styles/`.
-
-4. **Enforce Development Standards:**
-   - Run `flake8` and `black` for backend code.
-   - Run `ESLint` and `Prettier` for frontend code.
-   - Ensure all dependencies are at specified versions.
-
-5. **Testing Voice Input Functionality:**
-   - Write unit tests for the voice input API endpoint.
-   - Develop integration tests to verify voice input processing between frontend and backend.
-   - Conduct user testing to evaluate accuracy and usability.
-   - Achieve at least 80% code coverage for voice input functionality.
-
-6. **Performance Optimization:**
-   - Optimize backend request processing for increased speed and efficiency.
-   - Implement caching mechanisms if necessary.
-   - Conduct load testing to assess overall system performance.
-
-7. **Update Documentation:**
-   - Document the voice input endpoint in `docs/api_documentation.md`.
-   - Update user guide with voice input functionality details in `docs/user_guide.md`.
+   - Update the user guide with video-to-slides conversion functionality details in `docs/user_guide.md`.
 
 ---
     

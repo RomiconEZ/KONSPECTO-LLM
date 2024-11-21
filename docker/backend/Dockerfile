@@ -3,69 +3,91 @@
 # Stage 1: Builder
 FROM python:3.11-slim-bookworm AS builder
 
-# Install build dependencies
+# Установка build-зависимостей и FFmpeg с необходимыми кодеками
 RUN apt-get update && apt-get install -y --no-install-recommends \
    build-essential \
    gcc \
+   ffmpeg \
+   libglib2.0-0 \
+   libsm6 \
+   libxext6 \
+   libavcodec-extra \
+   libavdevice-dev \
+   libavfilter-dev \
+   libavformat-dev \
+   libavutil-dev \
+   libswscale-dev \
+   libmp3lame0 \
    && rm -rf /var/lib/apt/lists/*
 
-# Set work directory
+# Установка рабочего каталога
 WORKDIR /app
 
-# Install Poetry
+# Установка Poetry
 RUN pip install poetry==1.7.1
 
-# Copy dependency files
+# Копирование файлов зависимостей
 COPY backend/pyproject.toml backend/poetry.lock ./
 
-# Install dependencies
+# Установка зависимостей
 RUN poetry config virtualenvs.create false \
    && poetry install --no-interaction --no-ansi --only main
 
 # Stage 2: Production
 FROM python:3.11-slim-bookworm
 
-# Set work directory
-WORKDIR /app
-
-# Install runtime dependencies
+# Установка runtime-зависимостей и FFmpeg с необходимыми кодеками
 RUN apt-get update && apt-get install -y --no-install-recommends \
+   ffmpeg \
+   libglib2.0-0 \
+   libsm6 \
+   libxext6 \
+   libavcodec-extra \
+   libavdevice-dev \
+   libavfilter-dev \
+   libavformat-dev \
+   libavutil-dev \
+   libswscale-dev \
+   libmp3lame0 \
    libsqlite3-dev \
    && rm -rf /var/lib/apt/lists/*
 
-# Copy dependencies from builder
+# Установка рабочего каталога
+WORKDIR /app
+
+# Копирование зависимостей из builder stage
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy application code
+# Копирование кода приложения
 COPY backend/ .
 
-# Copy configuration files
+# Копирование конфигурационных файлов
 COPY backend/app/config ./config
 
-# Set HF_HOME environment variable (replacing TRANSFORMERS_CACHE)
+# Установка переменной окружения для кэша Hugging Face
 ENV HF_HOME=/app/.cache/huggingface
 
-# Create the cache directory
+# Создание каталога для кэша
 RUN mkdir -p /app/.cache/huggingface
 
-# Create non-root user
+# Создание непривилегированного пользователя
 RUN adduser --disabled-password --no-create-home appuser
 
-# Change ownership of the application directory to appuser
+# Изменение прав собственности на рабочий каталог
 RUN chown -R appuser:appuser /app
 
-# Switch to non-root user
+# Переключение на непривилегированного пользователя
 USER appuser
 
-# Create logs directory
+# Создание каталога для логов
 RUN mkdir -p /app/logs
 
-# Expose port
+# Открытие порта
 EXPOSE 8000
 
-# Set environment variables
+# Установка переменных окружения
 ENV PYTHONUNBUFFERED=1
 
-# Start the application
+# Запуск приложения
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

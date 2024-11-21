@@ -13,10 +13,10 @@ const GoogleDocViewer = React.memo(({ fileId, onClose }) => {
     <div className="flex flex-col h-full w-full">
       {/* Header with Close Button */}
       <div className="flex justify-between items-center p-4 bg-dark-700 border-b border-dark-600">
-        <h2 className="text-lg font-semibold text-white">Просмотр документа</h2>
+        <h2 className="text-lg font-semibold text-blue-100">Просмотр документа</h2>
         <button
           onClick={onClose}
-          className="bg-orange-500 text-dark-900 px-3 py-1 rounded hover:bg-orange-600 transition duration-200"
+          className="bg-blue-500 text-gray-50 px-3 py-1 rounded hover:bg-blue-600 transition duration-200"
           aria-label="Закрыть просмотр документа"
         >
           Закрыть

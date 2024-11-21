@@ -131,3 +131,4 @@ dmypy.json
 /backend/app/documents/
 /backend/app/config/
 /frontend/package-lock.json
+/frontend/node_modules/

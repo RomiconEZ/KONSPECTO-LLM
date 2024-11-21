@@ -1,12 +1,13 @@
-/* src/index.css */
+/* frontend/src/index.css */
 
+/* Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global Styles */
+/* Глобальные стили */
 body {
-  @apply antialiased text-dark-50 bg-dark-900;
+  @apply antialiased text-gray-50 bg-dark-900;
 }
 
 nav {
@@ -21,31 +22,37 @@ nav ul li {
   @apply flex justify-between items-center;
 }
 
-/* Prevent global horizontal scroll */
+/* Предотвращение горизонтальной прокрутки */
 html,
 body,
 #root {
   @apply overflow-hidden;
 }
 
-/* Custom Resizable Handle Styling */
+/* Плавные переходы для ResizableBox */
+.react-resizable {
+  transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+}
+
+/* Стилизация ручки изменения размера */
 .react-resizable-handle {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  transition: background 0.3s ease-in-out;
   width: 10px;
   height: 30px;
   cursor: ew-resize;
-  background: rgba(249, 115, 22, 0.5); /* Orange overlay */
+  background: rgba(0, 150, 199, 0.5); /* Синий оверлей */
   z-index: 10;
   border-radius: 4px;
 }
 
 .react-resizable-handle:hover {
-  background: rgba(249, 115, 22, 0.8); /* Darker orange on hover */
+  background: rgba(0, 150, 199, 0.8); /* Темнее синий при наведении */
 }
 
-/* Scrollbar Styling for Chat */
+/* Стилизация полосы прокрутки для сообщений */
 .messages-container::-webkit-scrollbar {
   width: 8px;
 }
@@ -55,36 +62,36 @@ body,
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background-color: #f97316; /* orange-500 */
+  background-color: #0096c7; /* blue-500 */
   border-radius: 4px;
   border: 2px solid #1f2937;
 }
 
 .messages-container::-webkit-scrollbar-thumb:hover {
-  background-color: #ea580c; /* orange-600 */
+  background-color: #0079a5; /* blue-600 */
 }
 
 .messages-container {
   scrollbar-width: thin;
-  scrollbar-color: #f97316 #1f2937;
+  scrollbar-color: #0096c7 #1f2937;
 }
 
-/* Optional: Smooth scrolling for messages */
+/* Плавная прокрутка для сообщений */
 .messages-container {
   scroll-behavior: smooth;
 }
 
-/* Hide scrollbar in textarea */
+/* Скрытие полосы прокрутки в textarea */
 textarea::-webkit-scrollbar {
   display: none;
 }
 
 textarea {
-  scrollbar-width: none; /* For Firefox */
+  scrollbar-width: none; /* Для Firefox */
 }
 
-/* Textarea styling */
+/* Стилизация textarea */
 .textarea-custom {
-  @apply w-full resize-none overflow-y-auto bg-dark-700 text-white border border-dark-600 rounded py-4 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-inset text-lg;
-  max-height: calc(1.5em * 6 + 1rem); /* Adjust as needed for 6 lines */
+  @apply w-full resize-none overflow-y-auto bg-dark-800 text-gray-50 border border-dark-700 rounded py-4 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset text-lg;
+  max-height: calc(1.5em * 6 + 1rem); /* Настройка для 6 строк */
 }

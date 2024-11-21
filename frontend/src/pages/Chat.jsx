@@ -1,5 +1,4 @@
 // frontend/src/pages/Chat.jsx
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -143,7 +142,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
           >
             <div
               className={`max-w-1/2 p-3 rounded-lg ${
-                message.sender === 'user' ? 'bg-orange-500 text-white' : 'bg-dark-600 text-dark-50'
+                message.sender === 'user' ? 'bg-blue-500 text-gray-50' : 'bg-dark-700 text-gray-50'
               } break-words text-lg`}
             >
               {message.file_name && <div className="font-semibold mb-1">{message.file_name}</div>}
@@ -151,14 +150,14 @@ function Chat({ chats, setChats, onOpenDoc }) {
               {message.sender === 'agent' && message.file_id && (
                 <button
                   onClick={() => onOpenDoc(message.file_id)}
-                  className="mt-2 bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 transition duration-200"
+                  className="mt-2 bg-blue-600 text-gray-50 px-3 py-1 rounded hover:bg-blue-700 transition duration-200"
                 >
                   Просмотреть документ
                 </button>
               )}
               <div
                 className={`text-xs mt-1 text-right ${
-                  message.sender === 'user' ? 'text-gray-900' : 'text-gray-100'
+                  message.sender === 'user' ? 'text-gray-200' : 'text-gray-100'
                 }`}
               >
                 {dayjs(message.timestamp).format('HH:mm DD.MM.YYYY')}
@@ -171,7 +170,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
       {/* Input Field */}
       <div className="mt-4">
-        <form onSubmit={handleQuerySubmit} className="flex items-end">
+        <form onSubmit={handleQuerySubmit} className="flex items-center"> {/* Изменено с items-end на items-center */}
           <div className="flex-1 relative">
             <textarea
               ref={textareaRef}
@@ -186,13 +185,13 @@ function Chat({ chats, setChats, onOpenDoc }) {
           </div>
           <button
             type="submit"
-            className="ml-2 bg-orange-500 text-dark-900 px-3 py-2 rounded hover:bg-orange-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-shrink-0"
+            className="ml-2 bg-blue-500 text-gray-50 px-4 py-2 rounded hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-shrink-0 h-12" // Добавлено h-12 для согласованности высоты
             disabled={loading}
           >
             {loading ? 'Отправка...' : 'Отправить'}
           </button>
         </form>
-        {error && <div className="mt-4 text-red-500 text-center text-lg">{error}</div>}
+        {error && <div className="mt-4 text-red-400 text-center text-lg">{error}</div>}
       </div>
     </div>
   );

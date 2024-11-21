@@ -75,7 +75,7 @@ function App() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-dark-900 text-dark-50 overflow-hidden">
+    <div className="flex h-screen bg-dark-900 text-gray-50 overflow-hidden">
       {/* Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
@@ -86,7 +86,7 @@ function App() {
         renameChat={renameChat}
       />
 
-      {/* Main Content Area (Chat and Document Viewer) */}
+      {/* Main Content Area (Chat и Document Viewer) */}
       <div className="flex-1 flex overflow-hidden">
         {/* Chat Area */}
         <main className="flex-1 p-4 bg-dark-700 flex flex-col overflow-hidden">
@@ -95,7 +95,7 @@ function App() {
               path="/"
               element={
                 <div className="flex items-center justify-center h-full text-center">
-                  <div className="text-orange-300">
+                  <div className="text-blue-200">
                     <p className="mb-4 text-xl">
                       Интеллектуальный агент для работы с заметками и видео лекциями
                     </p>
@@ -108,12 +108,12 @@ function App() {
               path="/chat/:chatId"
               element={<Chat chats={chats} setChats={setChats} onOpenDoc={handleOpenDocViewer} />}
             />
-            {/* Handle Non-Existent Routes */}
+            {/* Обработка несуществующих маршрутов */}
             <Route
               path="*"
               element={
                 <div className="flex items-center justify-center h-full text-center">
-                  <div className="text-red-500">
+                  <div className="text-red-400">
                     <h2 className="text-2xl font-bold mb-4">404 - Не найдено</h2>
                     <p>Страница, которую вы ищете, не существует.</p>
                   </div>
@@ -139,7 +139,7 @@ function App() {
               />
             }
             onResize={handleResize}
-            className="bg-dark-800 shadow-lg z-50 flex flex-col"
+            className="bg-dark-800 shadow-lg z-50 flex flex-col transition-all duration-300 ease-in-out" // Добавлено для плавности
           >
             <GoogleDocViewer fileId={docFileId} onClose={handleCloseDocViewer} />
           </ResizableBox>

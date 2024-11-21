@@ -13,17 +13,17 @@ const Sidebar = React.memo(({ isOpen, toggleSidebar, chats, addChat, deleteChat,
     {/* Toggle Sidebar Button */}
     <button
       onClick={toggleSidebar}
-      className="mb-4 text-orange-400 focus:outline-none"
+      className="mb-4 text-blue-400 focus:outline-none"
       aria-label={isOpen ? 'Скрыть меню' : 'Показать меню'}
     >
       {isOpen ? <FaChevronLeft /> : <FaChevronRight />}
     </button>
     {isOpen && (
       <>
-        <h1 className="text-2xl font-bold text-orange-400 mb-4">KONSPECTO</h1>
+        <h1 className="text-2xl font-bold text-blue-400 mb-4">KONSPECTO</h1>
         <button
           onClick={addChat}
-          className="bg-orange-500 text-dark-900 px-4 py-2 rounded hover:bg-orange-600 transition duration-200 mb-4"
+          className="bg-blue-500 text-gray-50 px-4 py-2 rounded hover:bg-blue-600 transition duration-200 mb-4"
         >
           Добавить чат
         </button>
@@ -32,7 +32,7 @@ const Sidebar = React.memo(({ isOpen, toggleSidebar, chats, addChat, deleteChat,
             <li key={chat.id} className="flex justify-between items-center">
               <Link
                 to={`/chat/${chat.id}`}
-                className="text-orange-300 hover:text-orange-400 transition duration-200 font-medium flex-1 truncate"
+                className="text-blue-300 hover:text-blue-400 transition duration-200 font-medium flex-1 truncate"
               >
                 {chat.name}
               </Link>
@@ -45,7 +45,7 @@ const Sidebar = React.memo(({ isOpen, toggleSidebar, chats, addChat, deleteChat,
                       renameChat(chat.id, newName);
                     }
                   }}
-                  className="text-orange-300 hover:text-orange-400 focus:outline-none"
+                  className="text-blue-300 hover:text-blue-400 focus:outline-none"
                   aria-label="Изменить название чата"
                   title="Изменить название чата"
                 >

@@ -9,7 +9,7 @@ logger = logging.getLogger("app.services.redis_service")
 
 class RedisService:
     def __init__(self):
-        self.redis_client = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+        self.redis_client = Redis.from_url(settings.REDIS_URL, decode_responses=False)  # Keep as bytes
 
     async def connect(self):
         """Connect to Redis."""
@@ -20,7 +20,7 @@ class RedisService:
             logger.exception("Failed to connect to Redis.")
             raise
 
-    async def set_key(self, key: str, value: str, expire: Optional[int] = None) -> bool:
+    async def set_key(self, key: str, value: bytes, expire: Optional[int] = None) -> bool:
         """Set a key-value pair in Redis."""
         try:
             return await self.redis_client.set(key, value, ex=expire)
@@ -28,7 +28,7 @@ class RedisService:
             logger.exception(f"Failed to set key '{key}' in Redis.")
             return False
 
-    async def get_key(self, key: str) -> Optional[str]:
+    async def get_key(self, key: str) -> Optional[bytes]:
         """Get value by key from Redis."""
         try:
             return await self.redis_client.get(key)
@@ -51,6 +51,14 @@ class RedisService:
         except Exception as e:
             logger.exception(f"Failed to check existence of key '{key}' in Redis.")
             return False
+
+    async def set_file(self, key: str, data: bytes, expire: Optional[int] = None) -> bool:
+        """Save a file to Redis."""
+        return await self.set_key(key, data, expire)
+
+    async def get_file(self, key: str) -> Optional[bytes]:
+        """Retrieve a file from Redis."""
+        return await self.get_key(key)
 
     async def close(self):
         """Close the Redis connection."""

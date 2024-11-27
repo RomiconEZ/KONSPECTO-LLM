@@ -1,3 +1,4 @@
+# KONSPECTO/docker-compose.yml
 services:
   frontend:
     build:
@@ -22,8 +23,8 @@ services:
     volumes:
       - ./backend/logs:/app/logs
       - ./backend/app/config:/app/config
-      - huggingface_cache:/app/.cache/huggingface  # Add this line
-      - ./backend/generated_docs:/app/generated_docs
+      - huggingface_cache:/app/.cache/huggingface
+      # - ./backend/generated_docs:/app/generated_docs  # Remove this line
     environment:
       - PYTHON_ENV=production
       - PYTHONPATH=/app

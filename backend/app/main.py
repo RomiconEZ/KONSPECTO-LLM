@@ -1,15 +1,16 @@
 # backend/app/main.py
-import logging
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from faster_whisper import WhisperModel  # Import WhisperModel
-import torch
 
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from faster_whisper import WhisperModel
+import torch
+import logging
 
 from .core.config import settings
 from .core.logging_config import setup_logging
 from .api.v1.api import api_router
 from .services.redis_service import RedisService
+
 
 def create_application() -> FastAPI:
     setup_logging()
@@ -34,6 +35,10 @@ def create_application() -> FastAPI:
     # Initialize services
     redis_service = RedisService()
 
+    # Define a dependency function
+    def get_redis_service():
+        return redis_service
+
     @app.on_event("startup")
     async def startup_event():
         logger.info("Starting up: Connecting to Redis...")
@@ -43,10 +48,12 @@ def create_application() -> FastAPI:
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
             compute_type = "float16" if torch.cuda.is_available() else "float32"
             cpu_threads = 8
-            app.state.whisper_model = WhisperModel("large-v3",
-                                                   device=device,
-                                                   compute_type=compute_type,
-                                                   cpu_threads=cpu_threads)
+            app.state.whisper_model = WhisperModel(
+                "large-v3",
+                device=device,
+                compute_type=compute_type,
+                cpu_threads=cpu_threads
+            )
             logger.info("Whisper model loaded successfully.")
         except Exception as e:
             logger.exception("Failed to load Whisper model.")
@@ -80,9 +87,15 @@ def create_application() -> FastAPI:
                 "error": str(e)
             }
 
-    # Include API Router
-    app.include_router(api_router, prefix="/api")
+    # Include API Router with the dependency
+    app.include_router(
+        api_router,
+        prefix="/api",
+        dependencies=[Depends(get_redis_service)]
+    )
+
     logger.info("KONSPECTO API initialized successfully.")
     return app
+
 
 app = create_application()

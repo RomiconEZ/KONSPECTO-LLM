@@ -68,7 +68,7 @@ cd KONSPECTO
 
 ### Шаг 2: Запуск приложения
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 

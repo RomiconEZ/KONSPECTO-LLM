@@ -23,14 +23,13 @@ services:
       - ./backend/logs:/app/logs
       - ./backend/app/config:/app/config
       - huggingface_cache:/app/.cache/huggingface  # Add this line
+      - ./backend/generated_docs:/app/generated_docs
     environment:
       - PYTHON_ENV=production
       - PYTHONPATH=/app
       - REDIS_URL=redis://redis-stack:6379
       - CHROMA_URL=http://chroma:8000
-      - HF_HOME=/app/.cache/huggingface  # Add this line
-      # Remove or comment out TRANSFORMERS_CACHE if present
-      # - TRANSFORMERS_CACHE=/app/.cache/huggingface/hub
+      - HF_HOME=/app/.cache/huggingface
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s

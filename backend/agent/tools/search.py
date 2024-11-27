@@ -3,9 +3,9 @@
 from typing import List
 import logging
 
-from app.services.index_service import query_engine
+from app.services.index_service import get_query_engine  # Updated import
 
-logger = logging.getLogger("app.agent.tools.search")
+logger = logging.getLogger("agent.tools.search")
 
 
 class SearchTool:
@@ -24,7 +24,8 @@ class SearchTool:
         try:
             logger.debug(f"Agent search received query: {query}")
 
-            # Выполнение поиска с использованием существующего query_engine
+            # Получение query_engine при необходимости
+            query_engine = get_query_engine()
             response = query_engine.query(query)
             logger.info("Agent received response from query engine.")
 

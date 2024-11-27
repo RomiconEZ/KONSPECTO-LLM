@@ -1,4 +1,4 @@
-# backend/app/main.py
+# KONSPECTO/backend/app/main.py
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,11 +6,11 @@ from faster_whisper import WhisperModel
 import torch
 import logging
 
-from .core.config import settings
+from .core.config import get_settings  # Updated import
 from .core.logging_config import setup_logging
 from .api.v1.api import api_router
 from .services.redis_service import RedisService
-
+from .services.index_service import get_query_engine  # Added import
 
 class KonspectoAPIApp:
     def __init__(self):
@@ -19,9 +19,9 @@ class KonspectoAPIApp:
         self.logger.info("Initializing KONSPECTO API...")
 
         self.app = FastAPI(
-            title=settings.PROJECT_NAME,
+            title=get_settings().PROJECT_NAME,
             description="Backend API for KONSPECTO application",
-            version=settings.PROJECT_VERSION,
+            version=get_settings().PROJECT_VERSION,
         )
 
         self._setup_middleware()
@@ -32,7 +32,8 @@ class KonspectoAPIApp:
         self.logger.info("KONSPECTO API initialized successfully.")
 
     def _setup_middleware(self):
-        """Настройка промежуточного программного обеспечения (middleware)."""
+        """Setup middleware."""
+        settings = get_settings()
         self.app.add_middleware(
             CORSMiddleware,
             allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
@@ -42,24 +43,25 @@ class KonspectoAPIApp:
         )
 
     def _setup_services(self):
-        """Инициализация сервисов, таких как Redis."""
+        """Initialize services such as Redis."""
         self.redis_service = RedisService()
 
     def _get_redis_service(self):
-        """Зависимость для получения экземпляра RedisService."""
+        """Dependency to retrieve RedisService instance."""
         return self.redis_service
 
     def _setup_event_handlers(self):
-        """Настройка событий запуска и остановки приложения."""
+        """Setup startup and shutdown event handlers."""
         self.app.add_event_handler("startup", self._startup_event)
         self.app.add_event_handler("shutdown", self._shutdown_event)
 
     async def _startup_event(self):
-        """Событие, выполняемое при запуске приложения."""
+        """Event handler executed on application startup."""
         self.logger.info("Starting up: Connecting to Redis...")
         await self.redis_service.connect()
         self.logger.info("Starting up: Loading Whisper model...")
         try:
+            settings = get_settings()
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
             compute_type = "float16" if torch.cuda.is_available() else "float32"
             cpu_threads = 8
@@ -70,21 +72,28 @@ class KonspectoAPIApp:
                 cpu_threads=cpu_threads
             )
             self.logger.info("Whisper model loaded successfully.")
+
+            # Initialize query engine during startup
+            self.logger.info("Initializing query engine...")
+            query_engine = get_query_engine()
+            # Optionally store it in app.state if needed elsewhere
+            self.app.state.query_engine = query_engine
+            self.logger.info("Query engine initialized successfully.")
         except Exception as e:
-            self.logger.exception("Failed to load Whisper model.")
+            self.logger.exception("Failed to load Whisper model or initialize query engine.")
             raise
 
     async def _shutdown_event(self):
-        """Событие, выполняемое при остановке приложения."""
+        """Event handler executed on application shutdown."""
         self.logger.info("Shutting down: Closing Redis connection...")
         await self.redis_service.close()
 
     def _setup_routes(self):
-        """Настройка маршрутов приложения."""
+        """Setup application routes."""
         self.app.add_api_route("/", self._root_endpoint, methods=["GET"], tags=["Root"])
         self.app.add_api_route("/health", self._health_check_endpoint, methods=["GET"], tags=["Health"])
 
-        # Включение API Router с зависимостью
+        # Include API Router with dependency
         self.app.include_router(
             api_router,
             prefix="/api",
@@ -92,30 +101,30 @@ class KonspectoAPIApp:
         )
 
     async def _root_endpoint(self):
-        """Корневой эндпоинт приложения."""
+        """Root endpoint of the application."""
         return {"message": "Welcome to KONSPECTO API"}
 
     async def _health_check_endpoint(self) -> dict:
-        """Эндпоинт для проверки состояния приложения."""
+        """Endpoint to check the health of the application."""
         try:
             redis_ok = await self.redis_service.exists_key("health_check")
             status = "healthy" if redis_ok else "unhealthy"
             return {
                 "status": status,
-                "version": settings.PROJECT_VERSION,
+                "version": get_settings().PROJECT_VERSION,
                 "redis_connected": redis_ok
             }
         except Exception as e:
             self.logger.error(f"Health check failed: {e}")
             return {
                 "status": "unhealthy",
-                "version": settings.PROJECT_VERSION,
+                "version": get_settings().PROJECT_VERSION,
                 "redis_connected": False,
                 "error": str(e)
             }
 
     def get_app(self) -> FastAPI:
-        """Возвращает экземпляр FastAPI приложения."""
+        """Returns the FastAPI application instance."""
         return self.app
 
 

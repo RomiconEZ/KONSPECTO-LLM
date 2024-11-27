@@ -1,11 +1,19 @@
-# backend/app/services/index_service.py
+# KONSPECTO/backend/app/services/index_service.py
+
 from .vector_db import get_index
 import logging
 
 logger = logging.getLogger("app.services.index_service")
 
-# Initialize the query engine at startup
-index = get_index()
-query_engine = index.as_query_engine(similarity_top_k=1)
 
-logger.info("Query engine initialized successfully.")
+def get_query_engine():
+    """
+    Lazily initializes and returns the query engine.
+
+    :return: An instance of the query engine.
+    """
+    index = get_index()
+    logger.debug("Obtained VectorStoreIndex from IndexManager.")
+    query_engine = index.as_query_engine(similarity_top_k=1)
+    logger.debug("Query engine initialized successfully.")
+    return query_engine

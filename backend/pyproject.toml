@@ -34,6 +34,7 @@ imagehash = "^4.3.1"
 python-docx = "^1.1.2"
 pytubefix = "^8.5.3"
 scikit-image = "^0.24.0"
+testcontainers = "^4.8.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.3.1"

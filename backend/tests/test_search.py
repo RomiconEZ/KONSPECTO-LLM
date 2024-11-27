@@ -1,21 +1,22 @@
-# backend/tests/test_search.py
-from fastapi.testclient import TestClient
+# KONSPECTO/backend/tests/test_search.py
+
+from unittest.mock import patch
 import pytest
 
-from app.main import app
+def test_search(test_client):
+    with patch('app.api.v1.endpoints.search.SearchService.process_search') as mock_process_search:
+        # Мокируем метод process_search для возврата тестовых данных
+        mock_process_search.return_value = []
 
-client = TestClient(app)
+        response = test_client.post("/api/v1/search/", json={"query": "тестовый запрос"})
+        assert response.status_code == 200
+        data = response.json()
+        assert "results" in data
+        assert isinstance(data["results"], list)
+        # Добавьте дополнительные проверки структуры данных, если необходимо
 
-def test_search():
-    response = client.post("/api/v1/search", json={"query": "test query"})
-    assert response.status_code == 200
-    data = response.json()
-    assert "results" in data
-    assert isinstance(data["results"], list)
-    # Further assertions can be added based on expected structure
-
-def test_search_invalid_payload():
-    response = client.post("/api/v1/search", json={"invalid_key": "test"})
+def test_search_invalid_payload(test_client):
+    response = test_client.post("/api/v1/search/", json={"invalid_key": "тест"})
     assert response.status_code == 422  # Unprocessable Entity
     data = response.json()
     assert "detail" in data

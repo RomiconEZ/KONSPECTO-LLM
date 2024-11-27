@@ -22,7 +22,7 @@ from app.services.redis_service import RedisService
 from app.exceptions import InvalidYouTubeURLException, VideoProcessingError
 from pytubefix.exceptions import RegexMatchError  # Добавляем импорт
 
-logger = logging.getLogger("app.agent.tools.video_processor")
+logger = logging.getLogger("agent.tools.video_processor")
 
 
 class ImageDifferenceChecker(ABC):

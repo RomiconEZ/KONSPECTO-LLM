@@ -19,14 +19,14 @@ from llama_index.storage.kvstore.redis import RedisKVStore as RedisCache
 from llama_index.vector_stores.redis import RedisVectorStore
 from redisvl.schema import IndexSchema
 
-from ..core.config import settings
+from ..core.config import get_settings
 
 logger = logging.getLogger("app.services.vector_db")
 
 
 class SingletonMeta(type):
     """
-    Реализация паттерна Singleton с потокобезопасностью.
+    Implementation of Singleton pattern with thread-safety.
     """
     _instances = {}
 
@@ -41,7 +41,7 @@ class SingletonMeta(type):
 
 class IndexManager(metaclass=SingletonMeta):
     """
-    Singleton класс для управления VectorStoreIndex.
+    Singleton class to manage VectorStoreIndex.
     """
 
     def __init__(self):
@@ -49,12 +49,13 @@ class IndexManager(metaclass=SingletonMeta):
 
     def initialize_index(self):
         """
-        Инициализация VectorStoreIndex, vector store и ingestion pipeline.
+        Initialize VectorStoreIndex, vector store, and ingestion pipeline.
         """
         try:
+            settings = get_settings()
             logger.info("Initializing VectorStoreIndex...")
 
-            # Конфигурация устройства
+            # Configure device
             device = (
                 torch.device("mps")
                 if torch.backends.mps.is_available()
@@ -62,7 +63,7 @@ class IndexManager(metaclass=SingletonMeta):
             )
             logger.info(f"Using device: {device}")
 
-            # Настройка модели эмбеддингов
+            # Setup embedding model
             embed_model = HuggingFaceEmbedding(
                 model_name="sentence-transformers/all-MiniLM-L12-v2",
                 device=device,
@@ -71,11 +72,11 @@ class IndexManager(metaclass=SingletonMeta):
             )
             logger.info("HuggingFaceEmbedding initialized successfully.")
 
-            # Настройки LLM
+            # LLM settings
             Settings.llm = None
             logger.info("LLM settings configured.")
 
-            # Пользовательская схема для RedisVectorStore
+            # Custom schema for RedisVectorStore
             custom_schema = IndexSchema.from_dict(
                 {
                     "index": {"name": "gdrive", "prefix": "doc"},
@@ -96,20 +97,20 @@ class IndexManager(metaclass=SingletonMeta):
                 }
             )
 
-            # Инициализация RedisVectorStore
+            # Initialize RedisVectorStore
             vector_store = RedisVectorStore(
                 schema=custom_schema,
                 redis_url=settings.REDIS_URL,
             )
             logger.info("RedisVectorStore initialized.")
 
-            # Настройка кеша для ingestion
+            # Setup ingestion cache
             cache = IngestionCache(
                 cache=RedisCache.from_host_and_port("redis-stack", 6379),
                 collection="redis_cache",
             )
 
-            # Настройка Ingestion Pipeline
+            # Setup Ingestion Pipeline
             pipeline = IngestionPipeline(
                 transformations=[
                     SentenceSplitter(),
@@ -124,13 +125,13 @@ class IndexManager(metaclass=SingletonMeta):
             )
             logger.info("Ingestion pipeline configured.")
 
-            # Инициализация VectorStoreIndex
+            # Initialize VectorStoreIndex
             self.index = VectorStoreIndex.from_vector_store(
                 pipeline.vector_store, embed_model=embed_model
             )
             logger.info("VectorStoreIndex created from vector store.")
 
-            # Загрузка документов из Google Drive
+            # Load documents from Google Drive
             service_account_path = Path(settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH)
             if not service_account_path.exists():
                 logger.error(f"Service account key file not found at {service_account_path}")
@@ -148,11 +149,11 @@ class IndexManager(metaclass=SingletonMeta):
             else:
                 logger.info(f"Loaded {len(docs)} documents from Google Drive.")
 
-            # Запуск ingestion pipeline
+            # Run ingestion pipeline
             nodes = pipeline.run(documents=docs)
             logger.info(f"Ingested {len(nodes)} nodes into VectorStoreIndex.")
 
-            # Проверка существования индекса
+            # Check if index exists
             if vector_store.index_exists():
                 logger.info("Index 'gdrive' exists after ingestion.")
             else:
@@ -164,9 +165,7 @@ class IndexManager(metaclass=SingletonMeta):
 
     def get_index(self) -> VectorStoreIndex:
         """
-        Возвращает VectorStoreIndex. Инициализирует его, если он еще не создан.
-
-        :return: Экземпляр VectorStoreIndex.
+        Returns the VectorStoreIndex. Initializes it if not already created.
         """
         if self.index is None:
             logger.info("Index not initialized. Initializing now...")
@@ -178,9 +177,7 @@ class IndexManager(metaclass=SingletonMeta):
 
 def get_index() -> VectorStoreIndex:
     """
-    Получает экземпляр VectorStoreIndex.
-
-    :return: Экземпляр VectorStoreIndex.
+    Retrieves the VectorStoreIndex instance.
     """
     index_manager = IndexManager()
     return index_manager.get_index()

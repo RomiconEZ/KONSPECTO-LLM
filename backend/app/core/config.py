@@ -1,8 +1,9 @@
-# backend/app/core/config.py
+# KONSPECTO/backend/app/core/config.py
 from pydantic_settings import BaseSettings
 from pydantic import AnyHttpUrl, Field
 from typing import List
 from pathlib import Path
+from functools import lru_cache
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "KONSPECTO API"
@@ -29,4 +30,6 @@ class Settings(BaseSettings):
         env_file = Path(__file__).resolve().parent.parent / "config/.env"
         case_sensitive = True
 
-settings = Settings()
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()

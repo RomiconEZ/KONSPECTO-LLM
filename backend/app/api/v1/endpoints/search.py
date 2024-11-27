@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 from typing import List
 
-from ....services.index_service import query_engine
+from ....services.index_service import get_query_engine  # Updated import
 from ....models.search import SearchRequest, SearchResult, SearchItem
 
 router = APIRouter()
@@ -26,15 +26,16 @@ class SearchService:
         :return: Список объектов SearchItem с результатами поиска.
         """
         logger.debug(f"Processing search query: {query}")
+        query_engine = get_query_engine()  # Use the function to get the query engine
         response = query_engine.query(query)
         logger.info("Received response from query engine.")
 
-        # Логирование полной структуры ответа для диагностики
+        # Log the full structure of the response for debugging
         logger.debug(f"Response structure: {response}")
 
         search_items = []
         for node_with_score in response.source_nodes:
-            # Проверяем наличие атрибутов 'score' и 'node'
+            # Check if 'score' and 'node' attributes exist
             if hasattr(node_with_score, "score") and hasattr(node_with_score, "node"):
                 score = node_with_score.score
                 node = node_with_score.node
@@ -51,7 +52,7 @@ class SearchService:
             file_name = metadata.get('file_name') or metadata.get('file name', '')
             file_id = metadata.get('file_id') or metadata.get('file id', '')
 
-            # Проверка обязательных полей метаданных
+            # Ensure mandatory metadata fields are present
             if not all([modified_at_str, file_name, file_id]):
                 logger.warning(f"Incomplete metadata for node ID: {node.id_}")
                 continue

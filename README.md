@@ -71,4 +71,14 @@ cd KONSPECTO
 docker compose up --build
 ```
 
+---
 
+cd backend
+
+poetry run pytest - запуск тестов
+
+npm install в frontend
+
+poetry install в backend
+
+docker compose up --build

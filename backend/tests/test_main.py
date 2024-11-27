@@ -1,18 +1,12 @@
-# backend/tests/test_main.py
-from fastapi.testclient import TestClient
-import pytest
+# KONSPECTO/backend/tests/test_main.py
 
-from app.main import app
-
-client = TestClient(app)
-
-def test_root():
-    response = client.get("/")
+def test_root(test_client):
+    response = test_client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Welcome to KONSPECTO API"}
 
-def test_health_check():
-    response = client.get("/health")
+def test_health_check(test_client):
+    response = test_client.get("/health")
     assert response.status_code in [200, 500]
 
     data = response.json()

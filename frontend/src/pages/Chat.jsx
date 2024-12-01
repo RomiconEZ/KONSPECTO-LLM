@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
-import { FaMicrophone, FaMicrophoneSlash, FaCircle } from 'react-icons/fa';
+import { FaMicrophone, FaCircle } from 'react-icons/fa';
 import { getConfig } from '../config';
 
 function Chat({ chats, setChats, onOpenDoc }) {
@@ -40,68 +40,67 @@ function Chat({ chats, setChats, onOpenDoc }) {
     setQuery(e.target.value);
   }, []);
 
-  const handleQuerySubmit = useCallback(async (e) => {
-    e.preventDefault();
+  const handleQuerySubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-    if (loading || !query.trim() || !chat || isTranscribing) return;
+      if (loading || !query.trim() || !chat || isTranscribing) return;
 
-    setLoading(true);
-    setIsTranscribing(true);
+      setLoading(true);
+      setIsTranscribing(true);
 
-    const timestamp = new Date().toISOString();
-    const userMessage = {
-      sender: 'user',
-      text: query,
-      timestamp,
-    };
-    const updatedChat = { ...chat, messages: [...chat.messages, userMessage] };
-    setChats((prevChats) =>
-      prevChats.map((c) => (c.id === chat.id ? updatedChat : c))
-    );
-    setQuery('');
-
-    try {
-      const response = await fetch(`${API_URL}/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (!data.results || !Array.isArray(data.results)) {
-        throw new Error('Неверный формат ответа от API.');
-      }
-
-      const agentMessages = data.results.map((item) => ({
-        sender: 'agent',
-        text: item.text,
-        file_id: item.file_id,
-        file_name: item.file_name,
-        timestamp: new Date().toISOString(),
-      }));
-
-      const finalChat = {
-        ...updatedChat,
-        messages: [...updatedChat.messages, ...agentMessages],
+      const timestamp = new Date().toISOString();
+      const userMessage = {
+        sender: 'user',
+        text: query,
+        timestamp,
       };
+      const updatedChat = { ...chat, messages: [...chat.messages, userMessage] };
+      setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? updatedChat : c)));
+      setQuery('');
 
-      setChats((prevChats) =>
-        prevChats.map((c) => (c.id === chat.id ? finalChat : c))
-      );
-    } catch (err) {
-      console.error('API Error:', err);
-      triggerRecordError();
-    } finally {
-      setLoading(false);
-      setIsTranscribing(false);
-      scrollToBottom();
-    }
-  }, [loading, query, chat, setChats, API_URL, scrollToBottom, isTranscribing, triggerRecordError]);
+      try {
+        const response = await fetch(`${API_URL}/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.results || !Array.isArray(data.results)) {
+          throw new Error('Неверный формат ответа от API.');
+        }
+
+        const agentMessages = data.results.map((item) => ({
+          sender: 'agent',
+          text: item.text,
+          file_id: item.file_id,
+          file_name: item.file_name,
+          timestamp: new Date().toISOString(),
+        }));
+
+        const finalChat = {
+          ...updatedChat,
+          messages: [...updatedChat.messages, ...agentMessages],
+        };
+
+        setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? finalChat : c)));
+      } catch (err) {
+        console.error('API Error:', err);
+        triggerRecordError();
+      } finally {
+        setLoading(false);
+        setIsTranscribing(false);
+        scrollToBottom();
+      }
+    },
+    [loading, query, chat, setChats, API_URL, scrollToBottom, isTranscribing, triggerRecordError]
+  );
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -111,11 +110,12 @@ function Chat({ chats, setChats, onOpenDoc }) {
       } else if (e.key === 'Enter' && (e.ctrlKey || e.shiftKey)) {
         e.preventDefault();
         const { selectionStart, selectionEnd } = e.target;
-        const newValue = query.slice(0, selectionStart) + '\n' + query.slice(selectionEnd);
+        const newValue = `${query.slice(0, selectionStart)}\n${query.slice(selectionEnd)}`;
         setQuery(newValue);
         setTimeout(() => {
           if (textareaRef.current) {
-            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = selectionStart + 1;
+            textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
+              selectionStart + 1;
           }
         }, 0);
       }
@@ -169,7 +169,19 @@ function Chat({ chats, setChats, onOpenDoc }) {
           }
 
           const data = await response.json();
-          setQuery((prev) => prev + data.transcription);
+
+          setQuery((prev) => {
+            const newQuery = prev + data.transcription;
+            // Устанавливаем курсор в конец поля ввода
+            setTimeout(() => {
+              if (textareaRef.current) {
+                textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
+                  newQuery.length;
+                textareaRef.current.focus();
+              }
+            }, 0);
+            return newQuery;
+          });
           scrollToBottom();
         } catch (err) {
           console.error('Transcription Error:', err);
@@ -224,20 +236,14 @@ function Chat({ chats, setChats, onOpenDoc }) {
         {chat.messages.map((message, index) => (
           <div
             key={index}
-            className={`mb-4 flex ${
-              message.sender === 'user' ? 'justify-end' : 'justify-start'
-            }`}
+            className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
               className={`max-w-1/2 p-3 rounded-lg ${
-                message.sender === 'user'
-                  ? 'bg-blue-500 text-gray-50'
-                  : 'bg-dark-700 text-gray-50'
+                message.sender === 'user' ? 'bg-blue-500 text-gray-50' : 'bg-dark-700 text-gray-50'
               } break-words text-lg`}
             >
-              {message.file_name && (
-                <div className="font-semibold mb-1">{message.file_name}</div>
-              )}
+              {message.file_name && <div className="font-semibold mb-1">{message.file_name}</div>}
               <pre className="whitespace-pre-wrap">{message.text}</pre>
               {message.sender === 'agent' && message.file_id && (
                 <button
@@ -249,9 +255,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
               )}
               <div
                 className={`text-xs mt-1 text-right ${
-                  message.sender === 'user'
-                    ? 'text-gray-200'
-                    : 'text-gray-100'
+                  message.sender === 'user' ? 'text-gray-200' : 'text-gray-100'
                 }`}
               >
                 {dayjs(message.timestamp).format('HH:mm DD.MM.YYYY')}
@@ -284,9 +288,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
             onTouchStart={!isTranscribing ? startRecording : null}
             onTouchEnd={!isTranscribing ? stopRecording : null}
             className={`ml-2 p-2 rounded-full flex items-center justify-center transition duration-200 ${
-              isRecording
-                ? 'bg-red-500 animate-pulse border-2 border-red-600'
-                : 'bg-blue-500'
+              isRecording ? 'bg-red-500 animate-pulse border-2 border-red-600' : 'bg-blue-500'
             } ${
               recordError ? 'border-2 border-red-500' : ''
             } text-gray-50 hover:bg-red-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`}

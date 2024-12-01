@@ -63,14 +63,14 @@ class KonspectoAPIApp:
         try:
             settings = get_settings()
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
-            compute_type = "float16" if torch.cuda.is_available() else "float32"
+            compute_type = "float32"
             cpu_threads = 8
-            model_size_large = "large-v3"
-            model_size_small = "medium"
+            model_size_large = "bzikst/faster-whisper-large-v3-russian"
+            # model_size_small = "medium"
             self.app.state.whisper_model = WhisperModel(
-                model_size_small,
+                model_size_large,
                 device=device,
-                # compute_type=compute_type,
+                compute_type=compute_type,
                 cpu_threads=cpu_threads
             )
             self.logger.info("Whisper model loaded successfully.")

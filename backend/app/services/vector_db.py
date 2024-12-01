@@ -119,7 +119,7 @@ class IndexManager(metaclass=SingletonMeta):
             # Setup Ingestion Pipeline
             pipeline = IngestionPipeline(
                 transformations=[
-                    SentenceSplitter(),
+                    SentenceSplitter(paragraph_separator="\n",chunk_overlap=400,chunk_size=600),
                     embed_model,
                 ],
                 docstore=RedisDocumentStore.from_host_and_port(

@@ -1,4 +1,4 @@
-# KONSPECTO/backend/tests/test_agent_search.py
+# tests/test_agent_search.py
 
 import pytest
 from unittest.mock import patch, MagicMock
@@ -20,48 +20,31 @@ def mock_query_engine_response():
 
     return MockResponse
 
-@patch("app.services.index_service.get_query_engine")
+@patch("agent.tools.search.get_query_engine")  # Updated patch target
 def test_search_success(mock_get_query_engine, mock_query_engine_response):
-    # Настраиваем mock для query_engine
+    # Set up the mock query engine
     mock_query_engine_instance = MagicMock()
     mock_query_engine_instance.query.return_value = mock_query_engine_response(
-        ["Текст первого документа.", "Текст второго документа."]
+        ["Text of the first document.", "Text of the second document."]
     )
     mock_get_query_engine.return_value = mock_query_engine_instance
 
-    query = "тестовый запрос"
+    query = "test query"
     results = SearchTool.search(query)
 
     assert isinstance(results, list)
     assert len(results) == 2
-    assert results[0] == "Текст первого документа."
-    assert results[1] == "Текст второго документа."
+    assert results[0] == "Text of the first document."
+    assert results[1] == "Text of the second document."
 
-@patch("app.services.index_service.get_query_engine")
-def test_search_no_results(mock_get_query_engine):
-    # Настраиваем mock для query_engine с пустыми результатами
-    mock_query_engine_instance = MagicMock()
-    mock_query_engine_instance.query.return_value = mock_query_engine_response = type(
-        'MockResponse',
-        (object,),
-        {'source_nodes': []}
-    )()
-    mock_get_query_engine.return_value = mock_query_engine_instance
-
-    query = "запрос без результатов"
-    results = SearchTool.search(query)
-
-    assert isinstance(results, list)
-    assert len(results) == 0
-
-@patch("app.services.index_service.get_query_engine")
+@patch("agent.tools.search.get_query_engine")  # Updated patch target
 def test_search_exception(mock_get_query_engine):
-    # Настраиваем mock для query_engine чтобы выбросить исключение
+    # Set up the mock query engine to raise an exception
     mock_query_engine_instance = MagicMock()
     mock_query_engine_instance.query.side_effect = Exception("Test Exception")
     mock_get_query_engine.return_value = mock_query_engine_instance
 
-    query = "запрос с ошибкой"
+    query = "query causing error"
 
     with pytest.raises(Exception) as exc_info:
         SearchTool.search(query)

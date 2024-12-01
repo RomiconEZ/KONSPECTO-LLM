@@ -3,6 +3,7 @@
 import json
 import logging
 from pathlib import Path
+from urllib.parse import urlparse
 
 import torch
 from llama_index.core import VectorStoreIndex, Settings
@@ -55,6 +56,11 @@ class IndexManager(metaclass=SingletonMeta):
             settings = get_settings()
             logger.info("Initializing VectorStoreIndex...")
 
+            # Parse Redis URL
+            parsed_redis_url = urlparse(settings.REDIS_URL)
+            redis_host = parsed_redis_url.hostname or "localhost"
+            redis_port = parsed_redis_url.port or 6379
+
             # Configure device
             device = (
                 torch.device("mps")
@@ -106,7 +112,7 @@ class IndexManager(metaclass=SingletonMeta):
 
             # Setup ingestion cache
             cache = IngestionCache(
-                cache=RedisCache.from_host_and_port("redis-stack", 6379),
+                cache=RedisCache.from_host_and_port(redis_host, redis_port),
                 collection="redis_cache",
             )
 
@@ -117,7 +123,7 @@ class IndexManager(metaclass=SingletonMeta):
                     embed_model,
                 ],
                 docstore=RedisDocumentStore.from_host_and_port(
-                    "redis-stack", 6379, namespace="document_store"
+                    redis_host, redis_port, namespace="document_store"
                 ),
                 vector_store=vector_store,
                 cache=cache,

@@ -29,7 +29,6 @@ services:
       - PYTHON_ENV=production
       - PYTHONPATH=/app
       - REDIS_URL=redis://redis-stack:6379
-      - CHROMA_URL=http://chroma:8000
       - HF_HOME=/app/.cache/huggingface
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

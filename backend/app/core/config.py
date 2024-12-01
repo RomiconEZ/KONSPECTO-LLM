@@ -1,9 +1,27 @@
 # KONSPECTO/backend/app/core/config.py
+
 from pydantic_settings import BaseSettings
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl, Field, validator
 from typing import List
 from pathlib import Path
 from functools import lru_cache
+import logging
+
+
+# Настройка логирования для конфигурационного модуля
+logger = logging.getLogger("app.core.config")
+logger.setLevel(logging.DEBUG)  # Установите нужный уровень логирования
+
+# Добавьте обработчик, если он еще не добавлен (например, для консоли)
+if not logger.handlers:
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+    )
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "KONSPECTO API"
@@ -20,16 +38,49 @@ class Settings(BaseSettings):
 
     # Google Drive Configuration
     FOLDER_ID: str = Field(..., env="FOLDER_ID")
+
     # Path to the service account key JSON file
-    GOOGLE_SERVICE_ACCOUNT_KEY_PATH: str = Field(
-        "config/service_account_key.json", env="GOOGLE_SERVICE_ACCOUNT_KEY_PATH"
+    GOOGLE_SERVICE_ACCOUNT_KEY_PATH: Path = Field(
+        default=Path("config/service_account_key.json"),
+        env="GOOGLE_SERVICE_ACCOUNT_KEY_PATH"
     )
 
+    @validator('GOOGLE_SERVICE_ACCOUNT_KEY_PATH', pre=True)
+    def validate_service_account_path(cls, v):
+        logger.debug(f"Original GOOGLE_SERVICE_ACCOUNT_KEY_PATH value: {v}")
+        path = Path(v)
+        if not path.is_absolute():
+            # Разрешение относительного пути относительно директории конфигурации
+            resolved_path = (Path(__file__).resolve().parent.parent / path).resolve()
+            logger.debug(f"Resolved relative path to: {resolved_path}")
+            path = resolved_path
+        else:
+            logger.debug(f"Provided path is absolute: {path}")
+
+        if not path.exists():
+            logger.warning(
+                f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH does not exist: {path}"
+            )
+        else:
+            logger.debug(
+                f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH exists: {path}"
+            )
+        return path
+
     class Config:
-        # Set the env_file path to the new location
-        env_file = Path(__file__).resolve().parent.parent / "config/.env"
+        # Устанавливаем путь к файлу окружения .env
+        env_file = (Path(__file__).resolve().parent.parent / "config" / ".env").as_posix()
         case_sensitive = True
+
 
 @lru_cache()
 def get_settings() -> Settings:
-    return Settings()
+    settings = Settings()
+    logger.debug("Settings loaded successfully.")
+    logger.debug(f"PROJECT_NAME: {settings.PROJECT_NAME}")
+    logger.debug(f"PROJECT_VERSION: {settings.PROJECT_VERSION}")
+    logger.debug(f"REDIS_URL: {settings.REDIS_URL}")
+    logger.debug(f"CHROMA_URL: {settings.CHROMA_URL}")
+    logger.debug(f"FOLDER_ID: {settings.FOLDER_ID}")
+    logger.debug(f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH: {settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH}")
+    return settings

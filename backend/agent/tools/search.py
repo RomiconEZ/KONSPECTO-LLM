@@ -2,8 +2,7 @@
 
 from typing import List
 import logging
-
-from app.services.index_service import get_query_engine  # Updated import
+from app.services.index_service import get_query_engine
 
 logger = logging.getLogger("agent.tools.search")
 

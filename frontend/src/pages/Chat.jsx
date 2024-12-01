@@ -3,24 +3,25 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
-import { FaMicrophone, FaMicrophoneSlash, FaCircle } from 'react-icons/fa'; // Добавлен FaCircle для анимации записи
+import { FaMicrophone, FaMicrophoneSlash, FaCircle } from 'react-icons/fa';
+import { getConfig } from '../config';
 
 function Chat({ chats, setChats, onOpenDoc }) {
+  const { API_URL } = getConfig();
   const { chatId } = useParams();
-  console.log('Navigated to chat ID:', chatId); // Debugging
+  console.log('Navigated to chat ID:', chatId);
   const chat = chats.find((c) => c.id === Number(chatId));
-  console.log('Found chat:', chat); // Debugging
+  console.log('Found chat:', chat);
 
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isRecording, setIsRecording] = useState(false); // Recording state
-  const [isTranscribing, setIsTranscribing] = useState(false); // Transcription state
-  const [recordError, setRecordError] = useState(false); // Recording error state
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [recordError, setRecordError] = useState(false);
 
-  const mediaRecorderRef = useRef(null); // MediaRecorder reference
-  const audioChunksRef = useRef([]); // Store audio chunks
-  const recordingStartTimeRef = useRef(null); // Recording start time
-
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingStartTimeRef = useRef(null);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -28,12 +29,19 @@ function Chat({ chats, setChats, onOpenDoc }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  const triggerRecordError = useCallback(() => {
+    setRecordError(true);
+    setTimeout(() => {
+      setRecordError(false);
+    }, 2000);
+  }, []);
+
   const handleQueryChange = useCallback((e) => {
     setQuery(e.target.value);
   }, []);
 
   const handleQuerySubmit = useCallback(async (e) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault();
 
     if (loading || !query.trim() || !chat || isTranscribing) return;
 
@@ -53,7 +61,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
     setQuery('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
+      const response = await fetch(`${API_URL}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
@@ -85,16 +93,15 @@ function Chat({ chats, setChats, onOpenDoc }) {
       setChats((prevChats) =>
         prevChats.map((c) => (c.id === chat.id ? finalChat : c))
       );
-      scrollToBottom();
     } catch (err) {
       console.error('API Error:', err);
-      // Здесь мы не устанавливаем setError, вместо этого показываем красную рамку
       triggerRecordError();
     } finally {
       setLoading(false);
       setIsTranscribing(false);
+      scrollToBottom();
     }
-  }, [loading, query, chat, setChats, scrollToBottom, isTranscribing]);
+  }, [loading, query, chat, setChats, API_URL, scrollToBottom, isTranscribing, triggerRecordError]);
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -116,7 +123,6 @@ function Chat({ chats, setChats, onOpenDoc }) {
     [handleQuerySubmit, query]
   );
 
-  // Recording Handlers
   const startRecording = useCallback(async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       triggerRecordError();
@@ -138,11 +144,10 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
       mediaRecorder.onstop = async () => {
         const recordingEndTime = Date.now();
-        const duration = (recordingEndTime - recordingStartTimeRef.current) / 1000; // in seconds
+        const duration = (recordingEndTime - recordingStartTimeRef.current) / 1000;
 
         if (duration < 0.2) {
           console.warn('Запись слишком короткая, не отправляем на сервер.');
-          // Здесь можно добавить эффект для слишком короткой записи
           triggerRecordError();
           return;
         }
@@ -151,11 +156,10 @@ function Chat({ chats, setChats, onOpenDoc }) {
         const formData = new FormData();
         formData.append('file', audioBlob, 'recording.mp3');
 
-        // Отправка аудио файла на сервер
         try {
           setLoading(true);
           setIsTranscribing(true);
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/transcribe`, {
+          const response = await fetch(`${API_URL}/transcribe`, {
             method: 'POST',
             body: formData,
           });
@@ -182,7 +186,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
       console.error('Recording Error:', err);
       triggerRecordError();
     }
-  }, [scrollToBottom]);
+  }, [API_URL, triggerRecordError, scrollToBottom]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
@@ -191,13 +195,6 @@ function Chat({ chats, setChats, onOpenDoc }) {
       setIsRecording(false);
     }
   }, [isRecording]);
-
-  const triggerRecordError = useCallback(() => {
-    setRecordError(true);
-    setTimeout(() => {
-      setRecordError(false);
-    }, 2000); // Красная рамка исчезнет через 2 секунды
-  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -211,7 +208,6 @@ function Chat({ chats, setChats, onOpenDoc }) {
   }, [query]);
 
   if (!chat) {
-    console.warn(`Чат с ID ${chatId} не найден.`);
     return (
       <div className="flex items-center justify-center h-full text-center text-dark-700">
         <div>
@@ -224,7 +220,6 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 bg-dark-800 rounded shadow messages-container">
         {chat.messages.map((message, index) => (
           <div
@@ -267,7 +262,6 @@ function Chat({ chats, setChats, onOpenDoc }) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Field */}
       <div className="mt-4 flex items-center">
         <form onSubmit={handleQuerySubmit} className="flex-1 flex items-center">
           <div className="flex-1 relative">
@@ -276,14 +270,13 @@ function Chat({ chats, setChats, onOpenDoc }) {
               value={query}
               onChange={handleQueryChange}
               onKeyDown={handleKeyDown}
-              className="textarea-custom"
+              className={`textarea-custom ${recordError ? 'border-2 border-red-500' : ''}`}
               placeholder="Введите ваш запрос"
               rows={1}
-              maxLength={500} // Optional: Input limit
-              disabled={isTranscribing} // Отключение при транскрипции
+              maxLength={500}
+              disabled={isTranscribing}
             />
           </div>
-          {/* Microphone Button */}
           <button
             type="button"
             onMouseDown={!isTranscribing ? startRecording : null}
@@ -298,11 +291,10 @@ function Chat({ chats, setChats, onOpenDoc }) {
               recordError ? 'border-2 border-red-500' : ''
             } text-gray-50 hover:bg-red-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`}
             aria-label={isRecording ? 'Запись...' : 'Начать запись'}
-            disabled={isTranscribing || loading} // Отключение при транскрипции или загрузке
+            disabled={isTranscribing || loading}
           >
             {isRecording ? <FaCircle className="text-white animate-pulse" /> : <FaMicrophone />}
           </button>
-          {/* Send Button */}
           <button
             type="submit"
             className="ml-2 bg-blue-500 text-gray-50 px-4 py-2 rounded hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-shrink-0 h-12"
@@ -311,7 +303,6 @@ function Chat({ chats, setChats, onOpenDoc }) {
             {loading ? 'Отправка...' : 'Отправить'}
           </button>
         </form>
-        {/* Удалено сообщение об ошибке */}
       </div>
     </div>
   );

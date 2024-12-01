@@ -45,6 +45,9 @@ class Settings(BaseSettings):
         env="GOOGLE_SERVICE_ACCOUNT_KEY_PATH"
     )
 
+    # Transcription Model Configuration
+    TRANSCRIPTION_MODEL: str = Field(default="whisper", env="TRANSCRIPTION_MODEL")
+
     @validator('GOOGLE_SERVICE_ACCOUNT_KEY_PATH', pre=True)
     def validate_service_account_path(cls, v):
         logger.debug(f"Original GOOGLE_SERVICE_ACCOUNT_KEY_PATH value: {v}")
@@ -83,4 +86,5 @@ def get_settings() -> Settings:
     logger.debug(f"CHROMA_URL: {settings.CHROMA_URL}")
     logger.debug(f"FOLDER_ID: {settings.FOLDER_ID}")
     logger.debug(f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH: {settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH}")
+    logger.debug(f"TRANSCRIPTION_MODEL: {settings.TRANSCRIPTION_MODEL}")
     return settings

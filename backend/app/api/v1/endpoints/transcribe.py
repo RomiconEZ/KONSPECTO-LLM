@@ -1,25 +1,17 @@
-# backend/app/api/v1/endpoints/transcribe.py
+# KONSPECTO/backend/app/api/v1/endpoints/transcribe.py
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Depends
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
 import aiofiles
 import tempfile
 import os
 import logging
-from faster_whisper import WhisperModel
+
+from ....models.transcription import TranscriptionResponse
+from ....services.transcription.base import AbstractTranscriptionModel
 
 router = APIRouter()
 logger = logging.getLogger("app.api.v1.endpoints.transcribe")
-
-
-def get_whisper_model(request: Request) -> WhisperModel:
-    """
-    Зависимость для получения экземпляра WhisperModel из состояния приложения.
-
-    :param request: Объект Request FastAPI.
-    :return: Экземпляр WhisperModel.
-    """
-    return request.app.state.whisper_model
 
 
 class TranscriptionService:
@@ -27,13 +19,13 @@ class TranscriptionService:
     Сервисный класс для обработки транскрипции аудио файлов.
     """
 
-    def __init__(self, model: WhisperModel):
+    def __init__(self, transcription_model: AbstractTranscriptionModel):
         """
-        Инициализация TranscriptionService с заданной моделью WhisperModel.
+        Инициализация TranscriptionService с заданной моделью транскрибации.
 
-        :param model: Экземпляр WhisperModel для транскрипции.
+        :param transcription_model: Экземпляр AbstractTranscriptionModel.
         """
-        self.model = model
+        self.transcription_model = transcription_model
         self.temp_file = None
 
     async def validate_and_save_file(self, file: UploadFile) -> str:
@@ -42,17 +34,18 @@ class TranscriptionService:
 
         :param file: Загруженный аудио файл.
         :return: Путь к сохраненному файлу.
+        :raises HTTPException: Если файл невалиден или не может быть сохранен.
         """
         # Проверка типа контента
         if not file.content_type.startswith("audio/"):
-            logger.warning(f"Invalid content type: {file.content_type}")
-            raise HTTPException(status_code=400, detail="Invalid file type. Audio file required.")
+            logger.warning(f"Неверный тип контента: {file.content_type}")
+            raise HTTPException(status_code=400, detail="Недопустимый тип файла. Требуется аудио файл.")
 
         # Проверка расширения файла
         _, file_ext = os.path.splitext(file.filename)
         if file_ext.lower() not in ['.mp3', '.wav']:
-            logger.warning(f"Unsupported file extension: {file_ext}")
-            raise HTTPException(status_code=400, detail="Unsupported file format. Use MP3 or WAV.")
+            logger.warning(f"Неподдерживаемое расширение файла: {file_ext}")
+            raise HTTPException(status_code=400, detail="Неподдерживаемый формат файла. Используйте MP3 или WAV.")
 
         # Сохранение файла во временное хранилище
         with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp:
@@ -63,68 +56,65 @@ class TranscriptionService:
 
         # Проверка, что файл не пустой
         if os.path.getsize(self.temp_file) == 0:
-            logger.error("Uploaded file is empty.")
-            raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+            logger.error("Загруженный файл пустой.")
+            raise HTTPException(status_code=400, detail="Загруженный файл пустой.")
 
         # Логирование размера файла
         file_size = os.path.getsize(self.temp_file)
-        logger.debug(f"Uploaded file size: {file_size} bytes")
+        logger.debug(f"Размер загруженного файла: {file_size} байт")
 
         return self.temp_file
 
-    def transcribe_audio(self, file_path: str) -> str:
+    async def transcribe_audio(self, file_path: str) -> str:
         """
-        Выполняет транскрипцию аудио файла с помощью WhisperModel.
+        Выполняет транскрипцию аудио файла с помощью модели транскрибации.
 
         :param file_path: Путь к аудио файлу.
         :return: Текст транскрипции.
         """
-        logger.debug(f"Starting transcription for file: {file_path}")
-        segments, _ = self.model.transcribe(
-            file_path,
-            task="transcribe",
-            without_timestamps=True,
-            beam_size=1,
-            language="ru",
-            condition_on_previous_text=False
-        )
-
-        # Объединение сегментов текста
-        transcription = " ".join([segment.text for segment in segments])
-        logger.info(f"Transcription completed successfully for file: {file_path}")
+        transcription = await self.transcription_model.transcribe(file_path)
         return transcription
 
     def cleanup(self):
         """
-        Очищает временные файлы, созданные в процессе обработки.
+        Очищает временные файлы.
         """
         if self.temp_file and os.path.exists(self.temp_file):
             os.remove(self.temp_file)
-            logger.debug(f"Removed temporary file: {self.temp_file}")
+            logger.debug(f"Удален временный файл: {self.temp_file}")
 
 
-@router.post("/")
+def get_transcription_model(request: Request) -> AbstractTranscriptionModel:
+    """
+    Зависимость для получения экземпляра AbstractTranscriptionModel из состояния приложения.
+
+    :param request: Объект запроса FastAPI.
+    :return: Экземпляр AbstractTranscriptionModel.
+    """
+    return request.app.state.transcription_model
+
+
+@router.post("/", response_model=TranscriptionResponse)
 async def transcribe_audio(
     file: UploadFile = File(...),
-    model: WhisperModel = Depends(get_whisper_model)
+    transcription_model: AbstractTranscriptionModel = Depends(get_transcription_model)
 ):
     """
-    Эндпойнт для транскрипции загруженного аудио файла с использованием WhisperModel.
-    Поддерживает форматы MP3 и WAV.
+    Эндпойнт для транскрипции загруженного аудио файла.
 
     :param file: Загруженный аудио файл.
-    :param model: Экземпляр WhisperModel.
+    :param transcription_model: Экземпляр модели транскрибации.
     :return: JSON ответ с текстом транскрипции.
     """
-    service = TranscriptionService(model)
+    service = TranscriptionService(transcription_model)
     try:
         file_path = await service.validate_and_save_file(file)
-        transcription = service.transcribe_audio(file_path)
-        return JSONResponse(content={"transcription": transcription})
+        transcription = await service.transcribe_audio(file_path)
+        return TranscriptionResponse(transcription=transcription)
     except HTTPException as he:
         raise he  # Передача HTTPException без изменений
     except Exception:
-        logger.exception("Failed to transcribe audio.")
-        raise HTTPException(status_code=500, detail="Failed to transcribe audio.")
+        logger.exception("Не удалось выполнить транскрипцию аудио.")
+        raise HTTPException(status_code=500, detail="Не удалось выполнить транскрипцию аудио.")
     finally:
         service.cleanup()

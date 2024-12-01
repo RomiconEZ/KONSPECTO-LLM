@@ -35,6 +35,9 @@ python-docx = "^1.1.2"
 pytubefix = "^8.5.3"
 scikit-image = "^0.24.0"
 fakeredis = "^2.26.1"
+langchain-openai = "^0.2.10"
+langchain = "^0.3.9"
+langchain-community = "^0.3.8"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.3.1"

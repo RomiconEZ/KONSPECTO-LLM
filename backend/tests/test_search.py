@@ -1,21 +1,24 @@
-# tests/test_search.py
+# KONSPECTO/backend/tests/test_search.py
 
-from unittest.mock import patch
+import pytest
+from unittest.mock import patch, AsyncMock
 
-def test_search(test_client):
+
+@pytest.mark.asyncio
+async def test_search(async_client):
     with patch('app.api.v1.endpoints.search.SearchService.process_search') as mock_process_search:
-        # Мокируем метод process_search для возврата тестовых данных
         mock_process_search.return_value = []
 
-        response = test_client.post("/api/v1/search/", json={"query": "тестовый запрос"})
+        response = await async_client.post("/api/v1/search/", json={"query": "тестовый запрос"})
         assert response.status_code == 200
         data = response.json()
         assert "results" in data
         assert isinstance(data["results"], list)
-        # Дополнительные проверки структуры данных, если необходимо
 
-def test_search_invalid_payload(test_client):
-    response = test_client.post("/api/v1/search/", json={"invalid_key": "тест"})
-    assert response.status_code == 422  # Unprocessable Entity
+
+@pytest.mark.asyncio
+async def test_search_invalid_payload(async_client):
+    response = await async_client.post("/api/v1/search/", json={"invalid_key": "тест"})
+    assert response.status_code == 422
     data = response.json()
     assert "detail" in data

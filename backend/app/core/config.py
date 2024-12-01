@@ -7,21 +7,9 @@ from pathlib import Path
 from functools import lru_cache
 import logging
 
-
 # Настройка логирования для конфигурационного модуля
 logger = logging.getLogger("app.core.config")
 logger.setLevel(logging.DEBUG)  # Установите нужный уровень логирования
-
-# Добавьте обработчик, если он еще не добавлен (например, для консоли)
-if not logger.handlers:
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
-    )
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "KONSPECTO API"
@@ -47,6 +35,13 @@ class Settings(BaseSettings):
 
     # Transcription Model Configuration
     TRANSCRIPTION_MODEL: str = Field(default="whisper", env="TRANSCRIPTION_MODEL")
+
+    # Новая переменная конфигурации для LLMStudioClient
+    LLM_STUDIO_BASE_URL: str = Field(
+        default="http://localhost:1234/v1",
+        env="LLM_STUDIO_BASE_URL",
+        description="Базовый URL для LLM Studio API."
+    )
 
     @validator('GOOGLE_SERVICE_ACCOUNT_KEY_PATH', pre=True)
     def validate_service_account_path(cls, v):
@@ -87,4 +82,5 @@ def get_settings() -> Settings:
     logger.debug(f"FOLDER_ID: {settings.FOLDER_ID}")
     logger.debug(f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH: {settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH}")
     logger.debug(f"TRANSCRIPTION_MODEL: {settings.TRANSCRIPTION_MODEL}")
+    logger.debug(f"LLM_STUDIO_BASE_URL: {settings.LLM_STUDIO_BASE_URL}")
     return settings

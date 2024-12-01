@@ -2,8 +2,6 @@
 
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from faster_whisper import WhisperModel
-import torch
 import logging
 
 from .core.config import get_settings  # Обновленный импорт
@@ -13,8 +11,8 @@ from .services.redis_service import RedisService
 from .services.index_service import get_query_engine  # Добавленный импорт
 
 # Новые импорты для моделей транскрибации
-from .services.transcription.base import AbstractTranscriptionModel
 from .services.transcription.whisper_model import WhisperTranscriptionModel
+
 
 class KonspectoAPIApp:
     def __init__(self):
@@ -113,8 +111,11 @@ class KonspectoAPIApp:
     async def _health_check_endpoint(self) -> dict:
         """Эндпойнт для проверки состояния приложения."""
         try:
-            redis_ok = await self.redis_service.exists_key("health_check")
+            # Пингуем Redis для проверки подключения
+            redis_ping = await self.redis_service.redis_client.ping()
+            redis_ok = redis_ping is True
             status = "healthy" if redis_ok else "unhealthy"
+
             return {
                 "status": status,
                 "version": get_settings().PROJECT_VERSION,

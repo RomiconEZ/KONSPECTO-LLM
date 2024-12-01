@@ -30,6 +30,7 @@ services:
       - PYTHONPATH=/app
       - REDIS_URL=redis://redis-stack:6379
       - HF_HOME=/app/.cache/huggingface
+      - LLM_STUDIO_BASE_URL=http://host.docker.internal:1234/v1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s

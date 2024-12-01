@@ -1,4 +1,4 @@
-# tests/test_agent_search.py
+# KONSPECTO/backend/tests/test_agent_search.py
 
 import pytest
 from unittest.mock import patch, MagicMock
@@ -20,9 +20,9 @@ def mock_query_engine_response():
 
     return MockResponse
 
-@patch("agent.tools.search.get_query_engine")  # Updated patch target
+@patch("agent.tools.search.get_query_engine")  # Обновленный путь патча
 def test_search_success(mock_get_query_engine, mock_query_engine_response):
-    # Set up the mock query engine
+    # Настройка мокового query engine
     mock_query_engine_instance = MagicMock()
     mock_query_engine_instance.query.return_value = mock_query_engine_response(
         ["Text of the first document.", "Text of the second document."]
@@ -37,9 +37,9 @@ def test_search_success(mock_get_query_engine, mock_query_engine_response):
     assert results[0] == "Text of the first document."
     assert results[1] == "Text of the second document."
 
-@patch("agent.tools.search.get_query_engine")  # Updated patch target
+@patch("agent.tools.search.get_query_engine")  # Обновленный путь патча
 def test_search_exception(mock_get_query_engine):
-    # Set up the mock query engine to raise an exception
+    # Настройка мокового query engine для генерации исключения
     mock_query_engine_instance = MagicMock()
     mock_query_engine_instance.query.side_effect = Exception("Test Exception")
     mock_get_query_engine.return_value = mock_query_engine_instance

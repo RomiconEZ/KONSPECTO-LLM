@@ -1,23 +1,31 @@
-// frontend/src/pages/Chat.jsx
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// KONSPECTO/frontend/src/pages/Chat.jsx
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { FaMicrophone, FaCircle } from 'react-icons/fa';
 import { getConfig } from '../config';
+import { containsYouTubeLink } from '../utils/youtubeUtils';
+import DownloadButton from '../components/DownloadButton';
+import ErrorMessage from '../components/ErrorMessage';
+import { ChatContext } from '../context/ChatContext';
 
-function Chat({ chats, setChats, onOpenDoc }) {
+function Chat({ onOpenDoc }) {
   const { API_URL } = getConfig();
+  const { chats, setChats } = useContext(ChatContext);
   const { chatId } = useParams();
-  console.log('Navigated to chat ID:', chatId);
-  const chat = chats.find((c) => c.id === Number(chatId));
-  console.log('Found chat:', chat);
+  console.log('ChatId:', chatId);
+  console.log('All chats:', chats);
+
+  const chat = chats.find((c) => c.id === chatId);
+  console.log('Current chat:', chat);
 
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [recordError, setRecordError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -29,11 +37,13 @@ function Chat({ chats, setChats, onOpenDoc }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  const triggerRecordError = useCallback(() => {
+  const triggerRecordError = useCallback((message = 'Произошла ошибка при записи.') => {
+    setErrorMessage(message);
     setRecordError(true);
     setTimeout(() => {
+      setErrorMessage('');
       setRecordError(false);
-    }, 2000);
+    }, 4000);
   }, []);
 
   const handleQueryChange = useCallback((e) => {
@@ -46,8 +56,8 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
       if (loading || !query.trim() || !chat || isTranscribing) return;
 
+      const hasYouTube = containsYouTubeLink(query);
       setLoading(true);
-      setIsTranscribing(true);
 
       const timestamp = new Date().toISOString();
       const userMessage = {
@@ -60,46 +70,162 @@ function Chat({ chats, setChats, onOpenDoc }) {
       setQuery('');
 
       try {
-        const response = await fetch(`${API_URL}/search`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query }),
-        });
+        if (hasYouTube) {
+          // Если есть YouTube ссылка, отправляем только запрос агенту
+          const agentResponse = await fetch(`${API_URL}/agent/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query }),
+          });
 
-        if (!response.ok) {
-          throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
+          if (!agentResponse.ok) {
+            throw new Error(`Ошибка агента: ${agentResponse.status} ${agentResponse.statusText}`);
+          }
+
+          const agentData = await agentResponse.json();
+          const agentText = agentData.response;
+
+          if (agentText.includes('docx:')) {
+            const docxMatch = agentText.match(/docx:[a-zA-Z0-9-]+/);
+            if (!docxMatch) {
+              throw new Error('Некорректный формат ответа агента');
+            }
+            const docxKey = docxMatch[0]; // Сохраняем префикс 'docx:'
+
+            try {
+              const videoResponse = await fetch(`${API_URL}/video/video/${docxKey}`);
+
+              if (!videoResponse.ok) {
+                if (videoResponse.status === 404) {
+                  throw new Error('Файл не найден.');
+                }
+                throw new Error(
+                  `Ошибка при получении файла: ${videoResponse.status} ${videoResponse.statusText}`
+                );
+              }
+
+              const fileBlob = await videoResponse.blob();
+              const fileUrl = URL.createObjectURL(fileBlob);
+              const fileName = `${docxKey}.docx`;
+
+              const fileMessage = {
+                sender: 'agent',
+                text: 'Документ готов для скачивания.',
+                file_url: fileUrl,
+                file_name: fileName,
+                timestamp: new Date().toISOString(),
+              };
+
+              const finalChat = {
+                ...updatedChat,
+                messages: [...updatedChat.messages, fileMessage],
+              };
+              setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? finalChat : c)));
+            } catch (err) {
+              console.error('File Fetch Error:', err);
+              const errorAgentMessage = {
+                sender: 'agent',
+                text: 'Файл не найден.',
+                timestamp: new Date().toISOString(),
+              };
+              const finalChat = {
+                ...updatedChat,
+                messages: [...updatedChat.messages, errorAgentMessage],
+              };
+              setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? finalChat : c)));
+            }
+          } else {
+            const agentMessage = {
+              sender: 'agent',
+              text: agentText,
+              timestamp: new Date().toISOString(),
+            };
+            const finalChat = {
+              ...updatedChat,
+              messages: [...updatedChat.messages, agentMessage],
+            };
+            setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? finalChat : c)));
+          }
+        } else {
+          // Если нет YouTube ссылки, сначала отправляем запрос на поиск
+          const searchResponse = await fetch(`${API_URL}/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query }),
+          });
+
+          if (!searchResponse.ok) {
+            throw new Error(`Ошибка поиска: ${searchResponse.status} ${searchResponse.statusText}`);
+          }
+
+          const searchData = await searchResponse.json();
+
+          if (!searchData.results || !Array.isArray(searchData.results)) {
+            throw new Error('Неверный формат ответа поиска.');
+          }
+
+          const searchMessages = searchData.results.map((item, index) => ({
+            sender: 'search',
+            text: item.text,
+            file_id: item.file_id,
+            file_name: item.file_name,
+            score: item.score,
+            start_char_idx: item.start_char_idx,
+            end_char_idx: item.end_char_idx,
+            timestamp: new Date().toISOString(),
+            id: `search-${index}-${Date.now()}`,
+          }));
+
+          const updatedChatWithSearch = {
+            ...updatedChat,
+            messages: [...updatedChat.messages, ...searchMessages],
+          };
+          setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? updatedChatWithSearch : c)));
+          scrollToBottom();
+
+          // Теперь отправляем запрос агенту
+          const agentResponse = await fetch(`${API_URL}/agent/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query }),
+          });
+
+          if (!agentResponse.ok) {
+            throw new Error(`Ошибка агента: ${agentResponse.status} ${agentResponse.statusText}`);
+          }
+
+          const agentData = await agentResponse.json();
+
+          const agentMessage = {
+            sender: 'agent',
+            text: agentData.response,
+            timestamp: new Date().toISOString(),
+          };
+
+          const finalChat = {
+            ...updatedChatWithSearch,
+            messages: [...updatedChatWithSearch.messages, agentMessage],
+          };
+          setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? finalChat : c)));
         }
-
-        const data = await response.json();
-
-        if (!data.results || !Array.isArray(data.results)) {
-          throw new Error('Неверный формат ответа от API.');
-        }
-
-        const agentMessages = data.results.map((item) => ({
-          sender: 'agent',
-          text: item.text,
-          file_id: item.file_id,
-          file_name: item.file_name,
-          timestamp: new Date().toISOString(),
-        }));
-
-        const finalChat = {
-          ...updatedChat,
-          messages: [...updatedChat.messages, ...agentMessages],
-        };
-
-        setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? finalChat : c)));
       } catch (err) {
-        console.error('API Error:', err);
-        triggerRecordError();
+        console.error('Processing Error:', err);
+        triggerRecordError(err.message || 'Произошла неизвестная ошибка.');
       } finally {
         setLoading(false);
-        setIsTranscribing(false);
         scrollToBottom();
       }
     },
-    [loading, query, chat, setChats, API_URL, scrollToBottom, isTranscribing, triggerRecordError]
+    [
+      loading,
+      query,
+      chat,
+      setChats,
+      API_URL,
+      isTranscribing,
+      triggerRecordError,
+      scrollToBottom,
+    ]
   );
 
   const handleKeyDown = useCallback(
@@ -114,8 +240,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
         setQuery(newValue);
         setTimeout(() => {
           if (textareaRef.current) {
-            textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
-              selectionStart + 1;
+            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = selectionStart + 1;
           }
         }, 0);
       }
@@ -125,7 +250,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
   const startRecording = useCallback(async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      triggerRecordError();
+      triggerRecordError('В вашем браузере не поддерживается запись аудио.');
       return;
     }
 
@@ -148,7 +273,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
         if (duration < 0.2) {
           console.warn('Запись слишком короткая, не отправляем на сервер.');
-          triggerRecordError();
+          triggerRecordError('Запись слишком короткая.');
           return;
         }
 
@@ -172,11 +297,9 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
           setQuery((prev) => {
             const newQuery = prev + data.transcription;
-            // Устанавливаем курсор в конец поля ввода
             setTimeout(() => {
               if (textareaRef.current) {
-                textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
-                  newQuery.length;
+                textareaRef.current.selectionStart = textareaRef.current.selectionEnd = newQuery.length;
                 textareaRef.current.focus();
               }
             }, 0);
@@ -185,7 +308,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
           scrollToBottom();
         } catch (err) {
           console.error('Transcription Error:', err);
-          triggerRecordError();
+          triggerRecordError('Ошибка при транскрипции аудио.');
         } finally {
           setLoading(false);
           setIsTranscribing(false);
@@ -196,7 +319,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
       setIsRecording(true);
     } catch (err) {
       console.error('Recording Error:', err);
-      triggerRecordError();
+      triggerRecordError('Не удалось начать запись.');
     }
   }, [API_URL, triggerRecordError, scrollToBottom]);
 
@@ -221,10 +344,10 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
   if (!chat) {
     return (
-      <div className="flex items-center justify-center h-full text-center text-dark-700">
-        <div>
+      <div className="flex items-center justify-center h-full text-center">
+        <div className="text-gray-400">
           <h2 className="text-2xl font-bold mb-4">Чат не найден</h2>
-          <p>Пожалуйста, выберите действительный чат.</p>
+          <p>Пожалуйста, выберите существующий чат или создайте новый.</p>
         </div>
       </div>
     );
@@ -232,11 +355,15 @@ function Chat({ chats, setChats, onOpenDoc }) {
 
   return (
     <div className="flex flex-col h-full">
+      {errorMessage && <ErrorMessage message={errorMessage} />}
+
       <div className="flex-1 overflow-y-auto p-4 bg-dark-800 rounded shadow messages-container">
         {chat.messages.map((message, index) => (
           <div
             key={index}
-            className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`mb-4 flex ${
+              message.sender === 'user' ? 'justify-end' : 'justify-start'
+            }`}
           >
             <div
               className={`max-w-1/2 p-3 rounded-lg ${
@@ -245,7 +372,12 @@ function Chat({ chats, setChats, onOpenDoc }) {
             >
               {message.file_name && <div className="font-semibold mb-1">{message.file_name}</div>}
               <pre className="whitespace-pre-wrap">{message.text}</pre>
-              {message.sender === 'agent' && message.file_id && (
+
+              {message.file_url && (
+                <DownloadButton fileUrl={message.file_url} fileName={message.file_name} />
+              )}
+
+              {(message.sender === 'agent' || message.sender === 'search') && message.file_id && (
                 <button
                   onClick={() => onOpenDoc(message.file_id)}
                   className="mt-2 bg-blue-600 text-gray-50 px-3 py-1 rounded hover:bg-blue-700 transition duration-200"
@@ -278,7 +410,7 @@ function Chat({ chats, setChats, onOpenDoc }) {
               placeholder="Введите ваш запрос"
               rows={1}
               maxLength={500}
-              disabled={isTranscribing}
+              disabled={isTranscribing || loading}
             />
           </div>
           <button
@@ -311,8 +443,6 @@ function Chat({ chats, setChats, onOpenDoc }) {
 }
 
 Chat.propTypes = {
-  chats: PropTypes.array.isRequired,
-  setChats: PropTypes.func.isRequired,
   onOpenDoc: PropTypes.func.isRequired,
 };
 

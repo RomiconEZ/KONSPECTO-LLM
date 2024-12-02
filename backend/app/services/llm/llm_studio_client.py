@@ -22,7 +22,7 @@ class LLMStudioClient(ChatOpenAI):
 
     def __init__(
             self,
-            temperature: float = 0.3,
+            temperature: float = 0.1,
             max_tokens: int = None,
             model: str = "local",
             timeout: float = None,

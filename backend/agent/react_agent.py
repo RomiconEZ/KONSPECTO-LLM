@@ -50,6 +50,7 @@ class ReactAgent:
             description=(
                 "Useful for generating a DOCX document with images extracted every 5 seconds from a YouTube video. "
                 "Use this tool when the user requests a document with images from a YouTube video. "
+                "The input should be the full YouTube video link starting with 'https'. "
                 "If the document is successfully generated, the tool returns a unique key starting with 'docx', which can be used to access the document. "
                 "If an error occurs during processing, it returns an error message, and a retry should not be performed."
             ),
@@ -75,7 +76,10 @@ You have access to the following tools:
 Model Parameters:
 {model_parameters}
 
-When searching the knowledge base, extract key terms or concepts from the user's question. If you decide to use the RAGSearch tool, supply only one definition or concept at a time as the input to the tool. For each term, find relevant information in the knowledge base. If the information retrieved does not help answer the user's question, do not use it.
+When searching the knowledge base, extract key terms or concepts from the user's question. 
+If you decide to use the RAGSearch tool, supply only one definition or concept at a time as the input to the tool. 
+For each term, find relevant information in the knowledge base. 
+If the information retrieved does not help answer the user's question, do not use it.
 
 If the user asks you to explain something, provide a clear and understandable explanation.
 

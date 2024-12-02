@@ -10,26 +10,29 @@ const GoogleDocViewer = React.memo(({ fileId, onClose }) => {
   const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
 
   return (
-    <div className="flex flex-col h-full w-full">
-      {/* Header with Close Button */}
-      <div className="flex justify-between items-center p-4 bg-dark-700 border-b border-dark-600">
-        <h2 className="text-lg font-semibold text-blue-100">Просмотр документа</h2>
+    <div className="flex flex-col h-full w-full relative">
+      <div className="flex justify-between items-center p-4 glass-effect border-b border-mist-700/20">
+        <h2 className="text-lg font-semibold text-mist-100">Просмотр документа</h2>
         <button
           onClick={onClose}
-          className="bg-blue-500 text-gray-50 px-3 py-1 rounded hover:bg-blue-600 transition duration-200"
+          className="btn-action"
           aria-label="Закрыть просмотр документа"
         >
           Закрыть
         </button>
       </div>
 
-      {/* Iframe for Document Preview */}
       <iframe
         title="Просмотр документа Google"
         src={embedUrl}
-        className="flex-1 border-none w-full h-full text-lg"
+        className="flex-1 border-none w-full h-full bg-white"
         loading="lazy"
       />
+
+      {/* Добавляем визуальный индикатор для ползунка */}
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-40 w-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="h-full w-full rounded-full bg-mist-500/20"></div>
+      </div>
     </div>
   );
 });

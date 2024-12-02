@@ -4,62 +4,70 @@ export default {
     './index.html',
     './src/**/*.{js,jsx,ts,tsx}',
   ],
-  darkMode: 'class', // Продолжаем использовать темную тему
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        dark: {
-          50: '#f0f4f8',
-          100: '#d9e2ec',
-          200: '#bcccdc',
-          300: '#9fb3c8',
-          400: '#829ab1',
-          500: '#627d98',
-          600: '#486581',
-          700: '#334e68',
-          800: '#243b53',
-          900: '#102a43',
+        mist: {
+          50: '#f8f7fa',
+          100: '#f0eef4',
+          200: '#e1dde9',
+          300: '#cec7db',
+          400: '#b7adc9',
+          500: '#9f93b8',
+          600: '#8779a7',
+          700: '#6f6290',
+          800: '#574c74',
+          900: '#403858',
         },
-        blue: {
-          50: '#e3f2fd',
-          100: '#c5e4fb',
-          200: '#a2d4fa',
-          300: '#7ac1f9',
-          400: '#46aef7',
-          500: '#0096c7',
-          600: '#0079a5',
-          700: '#016891',
-          800: '#014f86',
-          900: '#013a6b',
+        dusk: {
+          50: '#f6f6f8',
+          100: '#ececf1',
+          200: '#d9d9e3',
+          300: '#c2c1d1',
+          400: '#a9a7bc',
+          500: '#908da7',
+          600: '#777392',
+          700: '#5f5b77',
+          800: '#48455c',
+          900: '#322f41',
         },
-        gray: {
-          50: '#f9fafb',
-          100: '#f3f4f6',
-          200: '#e5e7eb',
-          300: '#d1d5db',
-          400: '#9ca3af',
-          500: '#6b7280',
-          600: '#4b5563',
-          700: '#374151',
-          800: '#1f2937',
-          900: '#111827',
-        },
-        green: {
-          50: '#e0f2f1',
-          100: '#b2dfdb',
-          200: '#80cbc4',
-          300: '#4db6ac',
-          400: '#26a69a',
-          500: '#009688',
-          600: '#00897b',
-          700: '#00796b',
-          800: '#00695c',
-          900: '#004d40',
+        sage: {
+          50: '#f5f7f6',
+          100: '#ebefed',
+          200: '#d7dfdb',
+          300: '#bfcbc5',
+          400: '#a5b4ad',
+          500: '#8b9c94',
+          600: '#71847c',
+          700: '#596a63',
+          800: '#42504a',
+          900: '#2b3631',
         },
       },
-      maxWidth: {
-        '1/2': '50%',
+      boxShadow: {
+        'soft': '0 2px 15px rgba(159, 147, 184, 0.2)',
+        'soft-lg': '0 4px 25px rgba(159, 147, 184, 0.25)',
+        'inner-soft': 'inset 0 2px 15px rgba(159, 147, 184, 0.15)',
       },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'soft-pattern': 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M30 0l25.98 15v30L30 60 4.02 45V15z\' fill-opacity=\'0.03\' fill=\'%239f93b8\'/%3E%3C/svg%3E")',
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'background-shine': 'background-shine 2s linear infinite',
+      },
+      keyframes: {
+        'background-shine': {
+          from: {
+            backgroundPosition: '0 0'
+          },
+          to: {
+            backgroundPosition: '-200% 0'
+          }
+        }
+      }
     },
   },
   plugins: [

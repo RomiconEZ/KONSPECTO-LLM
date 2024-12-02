@@ -19,9 +19,23 @@ const DownloadButton = React.memo(({ fileUrl, fileName }) => {
   return (
     <button
       onClick={handleDownload}
-      className="mt-2 bg-green-500 text-gray-50 px-3 py-1 rounded hover:bg-green-600 transition duration-200"
+      className="btn-action mt-2 flex items-center gap-2"
       aria-label={`Скачать файл ${fileName}`}
     >
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+        />
+      </svg>
       Скачать файл
     </button>
   );

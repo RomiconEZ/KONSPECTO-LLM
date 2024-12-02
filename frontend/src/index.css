@@ -1,97 +1,173 @@
 /* frontend/src/index.css */
-
-/* Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Глобальные стили */
 body {
-  @apply antialiased text-gray-50 bg-dark-900;
+  @apply bg-gradient-to-br from-dusk-900 via-mist-800 to-sage-900 text-mist-100 min-h-screen bg-fixed;
+  background-image: linear-gradient(to bottom right, #322f41, #403858), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-opacity='0.03' fill='%239f93b8'/%3E%3C/svg%3E");
 }
 
+/* Базовые стили для всех кнопок */
+button {
+  @apply transform transition-all duration-200 hover:scale-105 focus:outline-none;
+}
+
+/* Основная кнопка */
+.btn-primary {
+  @apply bg-gradient-to-r from-sage-600/90 to-mist-600/90 text-mist-50
+         px-6 py-2 rounded-lg shadow-soft
+         hover:shadow-soft-lg hover:from-sage-500/90 hover:to-mist-500/90
+         active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Кнопка действия */
+.btn-action {
+  @apply bg-gradient-to-r from-mist-600/80 to-sage-600/80 text-mist-50
+         px-4 py-2 rounded-lg shadow-soft
+         hover:shadow-soft-lg hover:from-mist-500/80 hover:to-sage-500/80
+         active:scale-95 disabled:opacity-50;
+}
+
+/* Кнопка удаления */
+.btn-delete {
+  @apply bg-gradient-to-r from-rose-400/70 to-mist-500/70 text-mist-50
+         px-3 py-1 rounded-lg shadow-soft
+         hover:shadow-soft-lg hover:from-rose-300/70 hover:to-mist-400/70;
+}
+
+/* Стилизация сообщений */
+.message-user {
+  @apply bg-gradient-to-br from-mist-600/90 to-sage-600/90 text-mist-50
+         rounded-2xl px-6 py-4 shadow-soft hover:shadow-soft-lg
+         transition-all duration-300 border border-mist-400/10;
+}
+
+.message-agent {
+  @apply bg-gradient-to-br from-dusk-700/90 to-mist-700/90 text-mist-100
+         rounded-2xl px-6 py-4 shadow-soft hover:shadow-soft-lg
+         transition-all duration-300 border border-mist-400/10;
+}
+
+/* Стилизация скроллбара */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dusk-900/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-sage-600/70 to-mist-600/70
+         rounded-full border-2 border-transparent
+         bg-clip-padding;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply from-sage-500/70 to-mist-500/70;
+}
+
+/* Стилизация контейнера сообщений */
+.messages-container {
+  @apply px-4 py-2;
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.sage.600/70') theme('colors.dusk.900/30');
+}
+
+.messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  @apply bg-dusk-900/20 rounded-full;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-sage-600/60 to-mist-600/60
+         rounded-full border border-transparent;
+}
+
+/* Стилизация текстового поля */
+.textarea-custom {
+  @apply w-full resize-none overflow-y-auto
+         bg-gradient-to-br from-dusk-800/60 to-mist-800/60 text-mist-100
+         border border-mist-600/20 rounded-lg py-4 px-4
+         focus:outline-none focus:ring-2 focus:ring-sage-500/30 focus:border-sage-500/30
+         placeholder-mist-400/40 backdrop-blur-sm shadow-inner-soft;
+}
+
+/* Стилизация сайдбара */
 nav {
-  @apply flex flex-col;
+  @apply bg-gradient-to-b from-dusk-900/95 to-mist-900/95 backdrop-blur-md
+         border-r border-mist-700/20 shadow-soft-lg;
 }
 
-nav ul {
-  @apply space-y-2;
+/* Кнопки в сайдбаре */
+nav button {
+  @apply hover:bg-sage-700/20 rounded-lg px-3 py-2 transition-all duration-200;
 }
 
-nav ul li {
-  @apply flex justify-between items-center;
+/* Стилизация ссылок в сайдбаре */
+nav a {
+  @apply text-mist-200 hover:text-mist-100 transition-colors duration-200;
 }
 
-/* Предотвращение горизонтальной прокрутки */
-html,
-body,
-#root {
-  @apply overflow-hidden;
+/* Кнопка записи голоса */
+.voice-record-btn {
+  @apply bg-gradient-to-r from-sage-600/80 to-mist-600/80
+         p-3 rounded-full shadow-soft
+         hover:shadow-soft-lg hover:from-sage-500/80 hover:to-mist-500/80;
 }
 
-/* Плавные переходы для ResizableBox */
+.voice-record-btn.recording {
+  @apply from-rose-400/70 to-mist-500/70 animate-pulse-slow;
+}
+
+/* Контейнер для чата */
+.chat-container {
+  @apply bg-gradient-to-br from-dusk-800/30 to-mist-800/30
+         backdrop-blur-md rounded-lg shadow-soft
+         border border-mist-700/20;
+}
+
+/* Дополнительные утилиты */
+.glass-effect {
+  @apply backdrop-blur-md bg-dusk-800/30 border border-mist-500/10;
+}
+
+.hover-effect {
+  @apply transform transition-all duration-300 hover:scale-105 hover:shadow-soft-lg;
+}
+
+/* Стилизация ResizableBox */
 .react-resizable {
-  transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+  position: relative;
 }
 
-/* Стилизация ручки изменения размера */
 .react-resizable-handle {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  transition: background 0.3s ease-in-out;
-  width: 10px;
-  height: 30px;
+  width: 12px;
+  height: 40px;
+  background: linear-gradient(to right, theme('colors.sage.600/50'), theme('colors.mist.600/50'));
   cursor: ew-resize;
-  background: rgba(0, 150, 199, 0.5); /* Синий оверлей */
-  z-index: 10;
-  border-radius: 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.react-resizable-handle-w {
+  left: -6px;
 }
 
 .react-resizable-handle:hover {
-  background: rgba(0, 150, 199, 0.8); /* Темнее синий при наведении */
+  background: linear-gradient(to right, theme('colors.sage.500/70'), theme('colors.mist.500/70'));
+  width: 14px;
 }
 
-/* Стилизация полосы прокрутки для сообщений */
-.messages-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.messages-container::-webkit-scrollbar-track {
-  background: #1f2937; /* dark-800 */
-}
-
-.messages-container::-webkit-scrollbar-thumb {
-  background-color: #0096c7; /* blue-500 */
-  border-radius: 4px;
-  border: 2px solid #1f2937;
-}
-
-.messages-container::-webkit-scrollbar-thumb:hover {
-  background-color: #0079a5; /* blue-600 */
-}
-
-.messages-container {
-  scrollbar-width: thin;
-  scrollbar-color: #0096c7 #1f2937;
-}
-
-/* Плавная прокрутка для сообщений */
-.messages-container {
-  scroll-behavior: smooth;
-}
-
-/* Скрытие полосы прокрутки в textarea */
-textarea::-webkit-scrollbar {
-  display: none;
-}
-
-textarea {
-  scrollbar-width: none; /* Для Firefox */
-}
-
-/* Стилизация textarea */
-.textarea-custom {
-  @apply w-full resize-none overflow-y-auto bg-dark-800 text-gray-50 border border-dark-700 rounded py-4 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset text-lg;
-  max-height: calc(1.5em * 6 + 1rem); /* Настройка для 6 строк */
+.react-resizable-handle:active {
+  background: linear-gradient(to right, theme('colors.sage.400/80'), theme('colors.mist.400/80'));
 }

@@ -1,11 +1,12 @@
+// frontend/src/App.jsx
 import React, { useState, useCallback } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import { ResizableBox } from 'react-resizable';
 import Chat from './pages/Chat';
 import GoogleDocViewer from './components/GoogleDocViewer';
-import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 import Sidebar from './components/Sidebar';
-import { ChatProvider } from './context/ChatContext'; // Removed .jsx extension
+import { ChatProvider } from './context/ChatContext';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -34,20 +35,17 @@ function App() {
 
   return (
     <ChatProvider>
-      <div className="flex h-screen bg-dark-900 text-gray-50 overflow-hidden">
-        {/* Sidebar */}
+      <div className="flex h-screen overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
-        {/* Main Content Area (Chat and Document Viewer) */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Chat Area */}
-          <main className="flex-1 p-4 bg-dark-700 flex flex-col overflow-hidden">
+          <main className="flex-1 p-4 flex flex-col overflow-hidden chat-container">
             <Routes>
               <Route
                 path="/"
                 element={
                   <div className="flex items-center justify-center h-full text-center">
-                    <div className="text-blue-200">
+                    <div className="text-mist-200 glass-effect p-8 rounded-lg">
                       <p className="mb-4 text-xl">
                         Интеллектуальный агент для работы с заметками и видео лекциями
                       </p>
@@ -56,16 +54,12 @@ function App() {
                   </div>
                 }
               />
-              <Route
-                path="/chat/:chatId"
-                element={<Chat onOpenDoc={handleOpenDocViewer} />}
-              />
-              {/* Handle non-existing routes */}
+              <Route path="/chat/:chatId" element={<Chat onOpenDoc={handleOpenDocViewer} />} />
               <Route
                 path="*"
                 element={
                   <div className="flex items-center justify-center h-full text-center">
-                    <div className="text-red-400">
+                    <div className="text-rose-400/90 glass-effect p-8 rounded-lg">
                       <h2 className="text-2xl font-bold mb-4">404 - Не найдено</h2>
                       <p>Страница, которую вы ищете, не существует.</p>
                     </div>
@@ -75,7 +69,6 @@ function App() {
             </Routes>
           </main>
 
-          {/* Document Viewer Area */}
           {docFileId && (
             <ResizableBox
               width={docViewerWidth}
@@ -91,7 +84,7 @@ function App() {
                 />
               }
               onResize={handleResize}
-              className="bg-dark-800 shadow-lg z-50 flex flex-col transition-all duration-300 ease-in-out"
+              className="glass-effect shadow-soft-lg z-50 flex flex-col transition-all duration-300 ease-in-out group"
             >
               <GoogleDocViewer fileId={docFileId} onClose={handleCloseDocViewer} />
             </ResizableBox>

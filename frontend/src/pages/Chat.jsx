@@ -1,4 +1,4 @@
-// KONSPECTO/frontend/src/pages/Chat.jsx
+// frontend/src/pages/Chat.jsx
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -14,11 +14,7 @@ function Chat({ onOpenDoc }) {
   const { API_URL } = getConfig();
   const { chats, setChats } = useContext(ChatContext);
   const { chatId } = useParams();
-  console.log('ChatId:', chatId);
-  console.log('All chats:', chats);
-
   const chat = chats.find((c) => c.id === chatId);
-  console.log('Current chat:', chat);
 
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -71,7 +67,6 @@ function Chat({ onOpenDoc }) {
 
       try {
         if (hasYouTube) {
-          // Если есть YouTube ссылка, отправляем только запрос агенту
           const agentResponse = await fetch(`${API_URL}/agent/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -90,7 +85,7 @@ function Chat({ onOpenDoc }) {
             if (!docxMatch) {
               throw new Error('Некорректный формат ответа агента');
             }
-            const docxKey = docxMatch[0]; // Сохраняем префикс 'docx:'
+            const docxKey = docxMatch[0];
 
             try {
               const videoResponse = await fetch(`${API_URL}/video/video/${docxKey}`);
@@ -147,7 +142,6 @@ function Chat({ onOpenDoc }) {
             setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? finalChat : c)));
           }
         } else {
-          // Если нет YouTube ссылки, сначала отправляем запрос на поиск
           const searchResponse = await fetch(`${API_URL}/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -183,7 +177,6 @@ function Chat({ onOpenDoc }) {
           setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? updatedChatWithSearch : c)));
           scrollToBottom();
 
-          // Теперь отправляем запрос агенту
           const agentResponse = await fetch(`${API_URL}/agent/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -345,9 +338,9 @@ function Chat({ onOpenDoc }) {
   if (!chat) {
     return (
       <div className="flex items-center justify-center h-full text-center">
-        <div className="text-gray-400">
-          <h2 className="text-2xl font-bold mb-4">Чат не найден</h2>
-          <p>Пожалуйста, выберите существующий чат или создайте новый.</p>
+        <div className="glass-effect p-8 rounded-lg">
+          <h2 className="text-2xl font-bold mb-4 text-mist-200">Чат не найден</h2>
+          <p className="text-mist-300">Пожалуйста, выберите существующий чат или создайте новый.</p>
         </div>
       </div>
     );
@@ -357,7 +350,7 @@ function Chat({ onOpenDoc }) {
     <div className="flex flex-col h-full">
       {errorMessage && <ErrorMessage message={errorMessage} />}
 
-      <div className="flex-1 overflow-y-auto p-4 bg-dark-800 rounded shadow messages-container">
+      <div className="messages-container flex-1 overflow-y-auto">
         {chat.messages.map((message, index) => (
           <div
             key={index}
@@ -366,11 +359,13 @@ function Chat({ onOpenDoc }) {
             }`}
           >
             <div
-              className={`max-w-1/2 p-3 rounded-lg ${
-                message.sender === 'user' ? 'bg-blue-500 text-gray-50' : 'bg-dark-700 text-gray-50'
-              } break-words text-lg`}
+              className={`max-w-2xl ${
+                message.sender === 'user' ? 'message-user' : 'message-agent'
+              }`}
             >
-              {message.file_name && <div className="font-semibold mb-1">{message.file_name}</div>}
+              {message.file_name && (
+                <div className="font-medium text-mist-200 mb-2">{message.file_name}</div>
+              )}
               <pre className="whitespace-pre-wrap">{message.text}</pre>
 
               {message.file_url && (
@@ -380,14 +375,14 @@ function Chat({ onOpenDoc }) {
               {(message.sender === 'agent' || message.sender === 'search') && message.file_id && (
                 <button
                   onClick={() => onOpenDoc(message.file_id)}
-                  className="mt-2 bg-blue-600 text-gray-50 px-3 py-1 rounded hover:bg-blue-700 transition duration-200"
+                  className="btn-action mt-2"
                 >
                   Просмотреть документ
                 </button>
               )}
               <div
-                className={`text-xs mt-1 text-right ${
-                  message.sender === 'user' ? 'text-gray-200' : 'text-gray-100'
+                className={`text-xs mt-2 text-right ${
+                  message.sender === 'user' ? 'text-mist-200/70' : 'text-mist-300/70'
                 }`}
               >
                 {dayjs(message.timestamp).format('HH:mm DD.MM.YYYY')}
@@ -398,46 +393,44 @@ function Chat({ onOpenDoc }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="mt-4 flex items-center">
-        <form onSubmit={handleQuerySubmit} className="flex-1 flex items-center">
-          <div className="flex-1 relative">
-            <textarea
-              ref={textareaRef}
-              value={query}
-              onChange={handleQueryChange}
-              onKeyDown={handleKeyDown}
-              className={`textarea-custom ${recordError ? 'border-2 border-red-500' : ''}`}
-              placeholder="Введите ваш запрос"
-              rows={1}
-              maxLength={500}
-              disabled={isTranscribing || loading}
-            />
-          </div>
-          <button
-            type="button"
-            onMouseDown={!isTranscribing ? startRecording : null}
-            onMouseUp={!isTranscribing ? stopRecording : null}
-            onTouchStart={!isTranscribing ? startRecording : null}
-            onTouchEnd={!isTranscribing ? stopRecording : null}
-            className={`ml-2 p-2 rounded-full flex items-center justify-center transition duration-200 ${
-              isRecording ? 'bg-red-500 animate-pulse border-2 border-red-600' : 'bg-blue-500'
-            } ${
-              recordError ? 'border-2 border-red-500' : ''
-            } text-gray-50 hover:bg-red-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`}
-            aria-label={isRecording ? 'Запись...' : 'Начать запись'}
+      <form onSubmit={handleQuerySubmit} className="mt-4 flex items-center gap-2">
+        <div className="flex-1 relative">
+          <textarea
+            ref={textareaRef}
+            value={query}
+            onChange={handleQueryChange}
+            onKeyDown={handleKeyDown}
+            className={`textarea-custom ${recordError ? 'border-rose-500/50' : ''}`}
+            placeholder="Введите ваш запрос"
+            rows={1}
+            maxLength={500}
             disabled={isTranscribing || loading}
-          >
-            {isRecording ? <FaCircle className="text-white animate-pulse" /> : <FaMicrophone />}
-          </button>
-          <button
-            type="submit"
-            className="ml-2 bg-blue-500 text-gray-50 px-4 py-2 rounded hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-shrink-0 h-12"
-            disabled={loading || isTranscribing}
-          >
-            {loading ? 'Отправка...' : 'Отправить'}
-          </button>
-        </form>
-      </div>
+          />
+        </div>
+
+        <button
+          type="button"
+          onMouseDown={!isTranscribing ? startRecording : null}
+          onMouseUp={!isTranscribing ? stopRecording : null}
+          onTouchStart={!isTranscribing ? startRecording : null}
+          onTouchEnd={!isTranscribing ? stopRecording : null}
+          className={`voice-record-btn ${isRecording ? 'recording' : ''} ${
+            recordError ? 'border-rose-500/50' : ''
+          }`}
+          aria-label={isRecording ? 'Запись...' : 'Начать запись'}
+          disabled={isTranscribing || loading}
+        >
+          {isRecording ? <FaCircle className="text-mist-100 animate-pulse" /> : <FaMicrophone />}
+        </button>
+
+        <button
+          type="submit"
+          className="btn-primary h-12"
+          disabled={loading || isTranscribing}
+        >
+          {loading ? 'Отправка...' : 'Отправить'}
+        </button>
+      </form>
     </div>
   );
 }

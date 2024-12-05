@@ -2,11 +2,13 @@
 
 import json
 import logging
+
 from pathlib import Path
 from urllib.parse import urlparse
 
 import torch
-from llama_index.core import VectorStoreIndex, Settings
+
+from llama_index.core import Settings, VectorStoreIndex
 from llama_index.core.ingestion import (
     DocstoreStrategy,
     IngestionCache,
@@ -29,10 +31,12 @@ class SingletonMeta(type):
     """
     Implementation of Singleton pattern with thread-safety.
     """
+
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
         from threading import Lock
+
         lock = Lock()
         with lock:
             if cls not in cls._instances:
@@ -74,7 +78,7 @@ class IndexManager(metaclass=SingletonMeta):
                 model_name="sentence-transformers/all-MiniLM-L12-v2",
                 device=device,
                 parallel_process=False,
-                embed_batch_size=16
+                embed_batch_size=16,
             )
             logger.info("HuggingFaceEmbedding initialized successfully.")
 
@@ -119,7 +123,9 @@ class IndexManager(metaclass=SingletonMeta):
             # Setup Ingestion Pipeline
             pipeline = IngestionPipeline(
                 transformations=[
-                    SentenceSplitter(paragraph_separator="\n",chunk_overlap=400,chunk_size=600),
+                    SentenceSplitter(
+                        paragraph_separator="\n", chunk_overlap=400, chunk_size=600
+                    ),
                     embed_model,
                 ],
                 docstore=RedisDocumentStore.from_host_and_port(
@@ -140,13 +146,19 @@ class IndexManager(metaclass=SingletonMeta):
             # Load documents from Google Drive
             service_account_path = Path(settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH)
             if not service_account_path.exists():
-                logger.error(f"Service account key file not found at {service_account_path}")
-                raise FileNotFoundError(f"Service account key file not found at {service_account_path}")
+                logger.error(
+                    f"Service account key file not found at {service_account_path}"
+                )
+                raise FileNotFoundError(
+                    f"Service account key file not found at {service_account_path}"
+                )
 
-            with service_account_path.open('r') as f:
+            with service_account_path.open("r") as f:
                 google_creds_dict = json.load(f)
 
-            loader = GoogleDriveReader(service_account_key=google_creds_dict, folder_id=settings.FOLDER_ID)
+            loader = GoogleDriveReader(
+                service_account_key=google_creds_dict, folder_id=settings.FOLDER_ID
+            )
             logger.info("GoogleDriveReader initialized.")
 
             docs = loader.load_data()

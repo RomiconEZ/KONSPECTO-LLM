@@ -161,7 +161,7 @@ repos:
       # Docker Compose валидация
       - id: docker-compose-check
         name: Docker Compose Check
-        entry: docker-compose -f docker-compose.yml config
+        entry: docker compose -f docker-compose.yml config
         language: system
         files: docker-compose\.yml$
         pass_filenames: false

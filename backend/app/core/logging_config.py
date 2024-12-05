@@ -1,15 +1,18 @@
 # app/core/logging_config.py
 
 import logging
-from logging.config import dictConfig
 import os
+
+from logging.config import dictConfig
 
 LOG_DIR = "logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
+
 class NoLangChainDeprecationFilter(logging.Filter):
     def filter(self, record):
         return "LangChainDeprecationWarning" not in record.getMessage()
+
 
 LOGGING_CONFIG = {
     "version": 1,
@@ -62,6 +65,7 @@ LOGGING_CONFIG = {
         },
     },
 }
+
 
 def setup_logging():
     dictConfig(LOGGING_CONFIG)

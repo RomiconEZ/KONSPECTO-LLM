@@ -1,12 +1,14 @@
 # backend/app/api/v1/endpoints/search.py
 
-from fastapi import APIRouter, HTTPException
 import logging
+
 from datetime import datetime
 from typing import List
 
+from fastapi import APIRouter, HTTPException
+
+from ....models.search import SearchItem, SearchRequest, SearchResult
 from ....services.index_service import get_query_engine  # Updated import
-from ....models.search import SearchRequest, SearchResult, SearchItem
 
 router = APIRouter()
 logger = logging.getLogger("app.api.v1.endpoints.search")
@@ -40,7 +42,9 @@ class SearchService:
                 score = node_with_score.score
                 node = node_with_score.node
             else:
-                logger.warning("node_with_score does not have 'score' or 'node' attributes.")
+                logger.warning(
+                    "node_with_score does not have 'score' or 'node' attributes."
+                )
                 continue
 
             if not node:
@@ -48,9 +52,9 @@ class SearchService:
                 continue
 
             metadata = node.metadata
-            modified_at_str = metadata.get('modified_at') or metadata.get('modified at')
-            file_name = metadata.get('file_name') or metadata.get('file name', '')
-            file_id = metadata.get('file_id') or metadata.get('file id', '')
+            modified_at_str = metadata.get("modified_at") or metadata.get("modified at")
+            file_name = metadata.get("file_name") or metadata.get("file name", "")
+            file_id = metadata.get("file_id") or metadata.get("file id", "")
 
             # Ensure mandatory metadata fields are present
             if not all([modified_at_str, file_name, file_id]):
@@ -58,9 +62,14 @@ class SearchService:
                 continue
 
             try:
-                modified_at = datetime.fromisoformat(modified_at_str.replace('Z', '+00:00'))
+                modified_at = datetime.fromisoformat(
+                    modified_at_str.replace("Z", "+00:00")
+                )
             except ValueError:
-                logger.error(f"Invalid date format for node ID: {node.id_} - {modified_at_str}", exc_info=True)
+                logger.error(
+                    f"Invalid date format for node ID: {node.id_} - {modified_at_str}",
+                    exc_info=True,
+                )
                 continue
 
             search_item = SearchItem(
@@ -70,7 +79,7 @@ class SearchService:
                 text=node.text,
                 score=score,
                 start_char_idx=node.start_char_idx,
-                end_char_idx=node.end_char_idx
+                end_char_idx=node.end_char_idx,
             )
             search_items.append(search_item)
 

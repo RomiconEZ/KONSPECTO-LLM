@@ -1,9 +1,12 @@
 # KONSPECTO/backend/app/services/transcription/whisper_model.py
 
 import logging
-from .base import AbstractTranscriptionModel
-from faster_whisper import WhisperModel
+
 import torch
+
+from faster_whisper import WhisperModel
+
+from .base import AbstractTranscriptionModel
 
 logger = logging.getLogger("app.services.transcription.whisper_model")
 
@@ -31,9 +34,11 @@ class WhisperTranscriptionModel(AbstractTranscriptionModel):
                 self.model_size,
                 device=device,
                 compute_type=compute_type,
-                cpu_threads=cpu_threads
+                cpu_threads=cpu_threads,
             )
-            logger.info(f"Whisper модель '{self.model_size}' успешно загружена на устройстве {device}.")
+            logger.info(
+                f"Whisper модель '{self.model_size}' успешно загружена на устройстве {device}."
+            )
         except Exception as e:
             logger.exception(f"Не удалось загрузить модель Whisper: {e}")
             raise
@@ -56,7 +61,7 @@ class WhisperTranscriptionModel(AbstractTranscriptionModel):
                 without_timestamps=True,
                 beam_size=1,
                 language="ru",
-                condition_on_previous_text=False
+                condition_on_previous_text=False,
             )
 
             # Объединение сегментов текста

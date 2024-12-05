@@ -6,7 +6,8 @@
 /* Глобальные стили */
 body {
   @apply bg-gradient-to-br from-dusk-900 via-mist-800 to-sage-900 text-mist-100 min-h-screen bg-fixed;
-  background-image: linear-gradient(to bottom right, #322f41, #403858), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-opacity='0.03' fill='%239f93b8'/%3E%3C/svg%3E");
+  background-image: linear-gradient(to bottom right, #322f41, #403858),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-opacity='0.03' fill='%239f93b8'/%3E%3C/svg%3E");
 }
 
 /* Базовые стили для всех кнопок */

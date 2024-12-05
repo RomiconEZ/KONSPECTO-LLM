@@ -1,16 +1,21 @@
 # KONSPECTO/backend/app/services/redis_service.py
-from redis.asyncio import Redis
-from typing import Optional
 import logging
+
+from typing import Optional
+
+from redis.asyncio import Redis
 
 from ..core.config import get_settings
 
 logger = logging.getLogger("app.services.redis_service")
 
+
 class RedisService:
     def __init__(self):
         settings = get_settings()
-        self.redis_client = Redis.from_url(settings.REDIS_URL, decode_responses=False)  # Keep as bytes
+        self.redis_client = Redis.from_url(
+            settings.REDIS_URL, decode_responses=False
+        )  # Keep as bytes
 
     async def connect(self):
         """Connect to Redis."""

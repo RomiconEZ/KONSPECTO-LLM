@@ -1,15 +1,20 @@
 # KONSPECTO/backend/tests/test_search.py
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import patch, AsyncMock
 
 
 @pytest.mark.asyncio
 async def test_search(async_client):
-    with patch('app.api.v1.endpoints.search.SearchService.process_search') as mock_process_search:
+    with patch(
+        "app.api.v1.endpoints.search.SearchService.process_search"
+    ) as mock_process_search:
         mock_process_search.return_value = []
 
-        response = await async_client.post("/api/v1/search/", json={"query": "тестовый запрос"})
+        response = await async_client.post(
+            "/api/v1/search/", json={"query": "тестовый запрос"}
+        )
         assert response.status_code == 200
         data = response.json()
         assert "results" in data

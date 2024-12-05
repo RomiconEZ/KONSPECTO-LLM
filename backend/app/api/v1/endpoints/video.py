@@ -1,12 +1,17 @@
 # KONSPECTO/backend/app/api/v1/endpoints/video.py
 
-from fastapi import APIRouter, HTTPException, Depends, Response
-from pydantic import BaseModel, HttpUrl
 import logging
 
+from fastapi import APIRouter, Depends, HTTPException, Response
+from pydantic import BaseModel, HttpUrl
+
 from agent.tools.video_processor import youtube_to_docx
+
+from ....exceptions import (  # Добавляем импорт
+    InvalidYouTubeURLException,
+    VideoProcessingError,
+)
 from ....services.redis_service import RedisService
-from ....exceptions import InvalidYouTubeURLException, VideoProcessingError  # Добавляем импорт
 
 router = APIRouter()
 logger = logging.getLogger("app.api.v1.endpoints.video")
@@ -16,6 +21,7 @@ class VideoRequest(BaseModel):
     """
     Модель запроса для конвертации видео.
     """
+
     youtube_url: HttpUrl
 
 
@@ -23,6 +29,7 @@ class VideoResponse(BaseModel):
     """
     Модель ответа после конвертации видео.
     """
+
     docx_key: str
 
 
@@ -75,8 +82,7 @@ def get_redis_service():
 
 @router.post("/youtube_to_docx", response_model=VideoResponse)
 async def convert_youtube_to_docx(
-    request: VideoRequest,
-    redis_service: RedisService = Depends(get_redis_service)
+    request: VideoRequest, redis_service: RedisService = Depends(get_redis_service)
 ):
     """
     Конвертирует YouTube видео в DOCX документ с изображениями каждые 5 секунд и сохраняет в Redis.
@@ -99,13 +105,14 @@ async def convert_youtube_to_docx(
         raise e
     except Exception:
         logger.exception("Неизвестная ошибка при конвертации видео.")
-        raise HTTPException(status_code=500, detail="Неизвестная ошибка при обработке видео.")
+        raise HTTPException(
+            status_code=500, detail="Неизвестная ошибка при обработке видео."
+        )
 
 
 @router.get("/video/{docx_key}")
 async def get_docx_file(
-    docx_key: str,
-    redis_service: RedisService = Depends(get_redis_service)
+    docx_key: str, redis_service: RedisService = Depends(get_redis_service)
 ):
     """
     Получает DOCX документ из Redis по уникальному ключу и возвращает его пользователю.
@@ -121,13 +128,13 @@ async def get_docx_file(
         # Установка заголовков для скачивания файла
         headers = {
             "Content-Disposition": f'attachment; filename="{docx_key}.docx"',
-            "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         }
 
         return Response(
             content=file_data,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            headers=headers
+            headers=headers,
         )
     except HTTPException as he:
         raise he

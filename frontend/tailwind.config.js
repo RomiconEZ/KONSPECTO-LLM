@@ -1,9 +1,6 @@
 // frontend/tailwind.config.js
 export default {
-  content: [
-    './index.html',
-    './src/**/*.{js,jsx,ts,tsx}',
-  ],
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {
@@ -46,13 +43,14 @@ export default {
         },
       },
       boxShadow: {
-        'soft': '0 2px 15px rgba(159, 147, 184, 0.2)',
+        soft: '0 2px 15px rgba(159, 147, 184, 0.2)',
         'soft-lg': '0 4px 25px rgba(159, 147, 184, 0.25)',
         'inner-soft': 'inset 0 2px 15px rgba(159, 147, 184, 0.15)',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'soft-pattern': 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M30 0l25.98 15v30L30 60 4.02 45V15z\' fill-opacity=\'0.03\' fill=\'%239f93b8\'/%3E%3C/svg%3E")',
+        'soft-pattern':
+          "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-opacity='0.03' fill='%239f93b8'/%3E%3C/svg%3E\")",
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -61,17 +59,14 @@ export default {
       keyframes: {
         'background-shine': {
           from: {
-            backgroundPosition: '0 0'
+            backgroundPosition: '0 0',
           },
           to: {
-            backgroundPosition: '-200% 0'
-          }
-        }
-      }
+            backgroundPosition: '-200% 0',
+          },
+        },
+      },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
 };

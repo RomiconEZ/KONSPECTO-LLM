@@ -1,18 +1,20 @@
 import logging
-from langchain.agents import initialize_agent, AgentType
-from langchain.prompts import PromptTemplate
-from langchain.llms.base import BaseLLM
-from langchain.tools import Tool
-from typing import List
 import re
+
+from typing import List
+
+from langchain.agents import AgentType, initialize_agent
+from langchain.llms.base import BaseLLM
+from langchain.prompts import PromptTemplate
+from langchain.tools import Tool
 
 # Import LLMStudioClient model
 from app.services.llm.llm_studio_client import LLMStudioClient
+from app.services.redis_service import RedisService  # For interacting with Redis
 
 # Import tools
 from .tools.search import SearchTool  # Tool for RAG search
 from .tools.video_processor import youtube_to_docx  # Tool for converting video to DOCX
-from app.services.redis_service import RedisService  # For interacting with Redis
 
 # Set up logging
 logger = logging.getLogger("agent.react_agent")
@@ -64,7 +66,11 @@ class ReactAgent:
         logger.debug("Creating prompt template for the agent.")
 
         # Assume we have a method to get model parameters
-        model_parameters = self.llm.get_parameters() if hasattr(self.llm, 'get_parameters') else "Model parameters not available."
+        model_parameters = (
+            self.llm.get_parameters()
+            if hasattr(self.llm, "get_parameters")
+            else "Model parameters not available."
+        )
 
         template = """
 You are an AI assistant that helps users by explaining information or generating documents with images from YouTube videos.
@@ -76,9 +82,9 @@ You have access to the following tools:
 Model Parameters:
 {model_parameters}
 
-When searching the knowledge base, extract key terms or concepts from the user's question. 
-If you decide to use the RAGSearch tool, supply only one definition or concept at a time as the input to the tool. 
-For each term, find relevant information in the knowledge base. 
+When searching the knowledge base, extract key terms or concepts from the user's question.
+If you decide to use the RAGSearch tool, supply only one definition or concept at a time as the input to the tool.
+For each term, find relevant information in the knowledge base.
 If the information retrieved does not help answer the user's question, do not use it.
 
 If the user asks you to explain something, provide a clear and understandable explanation.
@@ -112,7 +118,9 @@ Begin!
 Question: {input}
 {agent_scratchpad}
 """
-        tool_descriptions = "\n".join([f"{tool.name}: {tool.description}" for tool in self.tools])
+        tool_descriptions = "\n".join(
+            [f"{tool.name}: {tool.description}" for tool in self.tools]
+        )
         prompt = PromptTemplate(
             template=template,
             input_variables=["input", "agent_scratchpad"],
@@ -148,7 +156,9 @@ Question: {input}
             # Format the results for each term
             if results:
                 # Assuming results is a list of definitions
-                formatted_results = "\n".join([f"{query} - {result}" for result in results])
+                formatted_results = "\n".join(
+                    [f"{query} - {result}" for result in results]
+                )
                 logger.debug(f"Search tool retrieved results: {formatted_results}")
                 return formatted_results
             else:
@@ -181,21 +191,27 @@ Question: {input}
             # Process agent's response
             if isinstance(response, dict):
                 # Assume the final answer is in the 'output' key
-                final_answer = response.get('output', 'No final answer provided.')
+                final_answer = response.get("output", "No final answer provided.")
                 logger.debug(f"Extracted Final Answer from dict response: {final_answer}")
                 return final_answer
             elif isinstance(response, str):
                 # Attempt to extract 'Final Answer' from string
-                match = re.search(r'Final Answer:\s*(.*)', response, re.IGNORECASE)
+                match = re.search(r"Final Answer:\s*(.*)", response, re.IGNORECASE)
                 if match:
                     final_answer = match.group(1).strip()
-                    logger.debug(f"Extracted Final Answer from string response: {final_answer}")
+                    logger.debug(
+                        f"Extracted Final Answer from string response: {final_answer}"
+                    )
                     return final_answer
                 else:
-                    logger.debug("Final Answer not found in string response. Returning full response.")
+                    logger.debug(
+                        "Final Answer not found in string response. Returning full response."
+                    )
                     return response
             else:
-                logger.debug(f"Unexpected response type: {type(response)}. Returning string representation.")
+                logger.debug(
+                    f"Unexpected response type: {type(response)}. Returning string representation."
+                )
                 return str(response)
         except Exception as e:
             logger.exception("Agent ainvoke failed.")

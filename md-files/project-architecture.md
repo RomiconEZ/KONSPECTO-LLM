@@ -29,10 +29,10 @@ KONSPECTO/
 - **README.md**: Main project documentation with descriptions, installation, and usage instructions.
 - **LICENSE**: Project license agreement.
 
-
 ---
 
 ## frontend
+
 ```plaintext
 frontend/
 ├── public/
@@ -57,10 +57,12 @@ frontend/
 ### Description of Folders and Files
 
 - **public/**: Contains static files such as `index.html`, icons, and other resources that are not processed by the bundler.
+
   - `index.html`: Main HTML file of the application.
   - `favicon.ico`: Website icon.
 
 - **src/**: Main directory containing the frontend source code.
+
   - **assets/**: Contains images, fonts, and other media files.
   - **components/**: Reusable React components.
   - **pages/**: Application pages representing different routes.
@@ -122,7 +124,9 @@ backend/
 ### Description of Folders and Files
 
 - **app/**: Main backend directory.
+
   - **api/**: Implementation of the application API.
+
     - **v1/**: Version 1 of the API.
       - **endpoints/**: API endpoints organized by functional areas.
         - `users.py`: Endpoints related to users.
@@ -132,14 +136,17 @@ backend/
     - `__init__.py`: API initialization.
 
   - **core/**: Core configurations and settings of the application.
+
     - `config.py`: Application configuration settings.
     - `__init__.py`: Core initialization.
 
   - **services/**: Business logic and interactions with external services.
+
     - `api_search.py`: Logic for searching notes via the API.
     - `__init__.py`: Services initialization.
 
   - **utils/**: Helper functions and utilities.
+
     - `helpers.py`: General helper functions.
     - `__init__.py`: Utilities initialization.
 
@@ -148,6 +155,7 @@ backend/
   - `__init__.py`: Application initialization.
 
 - **tests/**: Backend tests.
+
   - **api/**: Tests for API endpoints.
   - **models/**: Tests for application models.
   - **schemas/**: Tests for Pydantic schemas.
@@ -188,21 +196,25 @@ agent/
 ### Description of Folders and Files
 
 - **models/**: Definition and initialization of AI agent models.
+
   - `llm_model.py`: Local LLM (LLM Studio) model for text processing.
   - `__init__.py`: Models initialization.
 
 - **services/**: Services and logic related to agent functionality.
+
   - `search_service.py`: Service for searching information in notes using LLM.
   - `merge_notes_service.py`: Service for merging notes based on topics and content.
   - `video_processing_service.py`: Service for converting video lectures into slides using FFmpeg.
   - `__init__.py`: Services initialization.
 
 - **tasks/**: Asynchronous tasks handled by Celery related to the agent.
+
   - `video_tasks.py`: Tasks for video processing and slide creation.
   - `merge_tasks.py`: Tasks for merging notes.
   - `__init__.py`: Tasks initialization.
 
 - **utils/**: Helper functions and utilities for the agent.
+
   - `llm_helpers.py`: Helper functions for working with LLM.
   - `__init__.py`: Utilities initialization.
 
@@ -213,7 +225,6 @@ agent/
 - `__init__.py`: Agent initialization.
 
 ---
-
 
 ## docs
 
@@ -266,7 +277,6 @@ docker/
 
 ---
 
-
 ## tests
 
 ```plaintext
@@ -290,16 +300,19 @@ tests/
 ### Description of Folders and Files
 
 - **frontend/**: Tests for the frontend part.
+
   - **unit/**: Unit tests for individual components and functions.
   - **integration/**: Integration tests for verifying component interactions.
   - **e2e/**: End-to-End tests for verifying the complete application functionality.
 
 - **backend/**: Tests for the backend part.
+
   - **unit/**: Unit tests for individual modules and functions.
   - **integration/**: Integration tests for verifying component interactions (e.g., API and services).
   - **e2e/**: End-To-End tests for verifying the complete API functionality.
 
 - **agent/**: Tests for the AI agent.
+
   - **unit/**: Unit tests for individual agent services and functions.
   - **integration/**: Integration tests for verifying agent interactions with other components.
   - **e2e/**: End-To-End tests for verifying the complete agent functionality.

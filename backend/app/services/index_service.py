@@ -1,7 +1,8 @@
 # KONSPECTO/backend/app/services/index_service.py
 
-from .vector_db import get_index
 import logging
+
+from .vector_db import get_index
 
 logger = logging.getLogger("app.services.index_service")
 

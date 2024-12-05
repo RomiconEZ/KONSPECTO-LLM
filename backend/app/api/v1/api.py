@@ -1,5 +1,6 @@
 # backend/app/api/v1/api.py
 from fastapi import APIRouter
+
 from .endpoints import agent, search, transcribe, video
 
 api_router = APIRouter(prefix="/v1", tags=["v1"])

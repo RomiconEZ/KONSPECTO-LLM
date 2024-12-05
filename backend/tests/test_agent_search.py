@@ -1,8 +1,11 @@
 # KONSPECTO/backend/tests/test_agent_search.py
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from agent.tools.search import SearchTool
+
 
 @pytest.fixture
 def mock_query_engine_response():
@@ -20,6 +23,7 @@ def mock_query_engine_response():
 
     return MockResponse
 
+
 @patch("agent.tools.search.get_query_engine")  # Обновленный путь патча
 def test_search_success(mock_get_query_engine, mock_query_engine_response):
     # Настройка мокового query engine
@@ -36,6 +40,7 @@ def test_search_success(mock_get_query_engine, mock_query_engine_response):
     assert len(results) == 2
     assert results[0] == "Text of the first document."
     assert results[1] == "Text of the second document."
+
 
 @patch("agent.tools.search.get_query_engine")  # Обновленный путь патча
 def test_search_exception(mock_get_query_engine):

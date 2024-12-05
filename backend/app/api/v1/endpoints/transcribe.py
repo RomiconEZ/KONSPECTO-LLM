@@ -1,11 +1,13 @@
 # KONSPECTO/backend/app/api/v1/endpoints/transcribe.py
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
-from fastapi.responses import JSONResponse
-import aiofiles
-import tempfile
-import os
 import logging
+import os
+import tempfile
+
+import aiofiles
+
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from fastapi.responses import JSONResponse
 
 from ....models.transcription import TranscriptionResponse
 from ....services.transcription.base import AbstractTranscriptionModel
@@ -39,18 +41,23 @@ class TranscriptionService:
         # Проверка типа контента
         if not file.content_type.startswith("audio/"):
             logger.warning(f"Неверный тип контента: {file.content_type}")
-            raise HTTPException(status_code=400, detail="Недопустимый тип файла. Требуется аудио файл.")
+            raise HTTPException(
+                status_code=400, detail="Недопустимый тип файла. Требуется аудио файл."
+            )
 
         # Проверка расширения файла
         _, file_ext = os.path.splitext(file.filename)
-        if file_ext.lower() not in ['.mp3', '.wav']:
+        if file_ext.lower() not in [".mp3", ".wav"]:
             logger.warning(f"Неподдерживаемое расширение файла: {file_ext}")
-            raise HTTPException(status_code=400, detail="Неподдерживаемый формат файла. Используйте MP3 или WAV.")
+            raise HTTPException(
+                status_code=400,
+                detail="Неподдерживаемый формат файла. Используйте MP3 или WAV.",
+            )
 
         # Сохранение файла во временное хранилище
         with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp:
             self.temp_file = tmp.name
-            async with aiofiles.open(self.temp_file, 'wb') as out_file:
+            async with aiofiles.open(self.temp_file, "wb") as out_file:
                 content = await file.read()  # Асинхронное чтение
                 await out_file.write(content)
 
@@ -97,7 +104,7 @@ def get_transcription_model(request: Request) -> AbstractTranscriptionModel:
 @router.post("/", response_model=TranscriptionResponse)
 async def transcribe_audio(
     file: UploadFile = File(...),
-    transcription_model: AbstractTranscriptionModel = Depends(get_transcription_model)
+    transcription_model: AbstractTranscriptionModel = Depends(get_transcription_model),
 ):
     """
     Эндпойнт для транскрипции загруженного аудио файла.
@@ -115,6 +122,8 @@ async def transcribe_audio(
         raise he  # Передача HTTPException без изменений
     except Exception:
         logger.exception("Не удалось выполнить транскрипцию аудио.")
-        raise HTTPException(status_code=500, detail="Не удалось выполнить транскрипцию аудио.")
+        raise HTTPException(
+            status_code=500, detail="Не удалось выполнить транскрипцию аудио."
+        )
     finally:
         service.cleanup()

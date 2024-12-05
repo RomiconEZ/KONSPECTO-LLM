@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class AbstractTranscriptionModel(ABC):
     @abstractmethod
     async def transcribe(self, file_path: str) -> str:

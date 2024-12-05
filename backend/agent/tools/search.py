@@ -1,7 +1,9 @@
 # KONSPECTO/backend/agent/tools/search.py
 
-from typing import List
 import logging
+
+from typing import List
+
 from app.services.index_service import get_query_engine
 
 logger = logging.getLogger("agent.tools.search")
@@ -48,7 +50,9 @@ class SearchTool:
                 else:
                     logger.warning("Node has no text.")
 
-            logger.info(f"Agent search query '{query}' returned {len(results_text)} text results.")
+            logger.info(
+                f"Agent search query '{query}' returned {len(results_text)} text results."
+            )
             return results_text
 
         except Exception as e:

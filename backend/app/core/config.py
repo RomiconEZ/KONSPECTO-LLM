@@ -1,15 +1,18 @@
 # KONSPECTO/backend/app/core/config.py
 
-from pydantic_settings import BaseSettings
-from pydantic import AnyHttpUrl, Field, validator
-from typing import List
-from pathlib import Path
-from functools import lru_cache
 import logging
+
+from functools import lru_cache
+from pathlib import Path
+from typing import List
+
+from pydantic import AnyHttpUrl, Field, validator
+from pydantic_settings import BaseSettings
 
 # Настройка логирования для конфигурационного модуля
 logger = logging.getLogger("app.core.config")
 logger.setLevel(logging.DEBUG)  # Установите нужный уровень логирования
+
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "KONSPECTO API"
@@ -30,7 +33,7 @@ class Settings(BaseSettings):
     # Path to the service account key JSON file
     GOOGLE_SERVICE_ACCOUNT_KEY_PATH: Path = Field(
         default=Path("config/service_account_key.json"),
-        env="GOOGLE_SERVICE_ACCOUNT_KEY_PATH"
+        env="GOOGLE_SERVICE_ACCOUNT_KEY_PATH",
     )
 
     # Transcription Model Configuration
@@ -40,10 +43,10 @@ class Settings(BaseSettings):
     LLM_STUDIO_BASE_URL: str = Field(
         default="http://localhost:1234/v1",
         env="LLM_STUDIO_BASE_URL",
-        description="Базовый URL для LLM Studio API."
+        description="Базовый URL для LLM Studio API.",
     )
 
-    @validator('GOOGLE_SERVICE_ACCOUNT_KEY_PATH', pre=True)
+    @validator("GOOGLE_SERVICE_ACCOUNT_KEY_PATH", pre=True)
     def validate_service_account_path(cls, v):
         logger.debug(f"Original GOOGLE_SERVICE_ACCOUNT_KEY_PATH value: {v}")
         path = Path(v)
@@ -56,13 +59,9 @@ class Settings(BaseSettings):
             logger.debug(f"Provided path is absolute: {path}")
 
         if not path.exists():
-            logger.warning(
-                f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH does not exist: {path}"
-            )
+            logger.warning(f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH does not exist: {path}")
         else:
-            logger.debug(
-                f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH exists: {path}"
-            )
+            logger.debug(f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH exists: {path}")
         return path
 
     class Config:
@@ -80,7 +79,9 @@ def get_settings() -> Settings:
     logger.debug(f"REDIS_URL: {settings.REDIS_URL}")
     logger.debug(f"CHROMA_URL: {settings.CHROMA_URL}")
     logger.debug(f"FOLDER_ID: {settings.FOLDER_ID}")
-    logger.debug(f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH: {settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH}")
+    logger.debug(
+        f"GOOGLE_SERVICE_ACCOUNT_KEY_PATH: {settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH}"
+    )
     logger.debug(f"TRANSCRIPTION_MODEL: {settings.TRANSCRIPTION_MODEL}")
     logger.debug(f"LLM_STUDIO_BASE_URL: {settings.LLM_STUDIO_BASE_URL}")
     return settings

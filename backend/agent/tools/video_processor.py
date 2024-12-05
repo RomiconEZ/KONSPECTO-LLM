@@ -1,26 +1,28 @@
 # KONSPECTO/backend/agent/tools/video_processor.py
 
-import os
-import tempfile
 import logging
+import os
 import re
+import tempfile
 import uuid
-from io import BytesIO
-from abc import ABC, abstractmethod
 
-from pytubefix import YouTube
-from pytubefix.cli import on_progress
+from abc import ABC, abstractmethod
+from io import BytesIO
+from urllib.error import HTTPError
+
 import cv2
-from PIL import Image
+import numpy as np
+
 from docx import Document
 from docx.shared import Inches
-from urllib.error import HTTPError
-import numpy as np
+from PIL import Image
+from pytubefix import YouTube
+from pytubefix.cli import on_progress
+from pytubefix.exceptions import RegexMatchError  # Добавляем импорт
 from skimage.metrics import structural_similarity as ssim
 
-from app.services.redis_service import RedisService
 from app.exceptions import InvalidYouTubeURLException, VideoProcessingError
-from pytubefix.exceptions import RegexMatchError  # Добавляем импорт
+from app.services.redis_service import RedisService
 
 logger = logging.getLogger("agent.tools.video_processor")
 
@@ -29,6 +31,7 @@ class ImageDifferenceChecker(ABC):
     """
     Абстрактный класс для проверки различий между двумя изображениями.
     """
+
     @abstractmethod
     def are_images_different(self, img_path1: str, img_path2: str) -> bool:
         """
@@ -45,6 +48,7 @@ class SSIMImageDifferenceChecker(ImageDifferenceChecker):
     """
     Класс для проверки различий между изображениями с использованием SSIM.
     """
+
     def __init__(self, threshold: float = 0.98):
         self.threshold = threshold
 
@@ -70,12 +74,16 @@ class SSIMImageDifferenceChecker(ImageDifferenceChecker):
 
             # Вычисление SSIM
             similarity = ssim(arr1, arr2)
-            logger.debug(f"SSIM similarity between '{img_path1}' and '{img_path2}': {similarity}")
+            logger.debug(
+                f"SSIM similarity between '{img_path1}' and '{img_path2}': {similarity}"
+            )
 
             return similarity < self.threshold
 
         except Exception as e:
-            logger.exception(f"Ошибка при сравнении изображений с использованием SSIM: {e}")
+            logger.exception(
+                f"Ошибка при сравнении изображений с использованием SSIM: {e}"
+            )
             # В случае ошибки считаем изображения различными
             return True
 
@@ -88,9 +96,9 @@ def sanitize_filename(filename: str) -> str:
     :return: Очищенное имя файла.
     """
     # Заменяем пробелы и другие нежелательные символы на подчеркивания
-    filename = re.sub(r'\s+', '_', filename)
+    filename = re.sub(r"\s+", "_", filename)
     # Удаляем любые символы, кроме букв, цифр, подчеркиваний, дефисов и точек
-    filename = re.sub(r'[^\w\-_\.]', '', filename)
+    filename = re.sub(r"[^\w\-_\.]", "", filename)
     return filename
 
 
@@ -98,12 +106,13 @@ class VideoToDocxConverter:
     """
     Класс, инкапсулирующий процесс конвертации видео YouTube в DOCX документ.
     """
+
     def __init__(
         self,
         youtube_url: str,
         redis_service: RedisService,
         difference_checker: ImageDifferenceChecker = None,
-        expire_seconds: int = 86400  # По умолчанию документ истекает через 1 день
+        expire_seconds: int = 86400,  # По умолчанию документ истекает через 1 день
     ):
         self.youtube_url = youtube_url
         self.redis_service = redis_service
@@ -151,7 +160,9 @@ class VideoToDocxConverter:
             stream = yt.streams.get_highest_resolution()
             if not stream:
                 logger.error("Не удалось найти подходящий поток для загрузки.")
-                raise VideoProcessingError("Не удалось найти подходящий поток для загрузки.")
+                raise VideoProcessingError(
+                    "Не удалось найти подходящий поток для загрузки."
+                )
 
             self.video_path = os.path.join(self.temp_dir, "video.mp4")
             logger.info(f"Загрузка видео: {self.video_title}")
@@ -163,7 +174,9 @@ class VideoToDocxConverter:
             raise InvalidYouTubeURLException()
         except HTTPError as http_err:
             logger.error(f"HTTP ошибка при загрузке видео: {http_err}")
-            raise VideoProcessingError("Доступ к видео запрещен (HTTP 403). Проверьте ссылку или ограничения видео.")
+            raise VideoProcessingError(
+                "Доступ к видео запрещен (HTTP 403). Проверьте ссылку или ограничения видео."
+            )
         except Exception as e:
             logger.exception(f"Не удалось загрузить видео: {e}")
             raise VideoProcessingError("Не удалось загрузить видео.")
@@ -200,12 +213,18 @@ class VideoToDocxConverter:
 
                 # Проверка на схожесть с последним сохраненным изображением
                 if last_image_path:
-                    if self.difference_checker.are_images_different(last_image_path, img_path):
+                    if self.difference_checker.are_images_different(
+                        last_image_path, img_path
+                    ):
                         self.extracted_images.append(img_path)
                         last_image_path = img_path
-                        logger.debug(f"Изображение {img_path} отличается от предыдущего. Сохранено.")
+                        logger.debug(
+                            f"Изображение {img_path} отличается от предыдущего. Сохранено."
+                        )
                     else:
-                        logger.debug(f"Изображение {img_path} схоже с предыдущим. Пропущено.")
+                        logger.debug(
+                            f"Изображение {img_path} схоже с предыдущим. Пропущено."
+                        )
                         os.remove(img_path)  # Удаляем схожее изображение
                 else:
                     self.extracted_images.append(img_path)
@@ -248,7 +267,9 @@ class VideoToDocxConverter:
         """
         self.unique_key = f"docx:{uuid.uuid4()}"
 
-        success = await self.redis_service.set_file(self.unique_key, doc_bytes, expire=self.expire_seconds)
+        success = await self.redis_service.set_file(
+            self.unique_key, doc_bytes, expire=self.expire_seconds
+        )
         if not success:
             logger.error("Не удалось сохранить DOCX файл в Redis.")
             raise VideoProcessingError("Не удалось сохранить документ в хранилище.")
@@ -273,7 +294,7 @@ async def youtube_to_docx(
     youtube_url: str,
     redis_service: RedisService,
     difference_checker: ImageDifferenceChecker = None,
-    expire_seconds: int = 86400  # Документ истекает через 1 день по умолчанию
+    expire_seconds: int = 86400,  # Документ истекает через 1 день по умолчанию
 ) -> str:
     """
     Обертка для конвертации YouTube видео в DOCX документ и сохранения его в Redis.
@@ -288,6 +309,6 @@ async def youtube_to_docx(
         youtube_url=youtube_url,
         redis_service=redis_service,
         difference_checker=difference_checker,
-        expire_seconds=expire_seconds
+        expire_seconds=expire_seconds,
     )
     return await converter.process()

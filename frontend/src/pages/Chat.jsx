@@ -174,7 +174,9 @@ function Chat({ onOpenDoc }) {
             ...updatedChat,
             messages: [...updatedChat.messages, ...searchMessages],
           };
-          setChats((prevChats) => prevChats.map((c) => (c.id === chat.id ? updatedChatWithSearch : c)));
+          setChats((prevChats) =>
+            prevChats.map((c) => (c.id === chat.id ? updatedChatWithSearch : c))
+          );
           scrollToBottom();
 
           const agentResponse = await fetch(`${API_URL}/agent/`, {
@@ -209,16 +211,7 @@ function Chat({ onOpenDoc }) {
         scrollToBottom();
       }
     },
-    [
-      loading,
-      query,
-      chat,
-      setChats,
-      API_URL,
-      isTranscribing,
-      triggerRecordError,
-      scrollToBottom,
-    ]
+    [loading, query, chat, setChats, API_URL, isTranscribing, triggerRecordError, scrollToBottom]
   );
 
   const handleKeyDown = useCallback(
@@ -233,7 +226,8 @@ function Chat({ onOpenDoc }) {
         setQuery(newValue);
         setTimeout(() => {
           if (textareaRef.current) {
-            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = selectionStart + 1;
+            textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
+              selectionStart + 1;
           }
         }, 0);
       }
@@ -292,7 +286,8 @@ function Chat({ onOpenDoc }) {
             const newQuery = prev + data.transcription;
             setTimeout(() => {
               if (textareaRef.current) {
-                textareaRef.current.selectionStart = textareaRef.current.selectionEnd = newQuery.length;
+                textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
+                  newQuery.length;
                 textareaRef.current.focus();
               }
             }, 0);
@@ -354,9 +349,7 @@ function Chat({ onOpenDoc }) {
         {chat.messages.map((message, index) => (
           <div
             key={index}
-            className={`mb-4 flex ${
-              message.sender === 'user' ? 'justify-end' : 'justify-start'
-            }`}
+            className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
               className={`max-w-2xl ${
@@ -373,10 +366,7 @@ function Chat({ onOpenDoc }) {
               )}
 
               {(message.sender === 'agent' || message.sender === 'search') && message.file_id && (
-                <button
-                  onClick={() => onOpenDoc(message.file_id)}
-                  className="btn-action mt-2"
-                >
+                <button onClick={() => onOpenDoc(message.file_id)} className="btn-action mt-2">
                   Просмотреть документ
                 </button>
               )}
@@ -423,11 +413,7 @@ function Chat({ onOpenDoc }) {
           {isRecording ? <FaCircle className="text-mist-100 animate-pulse" /> : <FaMicrophone />}
         </button>
 
-        <button
-          type="submit"
-          className="btn-primary h-12"
-          disabled={loading || isTranscribing}
-        >
+        <button type="submit" className="btn-primary h-12" disabled={loading || isTranscribing}>
           {loading ? 'Отправка...' : 'Отправить'}
         </button>
       </form>

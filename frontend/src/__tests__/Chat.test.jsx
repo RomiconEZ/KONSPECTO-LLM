@@ -9,8 +9,8 @@ import { getConfig } from '../config';
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({
-    chatId: '1'
-  })
+    chatId: '1',
+  }),
 }));
 
 // Мокаем config

@@ -38,11 +38,7 @@ export function ChatProvider({ children }) {
     );
   }
 
-  return (
-    <ChatContext.Provider value={{ chats, setChats }}>
-      {children}
-    </ChatContext.Provider>
-  );
+  return <ChatContext.Provider value={{ chats, setChats }}>{children}</ChatContext.Provider>;
 }
 
 ChatProvider.propTypes = {

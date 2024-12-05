@@ -1,13 +1,16 @@
 # KONSPECTO/backend/tests/conftest.py
 
+import logging
+import os
+import sys
+
+from pathlib import Path
+from unittest.mock import AsyncMock
+
 import pytest
 import pytest_asyncio
-import os
-import logging
-import sys
-from pathlib import Path
+
 from httpx import AsyncClient
-from unittest.mock import AsyncMock
 
 # Указываем плагины pytest
 pytest_plugins = ["pytest_asyncio"]
@@ -19,19 +22,26 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("tests.conftest")
 
+
 @pytest.fixture(scope="session")
 def app():
     """
     Фикстура для предоставления FastAPI приложения.
     """
     from app.main import app
+
     return app
+
 
 @pytest.fixture(scope="session")
 def check_redis_url():
     redis_url = os.getenv("REDIS_URL")
     if redis_url is None:
-        pytest.skip("REDIS_URL environment variable is not set, skipping tests.", allow_module_level=True)
+        pytest.skip(
+            "REDIS_URL environment variable is not set, skipping tests.",
+            allow_module_level=True,
+        )
+
 
 @pytest.fixture(scope="module")
 def test_client(app):
@@ -43,6 +53,7 @@ def test_client(app):
     with TestClient(app) as client:
         yield client
 
+
 @pytest_asyncio.fixture
 async def async_client(app):
     """
@@ -52,12 +63,14 @@ async def async_client(app):
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
+
 @pytest_asyncio.fixture
 async def mock_transcription_model_fixture(app):
     """
     Фикстура для мокинга и установки transcription_model в app.state.
     """
     from unittest.mock import AsyncMock
+
     from app.services.transcription.base import AbstractTranscriptionModel
 
     mock_transcription_model = AsyncMock(spec=AbstractTranscriptionModel)

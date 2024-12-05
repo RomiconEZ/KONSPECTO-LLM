@@ -28,10 +28,12 @@ global.localStorage = localStorageMock;
 // Мокаем MediaDevices
 global.navigator.mediaDevices = {
   getUserMedia: jest.fn().mockResolvedValue({
-    getTracks: () => [{
-      stop: jest.fn()
-    }]
-  })
+    getTracks: () => [
+      {
+        stop: jest.fn(),
+      },
+    ],
+  }),
 };
 
 afterAll(() => {

@@ -1,14 +1,15 @@
 # KONSPECTO/backend/app/main.py
 
-from fastapi import FastAPI, Depends, Request
-from fastapi.middleware.cors import CORSMiddleware
 import logging
 
+from fastapi import Depends, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+
+from .api.v1.api import api_router
 from .core.config import get_settings  # Обновленный импорт
 from .core.logging_config import setup_logging
-from .api.v1.api import api_router
-from .services.redis_service import RedisService
 from .services.index_service import get_query_engine  # Добавленный импорт
+from .services.redis_service import RedisService
 
 # Новые импорты для моделей транскрибации
 from .services.transcription.whisper_model import WhisperTranscriptionModel
@@ -72,10 +73,16 @@ class KonspectoAPIApp:
                 transcription_model = WhisperTranscriptionModel()
                 transcription_model.load_model()
                 self.app.state.transcription_model = transcription_model
-                self.logger.info(f"Модель транскрибации '{transcription_model_name}' успешно загружена.")
+                self.logger.info(
+                    f"Модель транскрибации '{transcription_model_name}' успешно загружена."
+                )
             else:
-                self.logger.error(f"Неизвестная модель транскрибации: {transcription_model_name}")
-                raise ValueError(f"Неизвестная модель транскрибации: {transcription_model_name}")
+                self.logger.error(
+                    f"Неизвестная модель транскрибации: {transcription_model_name}"
+                )
+                raise ValueError(
+                    f"Неизвестная модель транскрибации: {transcription_model_name}"
+                )
         except Exception as e:
             self.logger.exception("Не удалось инициализировать модель транскрибации.")
             raise
@@ -95,13 +102,15 @@ class KonspectoAPIApp:
     def _setup_routes(self):
         """Настройка маршрутов приложения."""
         self.app.add_api_route("/", self._root_endpoint, methods=["GET"], tags=["Root"])
-        self.app.add_api_route("/health", self._health_check_endpoint, methods=["GET"], tags=["Health"])
+        self.app.add_api_route(
+            "/health", self._health_check_endpoint, methods=["GET"], tags=["Health"]
+        )
 
         # Включение API Router без глобальных зависимостей
         self.app.include_router(
             api_router,
             prefix="/api",
-            dependencies=[]  # Зависимости устанавливаются в отдельных эндпойнтах
+            dependencies=[],  # Зависимости устанавливаются в отдельных эндпойнтах
         )
 
     async def _root_endpoint(self):
@@ -119,7 +128,7 @@ class KonspectoAPIApp:
             return {
                 "status": status,
                 "version": get_settings().PROJECT_VERSION,
-                "redis_connected": redis_ok
+                "redis_connected": redis_ok,
             }
         except Exception as e:
             self.logger.error(f"Проверка состояния не удалась: {e}")
@@ -127,7 +136,7 @@ class KonspectoAPIApp:
                 "status": "unhealthy",
                 "version": get_settings().PROJECT_VERSION,
                 "redis_connected": False,
-                "error": str(e)
+                "error": str(e),
             }
 
     def get_app(self) -> FastAPI:

@@ -1,8 +1,9 @@
 # KONSPECTO/backend/app/api/v1/endpoints/agent.py
 
+import logging
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-import logging
 
 from agent.react_agent import ReactAgent  # Импортируем ReactAgent
 
@@ -14,13 +15,18 @@ class QueryRequest(BaseModel):
     """
     Модель запроса для взаимодействия с агентом.
     """
-    query: str = Field("Градиентный спуск и преобразование Фурье", example="Градиентный спуск и преобразование Фурье")
+
+    query: str = Field(
+        "Градиентный спуск и преобразование Фурье",
+        example="Градиентный спуск и преобразование Фурье",
+    )
 
 
 class QueryResponse(BaseModel):
     """
     Модель ответа от агента.
     """
+
     response: str
 
 
@@ -47,8 +53,12 @@ class AgentService:
             response = await self.agent.ainvoke(query)
             logger.debug(f"Agent response: {response}")
             if not isinstance(response, str):
-                logger.error(f"Expected response to be a string, got {type(response)} instead.")
-                raise HTTPException(status_code=500, detail="Invalid response type from agent.")
+                logger.error(
+                    f"Expected response to be a string, got {type(response)} instead."
+                )
+                raise HTTPException(
+                    status_code=500, detail="Invalid response type from agent."
+                )
             # Дополнительная валидация или обработка может быть добавлена здесь
             return response
         except HTTPException as he:

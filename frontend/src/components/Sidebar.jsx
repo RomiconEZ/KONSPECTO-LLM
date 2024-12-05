@@ -57,10 +57,7 @@ const Sidebar = React.memo(({ isOpen, toggleSidebar }) => {
       {isOpen && (
         <>
           <h1 className="text-2xl font-bold text-mist-200 mb-4">KONSPECTO</h1>
-          <button
-            onClick={addChat}
-            className="btn-primary mb-4 text-center"
-          >
+          <button onClick={addChat} className="btn-primary mb-4 text-center">
             Добавить чат
           </button>
           <ul className="flex-1 space-y-4 overflow-y-auto">

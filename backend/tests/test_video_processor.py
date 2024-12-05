@@ -1,9 +1,17 @@
 # tests/test_video_processor.py
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import patch, AsyncMock
+
 from fastapi import HTTPException
-from agent.tools.video_processor import youtube_to_docx, VideoProcessingError, InvalidYouTubeURLException
+
+from agent.tools.video_processor import (
+    InvalidYouTubeURLException,
+    VideoProcessingError,
+    youtube_to_docx,
+)
+
 
 @pytest.mark.asyncio
 @patch("agent.tools.video_processor.VideoToDocxConverter", autospec=True)
@@ -28,7 +36,7 @@ async def test_youtube_to_docx_processing_error(mock_converter_class):
         youtube_url=youtube_url,
         redis_service=redis_service,
         difference_checker=None,
-        expire_seconds=86400
+        expire_seconds=86400,
     )
 
     # Verify that the 'process' method was awaited exactly once
@@ -58,7 +66,7 @@ async def test_youtube_to_docx_invalid_url(mock_converter_class):
         youtube_url=youtube_url,
         redis_service=redis_service,
         difference_checker=None,
-        expire_seconds=86400
+        expire_seconds=86400,
     )
 
     # Verify that the 'process' method was awaited exactly once

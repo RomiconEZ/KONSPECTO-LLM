@@ -28,17 +28,28 @@ module.exports = {
     'prettier/prettier': ['error'],
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off', // Consider using TypeScript for type checking
-    'react/jsx-props-no-spreading': ['error', {
-      custom: 'ignore',
-      exceptions: ['Component']
-    }],
+    'react/jsx-props-no-spreading': [
+      'error',
+      {
+        custom: 'ignore',
+        exceptions: ['Component'],
+      },
+    ],
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'import/prefer-default-export': 'off',
     'import/no-extraneous-dependencies': [
       'error',
-      { devDependencies: ['**/*.test.js', '**/*.test.jsx', '**/*.spec.js', '**/*.spec.jsx', '**/jest.setup.js'] },
+      {
+        devDependencies: [
+          '**/*.test.js',
+          '**/*.test.jsx',
+          '**/*.spec.js',
+          '**/*.spec.jsx',
+          '**/jest.setup.js',
+        ],
+      },
     ],
     'import/extensions': [
       'error',

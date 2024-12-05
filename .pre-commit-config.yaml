@@ -1,72 +1,174 @@
 default_language_version:
   python: python3.11
+  node: 18.17.1
 
 repos:
+  # Общие проверки
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
       - id: check-yaml
       - id: check-json
+      - id: check-toml
+      - id: check-xml
       - id: check-added-large-files
+        args: ["--maxkb=2000"]
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-case-conflict
       - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: debug-statements
+      - id: requirements-txt-fixer
 
+  # Python форматирование и проверки
   - repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 23.9.1
     hooks:
       - id: black
+        types: [python]
+        args: ["--config=pyproject.toml"]
 
-  - repo: https://github.com/timothycrosley/isort
-    rev: 5.13.2
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
     hooks:
       - id: isort
+        args: ["--settings-path=pyproject.toml"]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 7.1.0
+    rev: 6.1.0
     hooks:
       - id: flake8
-        additional_dependencies: [flake8-bugbear, Flake8-pyproject]
+        additional_dependencies:
+          [
+            "flake8-bugbear",
+            "flake8-comprehensions",
+            "flake8-docstrings",
+            "flake8-string-format",
+            "flake8-builtins",
+            "flake8-spellcheck",
+            "flake8-variables-names",
+            "flake8-quotes",
+            "flake8-pyproject",
+          ]
 
+  # Mypy для статической типизации
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        args: ["--install-types", "--non-interactive"]
+        additional_dependencies: ["pydantic", "fastapi", "httpx"]
+
+  # Jupyter Notebook форматирование
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.7.1
+    rev: 1.7.0
     hooks:
       - id: nbqa-black
-        additional_dependencies: [black==23.12.1]
+        additional_dependencies: [black==23.9.1]
       - id: nbqa-isort
-        additional_dependencies: [isort==5.13.2]
+        additional_dependencies: [isort==5.12.0]
       - id: nbqa-flake8
         additional_dependencies: [flake8==6.1.0]
+      - id: nbqa-mypy
+        additional_dependencies: [mypy==1.5.1]
 
+  # JavaScript/React форматирование и проверки
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+    rev: v3.0.0
     hooks:
       - id: prettier
-        types_or: [markdown, yaml, toml, json, dockerfile, shell]
-        additional_dependencies: ["prettier@3.1.0", "prettier-plugin-sh@0.13.1"]
-        args: [--print-width=80, --prose-wrap=always]
-#  - repo: local
-#    hooks:
-#      - id: frontend-lint
-#        name: Frontend Lint
-#        entry: bash -c 'cd frontend && npm run lint'
-#        language: system
-#        files: ^frontend/.*\.(js|jsx)$
-#        pass_filenames: false
-#
-#      - id: frontend-test
-#        name: Frontend Tests
-#        entry: bash -c 'cd frontend && npm run test'
-#        language: system
-#        files: ^frontend/.*\.(js|jsx)$
-#        pass_filenames: false
-#        stages: [push]
-#
-#      - id: backend-test
-#        name: Backend Tests
-#        entry: bash -c 'cd backend && pytest'
-#        language: system
-#        files: ^backend/.*\.py$
-#        pass_filenames: false
-#        stages: [push]
+        types_or: [javascript, jsx, ts, tsx, css, html, json, yaml, markdown]
+        additional_dependencies:
+          [
+            "prettier@3.0.0",
+            "prettier-plugin-tailwindcss@0.5.11",
+            "@prettier/plugin-xml@3.0.0",
+          ]
+
+  # ESLint
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.50.0
+    hooks:
+      - id: eslint
+        files: \.(js|jsx|ts|tsx)$
+        types: [file]
+        additional_dependencies:
+          [
+            "eslint@8.50.0",
+            "eslint-config-airbnb@19.0.4",
+            "eslint-plugin-import@2.29.1",
+            "eslint-plugin-jsx-a11y@6.7.1",
+            "eslint-plugin-react@7.33.2",
+            "eslint-plugin-react-hooks@4.6.0",
+            "@babel/core@7.23.7",
+            "@babel/eslint-parser@7.23.3",
+          ]
+
+  # Dockerfile линтер
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
+        args: ["--ignore=DL3008", "--ignore=DL3013"]
+
+  # Локальные хуки
+  - repo: local
+    hooks:
+      # Фронтенд тесты и линтинг
+      - id: frontend-install
+        name: Frontend Install Dependencies
+        entry: bash -c 'cd frontend && npm ci'
+        language: system
+        files: ^frontend/package\.json$
+        pass_filenames: false
+
+      - id: frontend-lint
+        name: Frontend Lint
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: \.(js|jsx)$
+        pass_filenames: false
+
+      - id: frontend-test
+        name: Frontend Tests
+        entry: bash -c 'cd frontend && npm run test'
+        language: system
+        files: \.(js|jsx)$
+        pass_filenames: false
+        stages: [push]
+
+      # Бэкенд тесты
+      - id: backend-install
+        name: Backend Install Dependencies
+        entry: bash -c 'cd backend && poetry install'
+        language: system
+        files: ^backend/pyproject\.toml$
+        pass_filenames: false
+
+      - id: backend-test
+        name: Backend Tests
+        entry: bash -c 'cd backend && poetry run pytest'
+        language: system
+        files: \.py$
+        pass_filenames: false
+        stages: [push]
+
+      # Docker Compose валидация
+      - id: docker-compose-check
+        name: Docker Compose Check
+        entry: docker-compose -f docker-compose.yml config
+        language: system
+        files: docker-compose\.yml$
+        pass_filenames: false
+
+ci:
+  autofix_commit_msg: "🎨 [pre-commit.ci] Auto format"
+  autoupdate_commit_msg: "⬆️ [pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

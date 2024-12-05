@@ -15,42 +15,76 @@ python = "~3.11"
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.6.0"
 pytest = "^7.4.4"
+black = "23.12.1"
+isort = "5.13.2"
+flake8 = "7.1.0"
+mypy = "1.8.0"
+pylint = "3.0.3"
 
 [tool.black]
 line-length = 90
 target-version = ["py311"]
+include = '\.pyi?$'
+extend-exclude = '''
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+^/docs
+'''
 
 [tool.isort]
-src_paths = ["KONSPECTO"]
 profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
 line_length = 90
-lines_after_imports = 2
+split_on_trailing_comma = true
+lines_between_types = 1
+combine_as_imports = true
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+known_first_party = ["app", "agent", "tests"]
+known_third_party = ["fastapi", "pydantic", "sqlalchemy"]
 
 [tool.flake8]
 max-line-length = 90
-ignore = ['E203', 'E501', 'W503', 'B950']
+extend-ignore = ["E203", "E501", "W503", "B950"]
 max-complexity = 12
-select = ['B', 'C', 'E', 'F', 'W', 'B9']
+select = ["B","C","E","F","W","B9"]
 per-file-ignores = [
-    # for easier imports to __init__ without __all__
-    '**/__init__.py: F401',
-    # file to define custom types
-    'types.py: F401',
+    "__init__.py:F401",
+    "tests/*:S101"
 ]
 count = true
+statistics = true
+show-source = true
 
-[tool.nbqa.config]
-black = "pyproject.toml"
-isort = "pyproject.toml"
-flake8 = "pyproject.toml"
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_optional = true
+plugins = ["pydantic.mypy"]
 
-[tool.nbqa.addopts]
-flake8 = ["--extend-ignore=E402"]
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
 
-[tool.nbqa.mutate]
-black = 1
-isort = 1
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=app --cov=agent --cov-report=term-missing"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning"
+]

@@ -11,7 +11,6 @@ Create an intelligent agent based on a local LLM model capable of efficiently se
 - **Project Objectives:**
 
   - Develop an agent for searching information within notes with the ability to output full and summarized results.
-  - Create functionality to merge multiple notes into a single document.
   - Implement the transformation of video lectures into a set of slides for use in presentations.
   - Ensure support for input queries via both text and voice.
 
@@ -34,12 +33,6 @@ Create an intelligent agent based on a local LLM model capable of efficiently se
   - Ability to input text and voice queries.
   - Search for relevant information within the notes.
   - Output results in both full and summarized formats with source references.
-
-- **Merging Notes:**
-
-  - Compare the content of two notes.
-  - Combine information based on topics and content.
-  - Create a single document from the merged notes.
 
 - **Video Lecture to Slides Conversion:**
 
@@ -72,10 +65,9 @@ Create an intelligent agent based on a local LLM model capable of efficiently se
 - **Technology Stack:**
 
   - **Frontend:** React.js, HTML/CSS, TailwindCSS.
-  - **Backend:** Python, FastAPI, Celery, Redis.
-  - **Voice Processing:** Lightning Whisper-MLX.
+  - **Backend:** Python, FastAPI, Redis.
+  - **Voice Processing:** Faster_Whisper.
   - **Text Processing Model:** LLM Studio.
-  - **Video to Slides Conversion:** FFmpeg.
   - **Infrastructure:** Docker.
 
 - **Architecture:**
@@ -84,19 +76,13 @@ Create an intelligent agent based on a local LLM model capable of efficiently se
   - Use of containerization for deploying all components.
   - Interaction between components via API.
 
-- **Data Models:**
-
-  - Store notes, queries, and processing results using file-based storage or alternative lightweight storage solutions as needed.
-
 - **Integration Points:**
   - Integrate frontend with backend via FastAPI.
-  - Use Celery and Redis for managing task queues.
 
 ### Acceptance Criteria
 
 - The agent successfully processes text and voice queries.
 - Search within notes returns relevant results in both formats.
-- The note merging function correctly creates a unified document.
 - Video lecture to slides conversion works without errors.
 - The user interface meets usability and responsiveness requirements.
 - All components function correctly in a containerized Docker environment.
@@ -111,7 +97,7 @@ Create an intelligent agent based on a local LLM model capable of efficiently se
 
 **Project Scope:**
 
-- Create functionality for searching, merging notes, and converting videos to slides.
+- Create functionality for searching and converting videos to slides.
 - Develop a user interface for interacting with the agent.
 - Ensure support for voice and text input queries.
 
@@ -149,9 +135,5 @@ Create an intelligent agent based on a local LLM model capable of efficiently se
 **Deployment Instructions:**
 
 - Step-by-step guide for cloning the repository, installing dependencies, and running via Docker.
-
-**Developer Guide:**
-
-- Description of code structure, coding standards, and development processes.
 
 ---

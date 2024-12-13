@@ -1,323 +1,285 @@
-# Архитектура Проекта KONSPECTO
+# KONSPECTO Project Architecture
 
-## Структура Проекта
+## Project Structure Overview
+
+The project is organized into two main components: frontend and backend, with supporting Docker configurations.
 
 ```plaintext
 KONSPECTO/
 ├── frontend/
 ├── backend/
-├── agent/
-├── docs/
-├── docker/
-├── tests/
-├── .gitignore
-├── docker-compose.yml
-├── README.md
-└── LICENSE
+└── docker/
 ```
 
-### Root Directory Description
-
-- **frontend/**: Contains all the source code and configuration for the frontend part of the application.
-- **backend/**: Contains the source code and configuration for the backend part of the application, including the API.
-- **agent/**: Contains the code and tools related to the AI agent, including models, request processing, and integration with other services.
-- **docs/**: Stores technical documentation, instructions, and other related documentation.
-- **docker/**: Contains Docker files and configurations for various services.
-- **tests/**: Contains general tests, if applicable.
-- **.gitignore**: File specifying which files and folders Git should ignore.
-- **docker-compose.yml**: Docker Compose configuration file for orchestrating services.
-- **README.md**: Main project documentation with descriptions, installation, and usage instructions.
-- **LICENSE**: Project license agreement.
-
----
-
-## frontend
-
-```plaintext
-frontend/
-├── public/
-│   ├── index.html
-│   └── favicon.ico
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   ├── styles/
-│   ├── App.jsx
-│   └── index.jsx
-├── .env
-├── .eslintrc.js
-├── package.json
-├── tailwind.config.js
-├── postcss.config.js
-└── vite.config.js
-```
-
-### Description of Folders and Files
-
-- **public/**: Contains static files such as `index.html`, icons, and other resources that are not processed by the bundler.
-
-  - `index.html`: Main HTML file of the application.
-  - `favicon.ico`: Website icon.
-
-- **src/**: Main directory containing the frontend source code.
-
-  - **assets/**: Contains images, fonts, and other media files.
-  - **components/**: Reusable React components.
-  - **pages/**: Application pages representing different routes.
-  - **services/**: Functions and modules for interacting with APIs and other services.
-  - **styles/**: Application styling, including TailwindCSS and additional CSS/SCSS files.
-  - `App.jsx`: Main application component containing routing and common components.
-  - `index.jsx`: Entry point of the application, rendering the React tree.
-
-- **.env**: Environment file for setting up environment variables (e.g., API URL).
-
-- **.eslintrc.js**: ESLint configuration to ensure coding style adherence.
-
-- **package.json**: Dependency and script file for the frontend.
-
-- **tailwind.config.js**: TailwindCSS configuration for setting up utility classes.
-
-- **postcss.config.js**: PostCSS configuration for processing CSS.
-
-- **vite.config.js**: Vite configuration used as the bundler and development server.
-
----
-
-## backend
+## Backend Structure
 
 ```plaintext
 backend/
+├── agent/
+│   ├── tools/
+│   │   ├── video_processor.py
+│   │   ├── search.py
+│   │   └── __init__.py
+│   ├── react_agent.py
+│   └── __init__.py
 ├── app/
 │   ├── api/
-│   │   ├── v1/
-│   │   │   ├── endpoints/
-│   │   │   │   ├── users.py
-│   │   │   │   ├── notes.py
-│   │   │   │   └── lectures.py
-│   │   │   └── __init__.py
-│   │   └── __init__.py
+│   │   └── v1/
+│   │       ├── endpoints/
+│   │       │   ├── agent.py
+│   │       │   ├── search.py
+│   │       │   ├── transcribe.py
+│   │       │   └── video.py
+│   │       └── api.py
 │   ├── core/
 │   │   ├── config.py
-│   │   └── __init__.py
-│   ├── services/
-│   │   ├── api_search.py
-│   │   └── __init__.py
-│   ├── utils/
-│   │   ├── helpers.py
-│   │   └── __init__.py
-│   ├── main.py
-│   └── __init__.py
-├── tests/
-│   ├── api/
+│   │   └── logging_config.py
 │   ├── models/
-│   ├── schemas/
-│   └── conftest.py
-├── requirements.txt
-├── Dockerfile
-└── .env
+│   │   ├── search.py
+│   │   └── transcription.py
+│   ├── services/
+│   │   ├── llm/
+│   │   │   └── llm_studio_client.py
+│   │   ├── transcription/
+│   │   │   ├── base.py
+│   │   │   └── whisper_model.py
+│   │   ├── index_service.py
+│   │   ├── redis_service.py
+│   │   └── vector_db.py
+│   ├── exceptions.py
+│   └── main.py
+├── tests/
+│   ├── conftest.py
+│   ├── test_agent_endpoint.py
+│   ├── test_agent_search.py
+│   ├── test_main.py
+│   ├── test_search.py
+│   ├── test_transcribe_endpoint.py
+│   ├── test_transcription.py
+│   ├── test_video_api.py
+│   └── test_video_processor.py
+├── pyproject.toml
+└── setup.cfg
 ```
 
-### Description of Folders and Files
+### Backend Components Description
 
-### Description of Folders and Files
+#### Agent Module
+- **tools/**: Contains specialized tools for the agent
+  - `video_processor.py`: Handles YouTube video processing and DOCX generation
+  - `search.py`: Implements search functionality
+- `react_agent.py`: Core agent implementation using ReAct framework
 
-- **app/**: Main backend directory.
+#### App Module
+- **api/v1/**: API version 1 implementation
+  - `endpoints/`: Contains all API endpoint handlers
+- **core/**: Core configurations and logging
+- **models/**: Data models and schemas
+- **services/**: Business logic implementation
+  - `llm/`: Language model client
+  - `transcription/`: Audio transcription services
+  - `index_service.py`: Vector store index management
+  - `redis_service.py`: Redis interaction
+  - `vector_db.py`: Vector database operations
 
-  - **api/**: Implementation of the application API.
+#### Tests
+- Comprehensive test suite for all major components
+- Includes configuration and fixtures in `conftest.py`
 
-    - **v1/**: Version 1 of the API.
-      - **endpoints/**: API endpoints organized by functional areas.
-        - `users.py`: Endpoints related to users.
-        - `notes.py`: Endpoints for managing notes.
-        - `lectures.py`: Endpoints for managing video lectures.
-      - `__init__.py`: Initialization of the API version.
-    - `__init__.py`: API initialization.
-
-  - **core/**: Core configurations and settings of the application.
-
-    - `config.py`: Application configuration settings.
-    - `__init__.py`: Core initialization.
-
-  - **services/**: Business logic and interactions with external services.
-
-    - `api_search.py`: Logic for searching notes via the API.
-    - `__init__.py`: Services initialization.
-
-  - **utils/**: Helper functions and utilities.
-
-    - `helpers.py`: General helper functions.
-    - `__init__.py`: Utilities initialization.
-
-  - `main.py`: Entry point of the backend application, setting up FastAPI and running the server.
-
-  - `__init__.py`: Application initialization.
-
-- **tests/**: Backend tests.
-
-  - **api/**: Tests for API endpoints.
-  - **models/**: Tests for application models.
-  - **schemas/**: Tests for Pydantic schemas.
-  - `conftest.py`: Test configurations and fixtures.
-
-- **requirements.txt**: List of Python dependencies for the backend.
-
-- **Dockerfile**: Instructions for building the backend service Docker image.
-
-- **.env**: Environment file for setting up environment variables.
-
----
-
-## agent
+## Frontend Structure
 
 ```plaintext
-agent/
-├── models/
-│   ├── llm_model.py
-│   └── __init__.py
-├── services/
-│   ├── search_service.py
-│   ├── merge_notes_service.py
-│   ├── video_processing_service.py
-│   └── __init__.py
-├── tasks/
-│   ├── video_tasks.py
-│   ├── merge_tasks.py
-│   └── __init__.py
-├── utils/
-│   ├── llm_helpers.py
-│   └── __init__.py
-├── config.py
-├── main.py
-└── __init__.py
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── DownloadButton.jsx
+│   │   ├── ErrorMessage.jsx
+│   │   ├── GoogleDocViewer.jsx
+│   │   └── Sidebar.jsx
+│   ├── context/
+│   │   └── ChatContext.jsx
+│   ├── pages/
+│   │   └── Chat.jsx
+│   ├── utils/
+│   │   └── youtubeUtils.js
+│   ├── App.jsx
+│   └── main.jsx
+├── __tests__/
+│   ├── App.test.jsx
+│   ├── Chat.test.jsx
+│   ├── GoogleDocViewer.test.jsx
+│   └── Sidebar.test.jsx
+├── __mocks__/
+│   ├── config.js
+│   └── fileMock.js
+├── .eslintrc.js
+├── .prettierrc
+├── babel.config.js
+├── index.html
+├── jest.config.js
+├── jest.setup.js
+├── package.json
+├── postcss.config.js
+├── tailwind.config.js
+└── vite.config.js
 ```
 
-### Description of Folders and Files
+### Frontend Components Description
 
-- **models/**: Definition and initialization of AI agent models.
+#### Source Files
+- **components/**: Reusable UI components
+  - `DownloadButton.jsx`: Component for file downloads
+  - `ErrorMessage.jsx`: Error display component
+  - `GoogleDocViewer.jsx`: Document viewer component
+  - `Sidebar.jsx`: Navigation sidebar component
+- **context/**: React context providers
+- **pages/**: Main application pages
+- **utils/**: Utility functions
 
-  - `llm_model.py`: Local LLM (LLM Studio) model for text processing.
-  - `__init__.py`: Models initialization.
+#### Testing
+- **__tests__/**: Test files for components
+- **__mocks__/**: Mock files for testing
 
-- **services/**: Services and logic related to agent functionality.
+#### Configuration
+- Various configuration files for:
+  - ESLint
+  - Prettier
+  - Babel
+  - Jest
+  - PostCSS
+  - Tailwind
+  - Vite
 
-  - `search_service.py`: Service for searching information in notes using LLM.
-  - `merge_notes_service.py`: Service for merging notes based on topics and content.
-  - `video_processing_service.py`: Service for converting video lectures into slides using FFmpeg.
-  - `__init__.py`: Services initialization.
-
-- **tasks/**: Asynchronous tasks handled by Celery related to the agent.
-
-  - `video_tasks.py`: Tasks for video processing and slide creation.
-  - `merge_tasks.py`: Tasks for merging notes.
-  - `__init__.py`: Tasks initialization.
-
-- **utils/**: Helper functions and utilities for the agent.
-
-  - `llm_helpers.py`: Helper functions for working with LLM.
-  - `__init__.py`: Utilities initialization.
-
-- `config.py`: Agent configuration settings, including model and service parameters.
-
-- `main.py`: Entry point to run the AI agent, setting up services and interacting with other components.
-
-- `__init__.py`: Agent initialization.
-
----
-
-## docs
-
-```plaintext
-docs/
-├── architecture.md
-├── api_documentation.md
-├── installation.md
-├── user_guide.md
-├── developer_guide.md
-└── images/
-    └── architecture_diagram.png
-```
-
-### Description of Folders and Files
-
-- **architecture.md**: Detailed description of the system architecture, component interactions, and technologies used.
-- **api_documentation.md**: API documentation, including endpoint descriptions, methods, parameters, and example requests/responses.
-- **installation.md**: Installation and setup instructions for the project on local machines and production environments.
-- **user_guide.md**: User guide for using the application, describing functionality and usage examples.
-- **developer_guide.md**: Developer guide for making code changes, running local development, and setting up the environment.
-- **images/**: Folder for storing images and diagrams used in documentation.
-  - `architecture_diagram.png`: Project architecture diagram.
-
----
-
-## docker
+## Docker Configuration
 
 ```plaintext
 docker/
-├── frontend/
-│   └── Dockerfile
 ├── backend/
 │   └── Dockerfile
-├── agent/
-│   └── Dockerfile
-├── nginx/
-│   └── nginx.conf
-└── volumes/
-    └── data/
+└── frontend/
+    ├── Dockerfile
+    └── nginx.conf
 ```
 
-### Description of Folders and Files
+### Docker Components Description
 
-- **frontend/Dockerfile**: Instructions for building the frontend service Docker image.
-- **backend/Dockerfile**: Instructions for building the backend service Docker image.
-- **agent/Dockerfile**: Instructions for building the AI agent Docker image.
-- **nginx/nginx.conf**: Nginx configuration file for proxying requests and serving static files.
-- **volumes/data/**: Folder for storing data used by Docker containers.
+#### Backend Docker
+- Dockerfile for Python backend service
+- Multi-stage build for optimized image size
+- Includes FFmpeg and other necessary dependencies
+
+#### Frontend Docker
+- Dockerfile for React frontend
+- Nginx configuration for serving static files
+- Production-ready setup with multi-stage build
 
 ---
 
-## tests
+## Docker Configuration
+
+### Docker Compose Overview
+
+The project uses Docker Compose for orchestrating multiple services:
 
 ```plaintext
-tests/
-├── frontend/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-├── backend/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-├── agent/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-└── shared/
-    └── fixtures/
+services:
+  ├── frontend
+  ├── backend
+  └── redis-stack
 ```
 
-### Description of Folders and Files
+### Service Descriptions
 
-- **frontend/**: Tests for the frontend part.
+#### Frontend Service
+- Built using multi-stage Dockerfile
+- Served via Nginx
+- Exposed on port 80
+- Environment configurations:
+  - NODE_ENV=production
+  - VITE_API_URL for API endpoint configuration
 
-  - **unit/**: Unit tests for individual components and functions.
-  - **integration/**: Integration tests for verifying component interactions.
-  - **e2e/**: End-to-End tests for verifying the complete application functionality.
+#### Backend Service
+- Python-based FastAPI application
+- Exposed on port 8000
+- Volumes:
+  - Logs directory
+  - Configuration files
+  - Hugging Face cache
+- Environment configurations:
+  - Python environment settings
+  - Redis connection
+  - LLM Studio configuration
+- Health check implementation
+- Dependencies on Redis Stack service
 
-- **backend/**: Tests for the backend part.
+#### Redis Stack Service
+- Uses official Redis Stack image
+- Exposed ports:
+  - 6379 for Redis
+  - 8001 for RedisInsight
+- Persistent volume for data storage
+- Health check implementation
 
-  - **unit/**: Unit tests for individual modules and functions.
-  - **integration/**: Integration tests for verifying component interactions (e.g., API and services).
-  - **e2e/**: End-To-End tests for verifying the complete API functionality.
+### Docker Volumes
+- `redis_stack_data`: Persistent storage for Redis
+- `huggingface_cache`: Cache for Hugging Face models
 
-- **agent/**: Tests for the AI agent.
+## Project Configuration
 
-  - **unit/**: Unit tests for individual agent services and functions.
-  - **integration/**: Integration tests for verifying agent interactions with other components.
-  - **e2e/**: End-To-End tests for verifying the complete agent functionality.
+### Pre-commit Configuration
 
-- **shared/**: Shared resources for tests.
-  - **fixtures/**: Fixtures and data used in tests.
+The project uses comprehensive pre-commit hooks for code quality:
 
----
+#### General Checks
+- YAML/JSON/TOML validation
+- File size limits
+- End of file fixing
+- Trailing whitespace removal
+- Merge conflict detection
+- Private key detection
+
+#### Python-specific
+- Black formatting
+- isort import sorting
+- Flake8 linting
+- Mypy type checking
+- Jupyter notebook formatting
+
+#### JavaScript/React
+- Prettier formatting
+- ESLint checking
+- Tailwind CSS plugin
+
+#### Docker
+- Hadolint for Dockerfile linting
+
+#### Local Hooks
+- Frontend dependency installation and testing
+- Backend dependency installation and testing
+- Docker Compose validation
+
+### Project Settings (pyproject.toml)
+
+The project uses Poetry for dependency management with specific configurations:
+
+#### Tool Configurations
+- Black: 90 character line length, Python 3.11 target
+- isort: Black profile compatibility
+- Flake8: Customized rule set
+- Mypy: Strict type checking
+- Pytest: Coverage reporting
+
+#### Dependencies
+- Production dependencies managed via Poetry
+- Development dependencies including:
+  - pre-commit
+  - Testing tools (pytest)
+  - Code formatters (black, isort)
+  - Linters (flake8, mypy, pylint)
+
+This configuration ensures:
+- Consistent code formatting
+- Type safety
+- Code quality standards
+- Automated testing
+- Clean git commits

@@ -1,133 +1,158 @@
-# Development Guidelines for the KONSPECTO Project
+# Development Guidelines for KONSPECTO
 
-## 1. General Rules
+## 1. Code Organization
 
-### 1.1. Project Structure
+### Backend Structure
+- FastAPI application structure with clear separation of concerns
+- Use of dependency injection and service pattern
+- Modular organization with agent tools and services
 
-- **Directory Organization:** Clearly structure the project by separating the frontend, backend, documentation, and other components.
-- **File and Folder Naming:** Use clear and descriptive names, adhering to naming conventions (e.g., `snake_case` for Python, `kebab-case` for JavaScript).
+### Frontend Structure
+- React components with proper separation
+- Context-based state management
+- Consistent styling with TailwindCSS
 
-### 1.2. Comments and Documentation
+## 2. Technology Stack
 
-- **File Header:** At the beginning of each file, add a comment indicating the path to the current file, starting from the project root.
-  - **Example for Python:**
-    ```python
-    # /backend/app/api/users.py
-    ```
-  - **Example for JavaScript:**
-    ```javascript
-    // /frontend/src/components/Header.jsx
-    ```
-- **Function and Class Documentation:**
-  - Write docstrings for all functions, methods, and classes.
-  - Use [Google Style](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) or [NumPy Style](https://numpydoc.readthedocs.io/en/latest/format.html) for formatting docstrings.
+### Backend
+- Python 3.11
+- FastAPI
+- LangChain for agent implementation
+- Redis Stack for storage
+- Whisper for voice transcription
+- OpenCV and Pillow for image processing
 
-### 1.3. Version Control
+### Frontend
+- React 18.2.0
+- Vite
+- TailwindCSS
+- React Router
+- React Icons
 
-- **Using Git:** Follow Git Flow principles for branching and merging changes.
-- **Commit Messages:** Write informative commit messages that describe the changes made.
-  - **Format:** `<type>: <short description>`
-  - **Example Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+## 3. Development Standards
 
-## 2. Language and Library Versions
+### Python Code Style
+```python
+# Example of proper Python code style
+class SearchTool:
+    """
+    Tool for performing search operations using query_engine.
+    """
+    @staticmethod
+    def search(query: str) -> List[str]:
+        """
+        Performs document search for given text query.
 
-To ensure compatibility and project stability, the following versions of programming languages and major libraries are used:
+        Args:
+            query: Text query for searching documents.
+        Returns:
+            List of search result texts.
+        """
+```
 
-### 2.1. Python
+### JavaScript Code Style
+```javascript
+// Example of proper React component style
+const GoogleDocViewer = React.memo(({ fileId, onClose }) => {
+  if (!fileId) return null;
 
-- **Version:** Python 3.11
-- **Package Manager:** `poetry`
+  return (
+    <div className="flex flex-col h-full w-full relative">
+      {/* Component content */}
+    </div>
+  );
+});
+```
 
-### 2.2. Frontend
+## 4. Testing Requirements
 
-- **React.js:** 18.2.0
-- **TailwindCSS:** 3.3.2
-- **Node.js:** 18.x
-- **npm:** 9.x
+### Backend Tests
+- Use pytest for testing
+- Maintain high test coverage
+- Mock external services
+- Test both success and error cases
 
-### 2.3. Backend
+### Frontend Tests
+- Use Jest and React Testing Library
+- Test component rendering
+- Test user interactions
+- Test API integration
 
-- **FastAPI:** 0.95.1
-- **Celery:** 5.3.0
-- **Redis:** 6.2.6
+## 5. Documentation Requirements
 
-### 2.4. Voice and Text Processing
+### Code Documentation
+- Clear and concise docstrings
+- Type hints for Python code
+- PropTypes for React components
+- Comments for complex logic
 
-- **Lightning Whisper-MLX:** Latest stable version from [repository](https://github.com/mustafaaljadery/lightning-whisper-mlx)
-- **LLM Studio:** 1.2.3
+### API Documentation
+- OpenAPI/Swagger documentation
+- Clear endpoint descriptions
+- Request/response examples
 
-### 2.5. Video Processing
+## 6. Version Control
 
-- **FFmpeg:** 4.4.1
+### Branches
+- main: Production code
+- develop: Development code
+- feature/*: New features
+- fix/*: Bug fixes
 
-### 2.6. Search Functionality
+### Commit Messages
+```
+feat: Add video processing functionality
+fix: Resolve chat context persistence
+docs: Update API documentation
+style: Format code according to standards
+```
 
-- **Options for Document Search:**
-  - **LlamaIndex:** Utilize [LlamaIndex](https://github.com/jerryjliu/llama_index) for building and querying indices over document collections.
-  - **ElasticSearch:** Implement search capabilities using [ElasticSearch](https://www.elastic.co/elasticsearch/) for scalable and efficient full-text search.
+## 7. Build and Deployment
 
-### 2.7. Infrastructure
+### Docker
+- Use multi-stage builds
+- Optimize image sizes
+- Proper environment variable handling
 
-- **Docker:** 24.0.0
-- **Docker Compose:** 2.18.1
+### CI/CD
+- Run tests before merging
+- Automated builds
+- Code quality checks
 
-## 3. Coding Standards
+## 8. Security
 
-### 3.1. Python
+### General Rules
+- No hardcoded credentials
+- Proper error handling
+- Input validation
+- Secure file handling
 
-- **Code Style:** PEP 8
-- **Linter:** `flake8`
-- **Formatter:** `black` (version 23.1.0)
-- **Typing:** Use type annotations for all functions and methods.
+### Environment Variables
+- Use .env files
+- Separate configs for different environments
+- Never commit sensitive data
 
-### 3.2. JavaScript/TypeScript
+## 9. Performance
 
-- **Code Style:** Airbnb JavaScript Style Guide
-- **Linter:** `ESLint` (version 8.40.0)
-- **Formatter:** `Prettier` (version 2.8.8)
-- **Typing:** Use TypeScript for all new components.
+### Backend
+- Async operations where possible
+- Proper error handling
+- Cache when appropriate
 
-## 4. Development Practices
+### Frontend
+- Lazy loading
+- Memoization
+- Optimized re-renders
 
-### 4.1. Containerization
+## 10. Tools and Utilities
 
-- **Docker:** All services (frontend, backend) must be containerized using Docker.
-- **Docker Compose:** Use `docker-compose.yml` to orchestrate services in the local development environment.
+### Development Tools
+- Poetry for Python dependency management
+- npm for JavaScript dependency management
+- pre-commit hooks
+- ESLint and Prettier
 
-### 4.2. Testing
-
-- **Code Coverage:** Aim for at least 80% code coverage with tests.
-- **Testing Frameworks:**
-  - **Python:** `pytest` (version 7.3.1)
-- **Types of Tests:** Write unit, integration, and E2E tests for all critical components.
-
-### 4.3. CI/CD
-
-- **Integration:** Set up CI/CD pipelines for automatic testing and deployment.
-- **Tools:** GitHub Actions or GitLab CI/CD.
-
-### 4.4. Security
-
-- **Dependencies:** Regularly update dependencies and check for vulnerabilities.
-- **Environment Variables:** Store sensitive data in environment variables and do not include them in the repository.
-
-## 5. Documentation Management
-
-### 5.1. Technical Documentation
-
-- **Tools:** Sphinx for Python, Storybook for frontend.
-- **Storage:** Documentation should be stored in the `/docs` directory.
-
-### 5.2. API Documentation
-
-- **FastAPI:** Automatically generates Swagger UI documentation.
-- **Maintenance:** Update documentation when API changes.
-
-## 6. Evaluation Criteria
-
-- **Compliance with coding standards.**
-- **Presence of tests for new features.**
-- **Documentation of changes.**
-- **Code optimization and efficiency.**
-
----
+### Monitoring and Logging
+- Structured logging
+- Error tracking
+- Performance monitoring

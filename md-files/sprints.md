@@ -221,51 +221,7 @@ The KONSPECTO project involves the development of an intelligent agent based on 
 
 ---
 
-## Sprint 5: Note Merging Functionality
-
-**Duration:** 2 weeks
-**MVP:** Functional note merging API endpoint and corresponding frontend component for merging notes.
-
-### Tasks:
-
-1. **Implement Note Merging API:**
-
-   - Develop `/v1/merge` endpoint to accept and process two notes.
-   - Integrate the LLM model (LLM Studio 1.2.3) to compare and merge notes based on topics and content.
-   - Ensure the endpoint returns a unified merged document.
-   - Maintain adherence to FastAPI coding standards and type annotations.
-
-2. **Develop Frontend Merge Notes Component:**
-
-   - Create a component with inputs for two notes and a merge button.
-   - Display the merged note upon successful processing.
-   - Integrate the merge component into the main application routing.
-   - Ensure React components follow the Airbnb JavaScript Style Guide.
-
-3. **Enforce Development Standards:**
-
-   - Run `flake8` and `black` for backend code.
-   - Run `ESLint` and `Prettier` for frontend code.
-   - Ensure all dependencies are at specified versions.
-
-4. **Asynchronous Task Processing:**
-
-   - Set up Celery (version 5.3.0) and Redis (version 6.2.6) for handling asynchronous merging tasks.
-   - Ensure the frontend can handle task status and display notifications upon completion.
-
-5. **Testing Merging Functionality:**
-
-   - Write unit tests for the merge API endpoint.
-   - Develop integration tests to verify the merging process between frontend and backend.
-   - Achieve at least 80% code coverage for merging functionality.
-
-6. **Update Documentation:**
-   - Document the merge endpoint in `docs/api_documentation.md`.
-   - Update the user guide with note merging functionality details in `docs/user_guide.md`.
-
----
-
-## Sprint 6: Video-to-Slides Conversion Functionality
+## Sprint 5: Video-to-Slides Conversion Functionality
 
 **Duration:** 2 weeks
 **MVP:** Functional video upload API endpoint and frontend component for converting videos to slides.
@@ -309,7 +265,7 @@ The KONSPECTO project involves the development of an intelligent agent based on 
 
 ---
 
-## Sprint 7: Deployment and Support
+## Sprint 6: Deployment and Support
 
 **Duration:** 2 weeks
 **MVP:** Fully deployed application with monitoring, logging, and user support channels established.

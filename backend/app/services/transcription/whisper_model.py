@@ -3,6 +3,7 @@
 import logging
 
 import torch
+
 from faster_whisper import WhisperModel
 
 from .base import AbstractTranscriptionModel

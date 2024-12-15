@@ -3,11 +3,13 @@
 ## 1. Code Organization
 
 ### Backend Structure
+
 - FastAPI application structure with clear separation of concerns
 - Use of dependency injection and service pattern
 - Modular organization with agent tools and services
 
 ### Frontend Structure
+
 - React components with proper separation
 - Context-based state management
 - Consistent styling with TailwindCSS
@@ -15,6 +17,7 @@
 ## 2. Technology Stack
 
 ### Backend
+
 - Python 3.11
 - FastAPI
 - LangChain for agent implementation
@@ -23,6 +26,7 @@
 - OpenCV and Pillow for image processing
 
 ### Frontend
+
 - React 18.2.0
 - Vite
 - TailwindCSS
@@ -32,6 +36,7 @@
 ## 3. Development Standards
 
 ### Python Code Style
+
 ```python
 # Example of proper Python code style
 class SearchTool:
@@ -51,6 +56,7 @@ class SearchTool:
 ```
 
 ### JavaScript Code Style
+
 ```javascript
 // Example of proper React component style
 const GoogleDocViewer = React.memo(({ fileId, onClose }) => {
@@ -67,12 +73,14 @@ const GoogleDocViewer = React.memo(({ fileId, onClose }) => {
 ## 4. Testing Requirements
 
 ### Backend Tests
+
 - Use pytest for testing
 - Maintain high test coverage
 - Mock external services
 - Test both success and error cases
 
 ### Frontend Tests
+
 - Use Jest and React Testing Library
 - Test component rendering
 - Test user interactions
@@ -81,12 +89,14 @@ const GoogleDocViewer = React.memo(({ fileId, onClose }) => {
 ## 5. Documentation Requirements
 
 ### Code Documentation
+
 - Clear and concise docstrings
 - Type hints for Python code
 - PropTypes for React components
 - Comments for complex logic
 
 ### API Documentation
+
 - OpenAPI/Swagger documentation
 - Clear endpoint descriptions
 - Request/response examples
@@ -94,12 +104,14 @@ const GoogleDocViewer = React.memo(({ fileId, onClose }) => {
 ## 6. Version Control
 
 ### Branches
+
 - main: Production code
 - develop: Development code
-- feature/*: New features
-- fix/*: Bug fixes
+- feature/\*: New features
+- fix/\*: Bug fixes
 
 ### Commit Messages
+
 ```
 feat: Add video processing functionality
 fix: Resolve chat context persistence
@@ -110,11 +122,13 @@ style: Format code according to standards
 ## 7. Build and Deployment
 
 ### Docker
+
 - Use multi-stage builds
 - Optimize image sizes
 - Proper environment variable handling
 
 ### CI/CD
+
 - Run tests before merging
 - Automated builds
 - Code quality checks
@@ -122,12 +136,14 @@ style: Format code according to standards
 ## 8. Security
 
 ### General Rules
+
 - No hardcoded credentials
 - Proper error handling
 - Input validation
 - Secure file handling
 
 ### Environment Variables
+
 - Use .env files
 - Separate configs for different environments
 - Never commit sensitive data
@@ -135,11 +151,13 @@ style: Format code according to standards
 ## 9. Performance
 
 ### Backend
+
 - Async operations where possible
 - Proper error handling
 - Cache when appropriate
 
 ### Frontend
+
 - Lazy loading
 - Memoization
 - Optimized re-renders
@@ -147,12 +165,14 @@ style: Format code according to standards
 ## 10. Tools and Utilities
 
 ### Development Tools
+
 - Poetry for Python dependency management
 - npm for JavaScript dependency management
 - pre-commit hooks
 - ESLint and Prettier
 
 ### Monitoring and Logging
+
 - Structured logging
 - Error tracking
 - Performance monitoring

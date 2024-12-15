@@ -65,12 +65,14 @@ backend/
 ### Backend Components Description
 
 #### Agent Module
+
 - **tools/**: Contains specialized tools for the agent
   - `video_processor.py`: Handles YouTube video processing and DOCX generation
   - `search.py`: Implements search functionality
 - `react_agent.py`: Core agent implementation using ReAct framework
 
 #### App Module
+
 - **api/v1/**: API version 1 implementation
   - `endpoints/`: Contains all API endpoint handlers
 - **core/**: Core configurations and logging
@@ -83,6 +85,7 @@ backend/
   - `vector_db.py`: Vector database operations
 
 #### Tests
+
 - Comprehensive test suite for all major components
 - Includes configuration and fixtures in `conftest.py`
 
@@ -127,6 +130,7 @@ frontend/
 ### Frontend Components Description
 
 #### Source Files
+
 - **components/**: Reusable UI components
   - `DownloadButton.jsx`: Component for file downloads
   - `ErrorMessage.jsx`: Error display component
@@ -137,10 +141,12 @@ frontend/
 - **utils/**: Utility functions
 
 #### Testing
-- **__tests__/**: Test files for components
-- **__mocks__/**: Mock files for testing
+
+- ****tests**/**: Test files for components
+- ****mocks**/**: Mock files for testing
 
 #### Configuration
+
 - Various configuration files for:
   - ESLint
   - Prettier
@@ -164,11 +170,13 @@ docker/
 ### Docker Components Description
 
 #### Backend Docker
+
 - Dockerfile for Python backend service
 - Multi-stage build for optimized image size
 - Includes FFmpeg and other necessary dependencies
 
 #### Frontend Docker
+
 - Dockerfile for React frontend
 - Nginx configuration for serving static files
 - Production-ready setup with multi-stage build
@@ -191,6 +199,7 @@ services:
 ### Service Descriptions
 
 #### Frontend Service
+
 - Built using multi-stage Dockerfile
 - Served via Nginx
 - Exposed on port 80
@@ -199,6 +208,7 @@ services:
   - VITE_API_URL for API endpoint configuration
 
 #### Backend Service
+
 - Python-based FastAPI application
 - Exposed on port 8000
 - Volumes:
@@ -213,6 +223,7 @@ services:
 - Dependencies on Redis Stack service
 
 #### Redis Stack Service
+
 - Uses official Redis Stack image
 - Exposed ports:
   - 6379 for Redis
@@ -221,6 +232,7 @@ services:
 - Health check implementation
 
 ### Docker Volumes
+
 - `redis_stack_data`: Persistent storage for Redis
 - `huggingface_cache`: Cache for Hugging Face models
 
@@ -231,6 +243,7 @@ services:
 The project uses comprehensive pre-commit hooks for code quality:
 
 #### General Checks
+
 - YAML/JSON/TOML validation
 - File size limits
 - End of file fixing
@@ -239,6 +252,7 @@ The project uses comprehensive pre-commit hooks for code quality:
 - Private key detection
 
 #### Python-specific
+
 - Black formatting
 - isort import sorting
 - Flake8 linting
@@ -246,14 +260,17 @@ The project uses comprehensive pre-commit hooks for code quality:
 - Jupyter notebook formatting
 
 #### JavaScript/React
+
 - Prettier formatting
 - ESLint checking
 - Tailwind CSS plugin
 
 #### Docker
+
 - Hadolint for Dockerfile linting
 
 #### Local Hooks
+
 - Frontend dependency installation and testing
 - Backend dependency installation and testing
 - Docker Compose validation
@@ -263,6 +280,7 @@ The project uses comprehensive pre-commit hooks for code quality:
 The project uses Poetry for dependency management with specific configurations:
 
 #### Tool Configurations
+
 - Black: 90 character line length, Python 3.11 target
 - isort: Black profile compatibility
 - Flake8: Customized rule set
@@ -270,6 +288,7 @@ The project uses Poetry for dependency management with specific configurations:
 - Pytest: Coverage reporting
 
 #### Dependencies
+
 - Production dependencies managed via Poetry
 - Development dependencies including:
   - pre-commit
@@ -278,6 +297,7 @@ The project uses Poetry for dependency management with specific configurations:
   - Linters (flake8, mypy, pylint)
 
 This configuration ensures:
+
 - Consistent code formatting
 - Type safety
 - Code quality standards

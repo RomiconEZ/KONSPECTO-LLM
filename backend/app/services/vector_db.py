@@ -2,10 +2,12 @@
 
 import json
 import logging
+
 from pathlib import Path
 from urllib.parse import urlparse
 
 import torch
+
 from llama_index.core import Settings as LlamaSettings, VectorStoreIndex
 from llama_index.core.ingestion import (
     DocstoreStrategy,

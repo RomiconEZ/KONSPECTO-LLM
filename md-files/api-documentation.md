@@ -3,6 +3,7 @@
 KONSPECTO is a platform that provides services for processing educational content, including video transcription, document search, and automated response generation.
 
 ## Base URL
+
 ```
 http://localhost:8000/api/v1
 ```
@@ -10,14 +11,17 @@ http://localhost:8000/api/v1
 ## Endpoints
 
 ### Agent Service
+
 Handles interaction with AI agent for content processing and explanation.
 
 #### Send Query to Agent
+
 ```http
 POST /agent/
 ```
 
 **Request Body:**
+
 ```json
 {
   "query": "Explain gradient descent and Fourier transform"
@@ -25,6 +29,7 @@ POST /agent/
 ```
 
 **Response:**
+
 ```json
 {
   "response": "Detailed explanation in Russian language..."
@@ -32,14 +37,17 @@ POST /agent/
 ```
 
 ### Search Service
+
 Performs semantic search across indexed documents.
 
 #### Search Documents
+
 ```http
 POST /search/
 ```
 
 **Request Body:**
+
 ```json
 {
   "query": "neural networks architecture"
@@ -47,6 +55,7 @@ POST /search/
 ```
 
 **Response:**
+
 ```json
 {
   "results": [
@@ -64,14 +73,17 @@ POST /search/
 ```
 
 ### Video Processing Service
+
 Processes YouTube videos and generates documents with extracted frames.
 
 #### Convert YouTube Video to DOCX
+
 ```http
 POST /video/youtube_to_docx
 ```
 
 **Request Body:**
+
 ```json
 {
   "youtube_url": "https://www.youtube.com/watch?v=example"
@@ -79,6 +91,7 @@ POST /video/youtube_to_docx
 ```
 
 **Response:**
+
 ```json
 {
   "docx_key": "docx:123e4567-e89b-12d3-a456-426614174000"
@@ -86,28 +99,34 @@ POST /video/youtube_to_docx
 ```
 
 #### Get Generated DOCX File
+
 ```http
 GET /video/video/{docx_key}
 ```
 
 **Response:**
+
 - Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
 - Content-Disposition: attachment; filename="{docx_key}.docx"
 
 ### Audio Transcription Service
+
 Transcribes audio files to text.
 
 #### Transcribe Audio
+
 ```http
 POST /transcribe/
 ```
 
 **Request:**
+
 - Method: POST
 - Content-Type: multipart/form-data
 - Body: file (audio file, MP3 or WAV format)
 
 **Response:**
+
 ```json
 {
   "transcription": "Transcribed text in Russian..."
@@ -125,6 +144,7 @@ The API uses standard HTTP status codes:
 - `500` - Internal Server Error
 
 Error Response Format:
+
 ```json
 {
   "detail": "Error description message"

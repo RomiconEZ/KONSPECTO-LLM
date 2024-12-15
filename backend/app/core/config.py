@@ -1,6 +1,7 @@
 # KONSPECTO/backend/app/core/config.py
 
 import logging
+
 from functools import lru_cache
 from pathlib import Path
 from typing import List
@@ -93,9 +94,7 @@ class Settings(BaseSettings):
 
     class Config:
         # Set the path to the .env file
-        env_file = (
-            Path(__file__).resolve().parent.parent / "config" / ".env"
-        ).as_posix()
+        env_file = (Path(__file__).resolve().parent.parent / "config" / ".env").as_posix()
         case_sensitive = True
 
 

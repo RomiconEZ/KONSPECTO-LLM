@@ -15,6 +15,7 @@ services:
     restart: unless-stopped
 
   backend:
+    env_file: "backend/app/config/.env"
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
@@ -30,7 +31,10 @@ services:
       - PYTHONPATH=/app
       - REDIS_URL=redis://redis-stack:6379
       - HF_HOME=/app/.cache/huggingface
-      - LLM_STUDIO_BASE_URL=http://host.docker.internal:1234/v1
+      - LLM_STUDIO_BASE_URL=${LLM_STUDIO_BASE_URL}
+      - OPENAI_API_URL=${OPENAI_API_URL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MODEL_NAME=${MODEL_NAME}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -54,6 +58,28 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+
+  vllm-openai:
+    env_file: "backend/app/config/.env"
+    image: vllm/vllm-openai:latest
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - "8002:8000"
+    volumes:
+      - huggingface_cache:/app/.cache/huggingface
+    environment:
+      - HF_HOME=/app/.cache/huggingface
+      - MODEL_NAME=${MODEL_NAME}
+    ipc: "host"
+    command: "--model ${MODEL_NAME}"
+    profiles: [vllm]
 
 volumes:
   redis_stack_data:

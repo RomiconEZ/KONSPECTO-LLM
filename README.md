@@ -133,6 +133,8 @@ bash tests/run_tests.sh
 
 ```bash
 docker compose up --build
+# or for vllm support
+docker compose --profile vllm up --build
 ```
 
 The application will be available at the following addresses:

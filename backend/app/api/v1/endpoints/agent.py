@@ -81,7 +81,7 @@ class AgentService:
 def get_llm_client(
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> BaseChatModel:
-    if settings.OPENAI_API_URL is not None:
+    if settings.OPENAI_API_URL:
         assert settings.MODEL_NAME is not None
         return ChatOpenAI(
             model=settings.MODEL_NAME,

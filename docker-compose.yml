@@ -70,8 +70,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    ports:
-      - "8002:8000"
     volumes:
       - huggingface_cache:/app/.cache/huggingface
     environment:

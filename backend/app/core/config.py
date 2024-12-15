@@ -74,6 +74,10 @@ class Settings(BaseSettings):
         description="Dimensions of the embedding vectors.",
     )
 
+    MODEL_NAME: str | None = None
+    OPENAI_API_URL: str | None = None
+    OPENAI_API_KEY: str | None = None
+
     @validator("GOOGLE_SERVICE_ACCOUNT_KEY_PATH", pre=True)
     def validate_service_account_path(cls, v):
         logger.debug(f"Original GOOGLE_SERVICE_ACCOUNT_KEY_PATH value: {v}")

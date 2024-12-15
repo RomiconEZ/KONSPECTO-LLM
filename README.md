@@ -71,6 +71,10 @@ TRANSCRIPTION_MODEL=whisper
 WHISPER_MODEL_SIZE=large-v3
 
 LLM_STUDIO_BASE_URL=http://localhost:1234/v1
+# Or for any openai-compatible endpoint
+MODEL_NAME=gpt-4o-mini
+OPENAI_API_URL=https://api.openai.com
+OPENAI_API_KEY=<your openai key here>
 
 EMBEDDING_MODEL_NAME="intfloat/multilingual-e5-large"
 EMBEDDING_BATCH_SIZE=16

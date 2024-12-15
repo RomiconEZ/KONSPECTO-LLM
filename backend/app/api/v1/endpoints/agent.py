@@ -2,10 +2,17 @@
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from functools import lru_cache
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException
+from langchain_community.chat_models import ChatOpenAI
+from langchain_core.language_models import BaseChatModel
 from pydantic import BaseModel, Field
 
 from agent.react_agent import ReactAgent  # Импортируем ReactAgent
+from app.core.config import Settings, get_settings
+from app.services.llm.llm_studio_client import LLMStudioClient
 
 router = APIRouter()
 logger = logging.getLogger("app.api.v1.endpoints.agent")
@@ -35,11 +42,11 @@ class AgentService:
     Сервисный класс для обработки запросов агента.
     """
 
-    def __init__(self):
+    def __init__(self, agent: ReactAgent):
         """
         Инициализация сервисного класса агента.
         """
-        self.agent = ReactAgent()  # Инициализируем ReactAgent
+        self.agent = agent  # Инициализируем ReactAgent
 
     async def process_query(self, query: str) -> str:
         """
@@ -69,12 +76,38 @@ class AgentService:
             raise HTTPException(status_code=500, detail=str(e))
 
 
-# Инициализация сервисного класса агента
-agent_service = AgentService()
+# Probably better to use DI container for this (e.g. wireup)
+# https://maldoinc.github.io/wireup/0.14.0/integrations/fastapi/
+def get_llm_client(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> BaseChatModel:
+    if settings.OPENAI_API_URL is not None:
+        assert settings.MODEL_NAME is not None
+        return ChatOpenAI(
+            model=settings.MODEL_NAME,
+            base_url=settings.OPENAI_API_URL,
+            api_key=settings.OPENAI_API_KEY,
+        )
+    else:
+        return LLMStudioClient()
+
+
+def get_react_agent(
+    llm_client: Annotated[BaseChatModel, Depends(get_llm_client)]
+) -> ReactAgent:
+    return ReactAgent(llm_client)
+
+
+@lru_cache
+def get_agent_service(react_agent: Annotated[ReactAgent, Depends(get_react_agent)]):
+    return AgentService(react_agent)
 
 
 @router.post("/", response_model=QueryResponse)
-async def interact_with_agent(request: QueryRequest):
+async def interact_with_agent(
+    request: QueryRequest,
+    agent_service: Annotated[AgentService, Depends(get_agent_service)],
+):
     """
     Эндпойнт для взаимодействия с агентом.
 

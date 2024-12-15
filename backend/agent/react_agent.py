@@ -4,9 +4,9 @@ import re
 from typing import List
 
 from langchain.agents import AgentType, initialize_agent
-from langchain.llms.base import BaseLLM
 from langchain.prompts import PromptTemplate
 from langchain.tools import Tool
+from langchain_core.language_models import BaseChatModel
 
 # Import LLMStudioClient model
 from app.services.llm.llm_studio_client import LLMStudioClient
@@ -22,7 +22,7 @@ logger.setLevel(logging.DEBUG)
 
 
 class ReactAgent:
-    def __init__(self, llm: BaseLLM = None):
+    def __init__(self, llm: BaseChatModel | None = None):
         self.llm = llm or LLMStudioClient()
         self.tools = self._initialize_tools()
         self.prompt = self._create_prompt()

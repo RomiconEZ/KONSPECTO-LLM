@@ -2,13 +2,11 @@
 
 import json
 import logging
-
 from pathlib import Path
 from urllib.parse import urlparse
 
 import torch
-
-from llama_index.core import Settings, VectorStoreIndex
+from llama_index.core import Settings as LlamaSettings, VectorStoreIndex
 from llama_index.core.ingestion import (
     DocstoreStrategy,
     IngestionCache,
@@ -57,7 +55,7 @@ class IndexManager(metaclass=SingletonMeta):
         Initialize VectorStoreIndex, vector store, and ingestion pipeline.
         """
         try:
-            settings = get_settings()
+            settings = get_settings()  # Get configuration settings
             logger.info("Initializing VectorStoreIndex...")
 
             # Parse Redis URL
@@ -67,23 +65,29 @@ class IndexManager(metaclass=SingletonMeta):
 
             # Configure device
             device = (
-                torch.device("mps")
+                "mps"
                 if torch.backends.mps.is_available()
-                else torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                else "cuda"
+                if torch.cuda.is_available()
+                else "cpu"
             )
             logger.info(f"Using device: {device}")
 
             # Setup embedding model
             embed_model = HuggingFaceEmbedding(
-                model_name="sentence-transformers/all-MiniLM-L12-v2",
+                model_name=settings.EMBEDDING_MODEL_NAME,
+                query_instruction="Represent the question for retrieving supporting documents: ",
+                text_instruction="Represent the document for retrieval: ",
+                embed_batch_size=settings.EMBEDDING_BATCH_SIZE,
                 device=device,
-                parallel_process=False,
-                embed_batch_size=16,
             )
-            logger.info("HuggingFaceEmbedding initialized successfully.")
+
+            logger.info(
+                f"HuggingFaceEmbedding initialized with model '{settings.EMBEDDING_MODEL_NAME}'."
+            )
 
             # LLM settings
-            Settings.llm = None
+            LlamaSettings.llm = None
             logger.info("LLM settings configured.")
 
             # Custom schema for RedisVectorStore
@@ -98,7 +102,7 @@ class IndexManager(metaclass=SingletonMeta):
                             "type": "vector",
                             "name": "vector",
                             "attrs": {
-                                "dims": 384,
+                                "dims": settings.EMBEDDING_DIMENSION,
                                 "algorithm": "hnsw",
                                 "distance_metric": "cosine",
                             },

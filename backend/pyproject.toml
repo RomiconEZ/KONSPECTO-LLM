@@ -2,7 +2,7 @@
 name = "konspecto-backend"
 version = "0.1.0"
 description = "Backend for KONSPECTO project"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Roman Neronov <roman.nieronov@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -15,16 +15,15 @@ python-jose = { extras = ["cryptography"], version = "^3.3.0" }
 passlib = { extras = ["bcrypt"], version = "^1.7.4" }
 python-multipart = "^0.0.6"
 python-dotenv = "^1.0.0"
-llama-index = "0.11.22"
-llama-index-embeddings-huggingface = "0.3.1"
-llama-index-vector-stores-chroma = "0.3.0"
+llama-index = "0.12.5"
+llama-index-core = "0.12.5"
+llama-index-readers-google = "0.5.0"
 torch = "2.5.1"
 docx2txt = "0.8"
 chromadb = "^0.5.18"
-sentence-transformers = "^3.2.1"
-llama-index-storage-docstore-redis = "^0.2.0"
-llama-index-vector-stores-redis = "^0.3.4"
-llama-index-readers-google = "^0.4.2"
+sentence-transformers = "3.3.1"
+llama-index-storage-docstore-redis = "0.3.0"
+llama-index-vector-stores-redis = "0.4.0"
 pydantic-settings = "^2.6.1"
 faster-whisper = "^1.0.3"
 aiofiles = "^24.1.0"
@@ -38,6 +37,7 @@ fakeredis = "^2.26.1"
 langchain-openai = "^0.2.10"
 langchain = "^0.3.9"
 langchain-community = "^0.3.8"
+llama-index-embeddings-huggingface = "^0.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.3.1"

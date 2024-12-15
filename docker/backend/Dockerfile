@@ -1,9 +1,9 @@
-# docker/backend/Dockerfile
+# KONSPECTO/docker/backend/Dockerfile
 
 # Stage 1: Builder
 FROM python:3.11-slim-bookworm AS builder
 
-# Установка build-зависимостей и FFmpeg с необходимыми кодеками
+# Install build dependencies and FFmpeg with the necessary codecs
 RUN apt-get update && apt-get install -y --no-install-recommends \
    build-essential \
    gcc \
@@ -20,23 +20,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
    libmp3lame0 \
    && rm -rf /var/lib/apt/lists/*
 
-# Установка рабочего каталога
+# Set the working directory
 WORKDIR /app
 
-# Установка Poetry
+# Install Poetry
 RUN pip install poetry==1.7.1
 
-# Копирование файлов зависимостей
+# Copy dependency files
 COPY backend/pyproject.toml backend/poetry.lock ./
 
-# Установка зависимостей
+# Install dependencies
 RUN poetry config virtualenvs.create false \
    && poetry install --no-interaction --no-ansi --only main
 
 # Stage 2: Production
 FROM python:3.11-slim-bookworm
 
-# Установка runtime-зависимостей и FFmpeg с необходимыми кодеками
+# Install runtime dependencies and FFmpeg with necessary codecs
 RUN apt-get update && apt-get install -y --no-install-recommends \
    ffmpeg \
    libglib2.0-0 \
@@ -52,42 +52,48 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
    libsqlite3-dev \
    && rm -rf /var/lib/apt/lists/*
 
-# Установка рабочего каталога
+# Set the working directory
 WORKDIR /app
 
-# Копирование зависимостей из builder stage
+# Создание папки для кэша HuggingFace
+RUN mkdir -p /app/models/huggingface_cache
+
+# Создание необходимой директории для HuggingFace
+RUN mkdir -p /app/.cache/huggingface/hub
+
+# Copy dependencies from builder stage
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Копирование кода приложения
+# Copy application code
 COPY backend/ .
 
-# Копирование конфигурационных файлов
+# Copy configuration files
 COPY backend/app/config ./config
 
-# Установка переменной окружения для кэша Hugging Face
+# Set environment variables for cache location
 ENV HF_HOME=/app/.cache/huggingface
 
-# Создание каталога для кэша
-RUN mkdir -p /app/.cache/huggingface
+# Set environment variable для папки кэша HuggingFace
+ENV HUGGINGFACE_CACHE_FOLDER=/app/models/huggingface_cache
 
-# Создание непривилегированного пользователя
-RUN adduser --disabled-password --no-create-home appuser
+# Create unprivileged user (без --no-create-home, так что домашняя директория создается)
+RUN adduser --disabled-password appuser
 
-# Изменение прав собственности на рабочий каталог
-RUN chown -R appuser:appuser /app
+# Изменение владельца рабочей директории и домашней директории
+RUN chown -R appuser:appuser /app /home/appuser
 
-# Переключение на непривилегированного пользователя
+# Switch to unprivileged user
 USER appuser
 
-# Создание каталога для логов
+# Create logs directory
 RUN mkdir -p /app/logs
 
-# Открытие порта
+# Expose port
 EXPOSE 8000
 
-# Установка переменных окружения
+# Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Запуск приложения
+# Run application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

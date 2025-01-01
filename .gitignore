@@ -132,3 +132,5 @@ dmypy.json
 /backend/app/config/
 /frontend/package-lock.json
 /frontend/node_modules/
+
+.idea

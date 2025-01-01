@@ -22,6 +22,10 @@ KONSPECTO is an intelligent agent based on a local LLM model, offering the follo
 - Support for the Russian language
 - Ability to combine voice and text input
 
+## Presentation
+
+
+
 ## 🛠 Tech Stack
 
 ### Frontend

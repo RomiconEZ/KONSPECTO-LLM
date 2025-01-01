@@ -142,8 +142,8 @@ frontend/
 
 #### Testing
 
-- ****tests**/**: Test files for components
-- ****mocks**/**: Mock files for testing
+- \***\*tests**/\*\*: Test files for components
+- \***\*mocks**/\*\*: Mock files for testing
 
 #### Configuration
 

@@ -24,6 +24,8 @@ KONSPECTO is an intelligent agent based on a local LLM model, offering the follo
 
 ## Presentation
 
+[Presentation KONSPECTO](https://github.com/RomiconEZ/KONSPECTO-LLM/blob/develop/presentation/KONSPECTO_LLM_base.pdf)
+
 ## 🛠 Tech Stack
 
 ### Frontend

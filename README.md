@@ -1,5 +1,10 @@
 # 🎓 KONSPECTO - LLM Agent for Note Management
 
+## 👥 Authors
+
+- Neronov Roman
+- Fazlyev Albert
+
 ## 📋 Project Description
 
 KONSPECTO is an intelligent agent based on a local LLM model, offering the following capabilities:
@@ -22,7 +27,7 @@ KONSPECTO is an intelligent agent based on a local LLM model, offering the follo
 - Support for the Russian language
 - Ability to combine voice and text input
 
-## Presentation
+## 📽️ Presentation
 
 [Presentation KONSPECTO](https://github.com/RomiconEZ/KONSPECTO-LLM/blob/develop/presentation/KONSPECTO_LLM_base.pdf)
 

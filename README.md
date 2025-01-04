@@ -166,6 +166,14 @@ The application will be available at the following addresses:
    - Transcription using Whisper
    - Adding the text to the current query
 
+## ✅ Validation
+
+It is not possible to produce a deterministic assessment of the agent’s performance because its effectiveness depends on the unique data serving as its knowledge base. In our case, this knowledge base consists of user-generated notes, which are different for every individual. Consequently, any quality measurement will vary significantly from one user’s environment to another.
+
+In this project, we tested the agent on two specific documents: one explaining gradient descent and another explaining stochastic gradient descent. The system demonstrated consistent accuracy in retrieving relevant information from these documents during the queries shown in the demo video. However, because user notes can differ in style, depth, and content, the same agent might show varied results when applied to an entirely different set of documents.
+
+This inherent reliance on specialized, user-specific data makes it impossible to generalize the agent’s quality or establish a uniform benchmark. The system’s performance is inseparable from the nuances of the data it is provided with, preventing any deterministic evaluation of its capabilities.
+
 ## 📜 License
 
 Apache License

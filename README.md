@@ -58,6 +58,20 @@ KONSPECTO is an intelligent agent based on a local LLM model, offering the follo
 - Python 3.11+
 - Poetry
 - pre-commit
+- LM Studio - Download from [https://lmstudio.ai](https://lmstudio.ai/)
+
+### LM Studio Setup
+
+1. Download and install LM Studio from the official website
+2. In LM Studio:
+   - Go to "Search" tab
+   - Find and download `IlyaGusev/saiga_nemo_12b_gguf/saiga_nemo_12b.Q8_0.gguf` model
+   - Go to "Local Server" tab
+   - Select the downloaded model from the dropdown menu
+   - Start the server (it will run on http://localhost:1234/v1)
+   - Keep the server running while using KONSPECTO
+
+> ⚠️ Note: Make sure the LM Studio server is running before starting the application, as KONSPECTO relies on it for text generation.
 
 ### 1️⃣ Clone the Repository
 

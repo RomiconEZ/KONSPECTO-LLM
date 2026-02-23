@@ -31,7 +31,7 @@ COPY backend/pyproject.toml backend/poetry.lock ./
 
 # Install dependencies
 RUN poetry config virtualenvs.create false \
-   && poetry install --no-interaction --no-ansi --only main
+   && poetry install --no-interaction --no-ansi --only main --no-root
 
 # Stage 2: Production
 FROM python:3.11-slim-bookworm

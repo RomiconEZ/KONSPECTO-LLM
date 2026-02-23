@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "KONSPECTO"
-version = "0.0.1"
+name = "KONSPECTO-LLM"
+version = "1.0.0"
 description = "LLM agent that provides tools for convenient work with personal documents using voice or text."
 authors = ["Roman Neronov"]
 maintainers = ["Roman Neronov"]
 readme = "README.md"
-repository = "https://github.com/RomiconEZ/KONSPECTO"
+repository = "https://github.com/RomiconEZ/KONSPECTO-LLM"
 keywords = ["agent", "documents", "voice", "text"]
 license = "Apache-2.0"
 
@@ -13,13 +13,13 @@ license = "Apache-2.0"
 python = "~3.11"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.6.0"
+pre-commit = "4.5.1"
 pytest = "^7.4.4"
-black = "23.12.1"
-isort = "5.13.2"
-flake8 = "7.1.0"
-mypy = "1.8.0"
-pylint = "3.0.3"
+black = "26.1.0"
+isort = "8.0.0"
+flake8 = "7.3.0"
+mypy = "1.19.1"
+pylint = "4.0.5"
 
 [tool.black]
 line-length = 90
@@ -50,7 +50,7 @@ known_third_party = ["fastapi", "pydantic", "sqlalchemy"]
 max-line-length = 90
 extend-ignore = ["E203", "E501", "W503", "B950"]
 max-complexity = 12
-select = ["B","C","E","F","W","B9"]
+select = ["B", "C", "E", "F", "W", "B9"]
 per-file-ignores = [
     "__init__.py:F401",
     "tests/*:S101"

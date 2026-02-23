@@ -24,7 +24,6 @@ services:
       - ./backend/logs:/app/logs
       - ./backend/app/config:/app/config
       - huggingface_cache:/app/.cache/huggingface
-      # - ./backend/generated_docs:/app/generated_docs  # Remove this line
     environment:
       - PYTHON_ENV=production
       - PYTHONPATH=/app
@@ -32,7 +31,7 @@ services:
       - HF_HOME=/app/.cache/huggingface
       - LLM_STUDIO_BASE_URL=http://host.docker.internal:1234/v1
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -42,14 +41,14 @@ services:
     restart: unless-stopped
 
   redis-stack:
-    image: redis/redis-stack:latest
+    image: redis/redis-stack:6.2.6-v19
     ports:
       - "6379:6379"
       - "8001:8001"
     volumes:
       - redis_stack_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5

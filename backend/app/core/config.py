@@ -1,7 +1,6 @@
 # KONSPECTO/backend/app/core/config.py
 
 import logging
-
 from functools import lru_cache
 from pathlib import Path
 from typing import List
@@ -16,7 +15,7 @@ logger.setLevel(logging.DEBUG)  # Set the desired logging level
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "KONSPECTO API"
-    PROJECT_VERSION: str = "0.1.0"
+    PROJECT_VERSION: str = "1.0.0"
 
     # CORS Configuration
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:3000"]

@@ -15,7 +15,7 @@ logger.setLevel(logging.DEBUG)  # Set the desired logging level
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "KONSPECTO API"
-    PROJECT_VERSION: str = "1.0.0"
+    PROJECT_VERSION: str = "1.1.0"
 
     # CORS Configuration
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:3000"]

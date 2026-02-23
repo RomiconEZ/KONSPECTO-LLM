@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "KONSPECTO-LLM"
-version = "1.0.0"
+version = "1.1.0"
 description = "LLM agent that provides tools for convenient work with personal documents using voice or text."
 authors = ["Roman Neronov"]
 maintainers = ["Roman Neronov"]

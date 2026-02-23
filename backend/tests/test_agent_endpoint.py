@@ -3,7 +3,6 @@
 from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
-
 from httpx import AsyncClient
 
 from app.main import app
@@ -31,9 +30,9 @@ def mock_agent_executor():
 
 @pytest.mark.asyncio
 async def test_agent_explain_terminology(mock_agent_executor, async_client):
-    mock_agent_executor.return_value = (
-        "Определение - Свёрточная нейронная сеть (CNN) — это вид глубокой нейронной сети."
-    )
+    mock_agent_executor.return_value = {
+        "output": "Определение - Свёрточная нейронная сеть (CNN) — это вид глубокой нейронной сети."
+    }
 
     query = {"query": "Объясни, что такое свёрточная нейронная сеть"}
     response = await async_client.post("/api/v1/agent/", json=query)
@@ -46,7 +45,9 @@ async def test_agent_explain_terminology(mock_agent_executor, async_client):
 
 @pytest.mark.asyncio
 async def test_agent_generate_document_with_images(mock_agent_executor, async_client):
-    mock_agent_executor.return_value = "Ваш документ был успешно сгенерирован. Вы можете скачать его, используя ключ docx:12345-abcde"
+    mock_agent_executor.return_value = {
+        "output": "Ваш документ был успешно сгенерирован. Вы можете скачать его, используя ключ docx:12345-abcde"
+    }
 
     query = {
         "query": "Сгенерируй документ с изображениями из видео: https://www.youtube.com/watch?v=example"
@@ -61,7 +62,9 @@ async def test_agent_generate_document_with_images(mock_agent_executor, async_cl
 
 @pytest.mark.asyncio
 async def test_agent_unknown_request(mock_agent_executor, async_client):
-    mock_agent_executor.return_value = "Извините, я не могу помочь с этим запросом."
+    mock_agent_executor.return_value = {
+        "output": "Извините, я не могу помочь с этим запросом."
+    }
 
     query = {"query": "Неизвестный запрос без инструментов"}
     response = await async_client.post("/api/v1/agent/", json=query)

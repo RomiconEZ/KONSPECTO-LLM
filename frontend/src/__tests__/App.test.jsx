@@ -1,6 +1,6 @@
 // frontend/src/__tests__/App.test.jsx
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 import { getConfig } from '../config';
@@ -39,7 +39,7 @@ describe('App Component', () => {
     ).toBeInTheDocument();
   });
 
-  it('adds a new chat', () => {
+  it('adds a new chat', async () => {
     render(
       <MemoryRouter>
         <App />
@@ -49,10 +49,15 @@ describe('App Component', () => {
     const addChatButton = screen.getByText(/Добавить чат/i);
     fireEvent.click(addChatButton);
 
-    expect(localStorage.getItem('chats')).toBeTruthy();
-    const savedChats = JSON.parse(localStorage.getItem('chats'));
-    expect(savedChats).toHaveLength(1);
-    expect(savedChats[0].name).toMatch(/Чат 1/);
+    await waitFor(() => {
+      expect(localStorage.setItem).toHaveBeenCalled();
+      const calls = localStorage.setItem.mock.calls;
+      const lastCall = calls[calls.length - 1];
+      expect(lastCall[0]).toBe('chats');
+      const savedChats = JSON.parse(lastCall[1]);
+      expect(savedChats).toHaveLength(1);
+      expect(savedChats[0].name).toMatch(/Чат 1/);
+    });
   });
 
   it('toggles sidebar visibility', () => {

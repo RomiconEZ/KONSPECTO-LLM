@@ -5,9 +5,7 @@ import os
 import tempfile
 
 import aiofiles
-
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
-from fastapi.responses import JSONResponse
 
 from ....models.transcription import TranscriptionResponse
 from ....services.transcription.base import AbstractTranscriptionModel
@@ -38,37 +36,32 @@ class TranscriptionService:
         :return: Путь к сохраненному файлу.
         :raises HTTPException: Если файл невалиден или не может быть сохранен.
         """
-        # Проверка типа контента
         if not file.content_type.startswith("audio/"):
-            logger.warning(f"Неверный тип контента: {file.content_type}")
+            logger.warning(f"Invalid content type: {file.content_type}")
             raise HTTPException(
                 status_code=400, detail="Недопустимый тип файла. Требуется аудио файл."
             )
 
-        # Проверка расширения файла
         _, file_ext = os.path.splitext(file.filename)
         if file_ext.lower() not in [".mp3", ".wav"]:
-            logger.warning(f"Неподдерживаемое расширение файла: {file_ext}")
+            logger.warning(f"Unsupported file extension: {file_ext}")
             raise HTTPException(
                 status_code=400,
                 detail="Неподдерживаемый формат файла. Используйте MP3 или WAV.",
             )
 
-        # Сохранение файла во временное хранилище
         with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp:
             self.temp_file = tmp.name
             async with aiofiles.open(self.temp_file, "wb") as out_file:
-                content = await file.read()  # Асинхронное чтение
+                content = await file.read()
                 await out_file.write(content)
 
-        # Проверка, что файл не пустой
         if os.path.getsize(self.temp_file) == 0:
-            logger.error("Загруженный файл пустой.")
+            logger.error("Uploaded file is empty.")
             raise HTTPException(status_code=400, detail="Загруженный файл пустой.")
 
-        # Логирование размера файла
         file_size = os.path.getsize(self.temp_file)
-        logger.debug(f"Размер загруженного файла: {file_size} байт")
+        logger.debug(f"Uploaded file size: {file_size} bytes")
 
         return self.temp_file
 
@@ -88,7 +81,7 @@ class TranscriptionService:
         """
         if self.temp_file and os.path.exists(self.temp_file):
             os.remove(self.temp_file)
-            logger.debug(f"Удален временный файл: {self.temp_file}")
+            logger.debug(f"Removed temporary file: {self.temp_file}")
 
 
 def get_transcription_model(request: Request) -> AbstractTranscriptionModel:
@@ -118,10 +111,10 @@ async def transcribe_audio(
         file_path = await service.validate_and_save_file(file)
         transcription = await service.transcribe_audio(file_path)
         return TranscriptionResponse(transcription=transcription)
-    except HTTPException as he:
-        raise he  # Передача HTTPException без изменений
+    except HTTPException:
+        raise
     except Exception:
-        logger.exception("Не удалось выполнить транскрипцию аудио.")
+        logger.exception("Failed to transcribe audio.")
         raise HTTPException(
             status_code=500, detail="Не удалось выполнить транскрипцию аудио."
         )

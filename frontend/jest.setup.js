@@ -18,12 +18,22 @@ beforeAll(() => {
 });
 
 // Мокаем localStorage
-const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  clear: jest.fn(),
-};
-global.localStorage = localStorageMock;
+const localStorageMock = (() => {
+  let store = {};
+  return {
+    getItem: jest.fn((key) => (key in store ? store[key] : null)),
+    setItem: jest.fn((key, value) => {
+      store[key] = String(value);
+    }),
+    removeItem: jest.fn((key) => {
+      delete store[key];
+    }),
+    clear: jest.fn(() => {
+      store = {};
+    }),
+  };
+})();
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Мокаем MediaDevices
 global.navigator.mediaDevices = {

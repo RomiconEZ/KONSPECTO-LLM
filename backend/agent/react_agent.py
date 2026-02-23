@@ -1,6 +1,4 @@
 import logging
-import re
-
 from typing import List
 
 from langchain.agents import AgentType, initialize_agent
@@ -161,12 +159,11 @@ Question: {input}
                 )
                 logger.debug(f"Search tool retrieved results: {formatted_results}")
                 return formatted_results
-            else:
-                logger.debug(f"No information found on {query} in the knowledge base.")
-                return f"No information found on {query} in the knowledge base."
+            logger.debug(f"No information found on '{query}' in the knowledge base.")
+            return f"No information found on {query} in the knowledge base."
         except Exception as e:
-            logger.exception("Error in RAGSearch tool.")
-            return f"Error in RAGSearch: {str(e)}"
+            logger.exception(f"Error in RAGSearch tool for query '{query}'.")
+            return f"Error in RAGSearch: {e}"
 
     async def _youtube_to_docx_tool_func(self, url: str) -> str:
         """Asynchronous function to generate a DOCX document from a YouTube video."""
@@ -179,40 +176,17 @@ Question: {input}
             logger.debug(f"YouTubeToDocx tool generated docx_key: {docx_key}")
             return docx_key
         except Exception as e:
-            logger.exception("Error in YouTubeToDocx tool.")
-            return f"Error in YouTubeToDocx: {str(e)}"
+            logger.exception(f"Error in YouTubeToDocx tool for URL '{url}'.")
+            return f"Error in YouTubeToDocx: {e}"
 
     async def ainvoke(self, input_question: str) -> str:
         """Asynchronous agent invocation."""
         logger.debug(f"Agent ainvoke called with input: {input_question}")
         try:
             response = await self.agent.ainvoke(input_question)
-            logger.debug(f"Agent ainvoke completed with response: {response}")
-            # Process agent's response
-            if isinstance(response, dict):
-                # Assume the final answer is in the 'output' key
-                final_answer = response.get("output", "No final answer provided.")
-                logger.debug(f"Extracted Final Answer from dict response: {final_answer}")
-                return final_answer
-            elif isinstance(response, str):
-                # Attempt to extract 'Final Answer' from string
-                match = re.search(r"Final Answer:\s*(.*)", response, re.IGNORECASE)
-                if match:
-                    final_answer = match.group(1).strip()
-                    logger.debug(
-                        f"Extracted Final Answer from string response: {final_answer}"
-                    )
-                    return final_answer
-                else:
-                    logger.debug(
-                        "Final Answer not found in string response. Returning full response."
-                    )
-                    return response
-            else:
-                logger.debug(
-                    f"Unexpected response type: {type(response)}. Returning string representation."
-                )
-                return str(response)
-        except Exception as e:
-            logger.exception("Agent ainvoke failed.")
-            raise e
+            final_answer = response.get("output", "")
+            logger.debug(f"Agent ainvoke completed with answer: {final_answer}")
+            return final_answer
+        except Exception:
+            logger.exception(f"Agent ainvoke failed for input: {input_question}")
+            raise

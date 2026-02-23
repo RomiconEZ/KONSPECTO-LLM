@@ -1,14 +1,13 @@
 # backend/app/api/v1/endpoints/search.py
 
 import logging
-
 from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, HTTPException
 
 from ....models.search import SearchItem, SearchRequest, SearchResult
-from ....services.index_service import get_query_engine  # Updated import
+from ....services.index_service import get_query_engine
 
 router = APIRouter()
 logger = logging.getLogger("app.api.v1.endpoints.search")
@@ -28,16 +27,12 @@ class SearchService:
         :return: Список объектов SearchItem с результатами поиска.
         """
         logger.debug(f"Processing search query: {query}")
-        query_engine = get_query_engine()  # Use the function to get the query engine
+        query_engine = get_query_engine()
         response = query_engine.query(query)
-        logger.info("Received response from query engine.")
-
-        # Log the full structure of the response for debugging
-        logger.debug(f"Response structure: {response}")
+        logger.info(f"Received response from query engine for query: {query}")
 
         search_items = []
         for node_with_score in response.source_nodes:
-            # Check if 'score' and 'node' attributes exist
             if hasattr(node_with_score, "score") and hasattr(node_with_score, "node"):
                 score = node_with_score.score
                 node = node_with_score.node
@@ -47,16 +42,11 @@ class SearchService:
                 )
                 continue
 
-            if not node:
-                logger.warning("Received node_with_score with no node.")
-                continue
-
             metadata = node.metadata
             modified_at_str = metadata.get("modified_at") or metadata.get("modified at")
             file_name = metadata.get("file_name") or metadata.get("file name", "")
             file_id = metadata.get("file_id") or metadata.get("file id", "")
 
-            # Ensure mandatory metadata fields are present
             if not all([modified_at_str, file_name, file_id]):
                 logger.warning(f"Incomplete metadata for node ID: {node.id_}")
                 continue
@@ -95,9 +85,5 @@ async def search_documents(request: SearchRequest):
     :param request: Объект запроса SearchRequest с полем query.
     :return: Объект ответа SearchResult с результатами поиска.
     """
-    try:
-        search_items = SearchService.process_search(request.query)
-        return SearchResult(results=search_items)
-    except Exception:
-        logger.exception("Search operation failed.")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+    search_items = SearchService.process_search(request.query)
+    return SearchResult(results=search_items)

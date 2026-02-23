@@ -1,6 +1,6 @@
 // frontend/src/App.jsx
 import React, { useState, useCallback } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { ResizableBox } from 'react-resizable';
 import Chat from './pages/Chat';
 import GoogleDocViewer from './components/GoogleDocViewer';
@@ -12,7 +12,6 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [docFileId, setDocFileId] = useState('');
   const [docViewerWidth, setDocViewerWidth] = useState(400);
-  const navigate = useNavigate();
 
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen((prev) => !prev);

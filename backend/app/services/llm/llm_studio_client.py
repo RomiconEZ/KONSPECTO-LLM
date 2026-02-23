@@ -1,10 +1,10 @@
 # KONSPECTO/backend/app/services/llm/llm_studio_client.py
 
-from typing import ClassVar
+from typing import ClassVar, Optional
 
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 
-from app.core.config import get_settings  # Импортируем функцию для получения настроек
+from app.core.config import get_settings
 
 
 class LLMStudioClient(ChatOpenAI):
@@ -25,9 +25,9 @@ class LLMStudioClient(ChatOpenAI):
     def __init__(
         self,
         temperature: float = 0.1,
-        max_tokens: int = None,
+        max_tokens: Optional[int] = None,
         model: str = "local",
-        timeout: float = None,
+        timeout: Optional[float] = None,
         max_retries: int = 1,
         **kwargs,
     ):

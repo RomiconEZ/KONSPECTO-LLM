@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 
 class SearchRequest(BaseModel):
-    query: str = Field(..., example="Find relevant documents about AI")
+    query: str = Field(..., examples=["Find relevant documents about AI"])
 
 
 class SearchItem(BaseModel):

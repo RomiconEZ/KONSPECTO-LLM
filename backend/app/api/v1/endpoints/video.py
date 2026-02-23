@@ -2,12 +2,12 @@
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, HttpUrl
 
 from agent.tools.video_processor import youtube_to_docx
 
-from ....exceptions import (  # Добавляем импорт
+from ....exceptions import (
     InvalidYouTubeURLException,
     VideoProcessingError,
 )
@@ -53,7 +53,7 @@ class VideoService:
         """
         logger.info(f"Starting conversion for video: {youtube_url}")
         docx_key = await youtube_to_docx(youtube_url, self.redis_service)
-        logger.info(f"DOCX документ сохранён в Redis с ключом: {docx_key}")
+        logger.info(f"DOCX document saved in Redis with key: {docx_key}")
         return docx_key
 
     async def get_docx_file(self, docx_key: str) -> bytes:
@@ -66,18 +66,19 @@ class VideoService:
         logger.info(f"Fetching DOCX document with key: {docx_key}")
         file_data = await self.redis_service.get_file(docx_key)
         if not file_data:
-            logger.warning(f"DOCX документ с ключом '{docx_key}' не найден.")
+            logger.warning(f"DOCX document with key '{docx_key}' not found")
             raise HTTPException(status_code=404, detail="Документ не найден.")
         return file_data
 
 
-def get_redis_service():
+def get_redis_service(request: Request) -> RedisService:
     """
-    Зависимость для получения экземпляра RedisService.
+    Dependency to retrieve the shared RedisService instance from app state.
 
-    :return: Экземпляр RedisService.
+    :param request: The incoming Starlette Request.
+    :return: The shared RedisService instance.
     """
-    return RedisService()
+    return request.app.state.redis_service
 
 
 @router.post("/youtube_to_docx", response_model=VideoResponse)
@@ -99,15 +100,10 @@ async def convert_youtube_to_docx(
         return VideoResponse(docx_key=docx_key)
     except InvalidYouTubeURLException as e:
         logger.error(f"Invalid input: {e.detail}")
-        raise e
+        raise
     except VideoProcessingError as e:
-        logger.exception("Ошибка при конвертации видео.")
-        raise e
-    except Exception:
-        logger.exception("Неизвестная ошибка при конвертации видео.")
-        raise HTTPException(
-            status_code=500, detail="Неизвестная ошибка при обработке видео."
-        )
+        logger.exception(f"Video conversion error: {e.detail}")
+        raise
 
 
 @router.get("/video/{docx_key}")
@@ -122,22 +118,15 @@ async def get_docx_file(
     :return: Ответ с содержимым DOCX файла для скачивания.
     """
     service = VideoService(redis_service)
-    try:
-        file_data = await service.get_docx_file(docx_key)
+    file_data = await service.get_docx_file(docx_key)
 
-        # Установка заголовков для скачивания файла
-        headers = {
-            "Content-Disposition": f'attachment; filename="{docx_key}.docx"',
-            "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        }
+    headers = {
+        "Content-Disposition": f'attachment; filename="{docx_key}.docx"',
+        "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    }
 
-        return Response(
-            content=file_data,
-            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            headers=headers,
-        )
-    except HTTPException as he:
-        raise he
-    except Exception:
-        logger.exception("Ошибка при получении DOCX документа.")
-        raise HTTPException(status_code=500, detail="Не удалось получить документ.")
+    return Response(
+        content=file_data,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers=headers,
+    )

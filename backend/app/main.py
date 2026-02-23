@@ -2,16 +2,14 @@
 
 import logging
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.v1.api import api_router
-from .core.config import get_settings  # Updated import
+from .core.config import get_settings
 from .core.logging_config import setup_logging
-from .services.index_service import get_query_engine  # Added import
+from .services.index_service import get_query_engine
 from .services.redis_service import RedisService
-
-# New imports for transcription models
 from .services.transcription.whisper_model import WhisperTranscriptionModel
 
 
@@ -46,12 +44,9 @@ class KonspectoAPIApp:
         )
 
     def _setup_services(self):
-        """Initialize services such as Redis."""
+        """Initialize services such as Redis and store them in app state."""
         self.redis_service = RedisService()
-
-    def _get_redis_service(self):
-        """Dependency to get an instance of RedisService."""
-        return self.redis_service
+        self.app.state.redis_service = self.redis_service
 
     def _setup_event_handlers(self):
         """Set up event handlers for startup and shutdown."""
@@ -67,32 +62,25 @@ class KonspectoAPIApp:
         settings = get_settings()
 
         # Initialize the selected transcription model based on the settings
-        try:
-            transcription_model_name = settings.TRANSCRIPTION_MODEL.lower()
-            if transcription_model_name == "whisper":
-                transcription_model = WhisperTranscriptionModel(
-                    model_size=settings.WHISPER_MODEL_SIZE
-                )
-                transcription_model.load_model()
-                self.app.state.transcription_model = transcription_model
-                self.logger.info(
-                    f"Transcription model '{transcription_model_name}' loaded successfully."
-                )
-            else:
-                self.logger.error(
-                    f"Unknown transcription model: {transcription_model_name}"
-                )
-                raise ValueError(
-                    f"Unknown transcription model: {transcription_model_name}"
-                )
-        except Exception as e:
-            self.logger.exception("Failed to initialize transcription model.")
-            raise
+        transcription_model_name = settings.TRANSCRIPTION_MODEL.lower()
+        if transcription_model_name == "whisper":
+            transcription_model = WhisperTranscriptionModel(
+                model_size=settings.WHISPER_MODEL_SIZE
+            )
+            transcription_model.load_model()
+            self.app.state.transcription_model = transcription_model
+            self.logger.info(
+                f"Transcription model '{transcription_model_name}' loaded successfully."
+            )
+        else:
+            self.logger.error(
+                f"Unknown transcription model: {transcription_model_name}"
+            )
+            raise ValueError(f"Unknown transcription model: {transcription_model_name}")
 
         # Initialize query engine at startup
         self.logger.info("Initializing query engine...")
         query_engine = get_query_engine()
-        # If needed, you can store it in app.state for use elsewhere
         self.app.state.query_engine = query_engine
         self.logger.info("Query engine initialized successfully.")
 
@@ -112,17 +100,16 @@ class KonspectoAPIApp:
         self.app.include_router(
             api_router,
             prefix="/api",
-            dependencies=[],  # Dependencies are set in individual endpoints
+            dependencies=[],
         )
 
     async def _root_endpoint(self):
         """Root endpoint of the application."""
-        return {"message": "Welcome to the KONSPECTO API"}
+        return {"message": "Добро пожаловать в KONSPECTO API"}
 
     async def _health_check_endpoint(self) -> dict:
         """Endpoint for checking the application's health."""
         try:
-            # Ping Redis to check the connection
             redis_ping = await self.redis_service.redis_client.ping()
             redis_ok = redis_ping is True
             status = "healthy" if redis_ok else "unhealthy"

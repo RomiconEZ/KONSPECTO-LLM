@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Chat from '../pages/Chat';
+import { ChatContext } from '../context/ChatContext';
 import { getConfig } from '../config';
 
 // Мокаем react-router-dom с useParams
@@ -29,7 +30,7 @@ describe('Chat Component', () => {
 
   const mockChats = [
     {
-      id: 1,
+      id: '1',
       name: 'Чат 1',
       messages: [
         {
@@ -48,12 +49,18 @@ describe('Chat Component', () => {
     },
   ];
 
-  it('renders messages correctly', () => {
-    render(
+  const renderChat = (chats = mockChats, setChats = jest.fn(), onOpenDoc = jest.fn()) => {
+    return render(
       <MemoryRouter>
-        <Chat chats={mockChats} setChats={jest.fn()} onOpenDoc={jest.fn()} />
+        <ChatContext.Provider value={{ chats, setChats }}>
+          <Chat onOpenDoc={onOpenDoc} />
+        </ChatContext.Provider>
       </MemoryRouter>
     );
+  };
+
+  it('renders messages correctly', () => {
+    renderChat();
 
     expect(screen.getByText('Hello')).toBeInTheDocument();
     expect(screen.getByText('Hi there!')).toBeInTheDocument();
@@ -72,11 +79,7 @@ describe('Chat Component', () => {
       })
     );
 
-    render(
-      <MemoryRouter>
-        <Chat chats={mockChats} setChats={mockSetChats} onOpenDoc={jest.fn()} />
-      </MemoryRouter>
-    );
+    renderChat(mockChats, mockSetChats);
 
     const textarea = screen.getByPlaceholderText(/Введите ваш запрос/i);
     fireEvent.change(textarea, { target: { value: 'Test query' } });
@@ -101,11 +104,7 @@ describe('Chat Component', () => {
       })
     );
 
-    render(
-      <MemoryRouter>
-        <Chat chats={mockChats} setChats={jest.fn()} onOpenDoc={jest.fn()} />
-      </MemoryRouter>
-    );
+    renderChat();
 
     const textarea = screen.getByPlaceholderText(/Введите ваш запрос/i);
     fireEvent.change(textarea, { target: { value: 'Test query' } });
@@ -121,11 +120,7 @@ describe('Chat Component', () => {
   it('opens document viewer when button is clicked', () => {
     const mockOnOpenDoc = jest.fn();
 
-    render(
-      <MemoryRouter>
-        <Chat chats={mockChats} setChats={jest.fn()} onOpenDoc={mockOnOpenDoc} />
-      </MemoryRouter>
-    );
+    renderChat(mockChats, jest.fn(), mockOnOpenDoc);
 
     const viewDocButton = screen.getByText(/Просмотреть документ/i);
     fireEvent.click(viewDocButton);

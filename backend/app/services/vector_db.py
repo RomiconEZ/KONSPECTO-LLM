@@ -2,13 +2,13 @@
 
 import json
 import logging
-
 from pathlib import Path
+from threading import Lock
 from urllib.parse import urlparse
 
 import torch
-
-from llama_index.core import Settings as LlamaSettings, VectorStoreIndex
+from llama_index.core import Settings as LlamaSettings
+from llama_index.core import VectorStoreIndex
 from llama_index.core.ingestion import (
     DocstoreStrategy,
     IngestionCache,
@@ -33,14 +33,14 @@ class SingletonMeta(type):
     """
 
     _instances = {}
+    _lock = Lock()
 
     def __call__(cls, *args, **kwargs):
-        from threading import Lock
-
-        lock = Lock()
-        with lock:
+        with cls._lock:
             if cls not in cls._instances:
-                cls._instances[cls] = super(SingletonMeta, cls).__call__(*args, **kwargs)
+                cls._instances[cls] = super(SingletonMeta, cls).__call__(
+                    *args, **kwargs
+                )
         return cls._instances[cls]
 
 
@@ -57,7 +57,7 @@ class IndexManager(metaclass=SingletonMeta):
         Initialize VectorStoreIndex, vector store, and ingestion pipeline.
         """
         try:
-            settings = get_settings()  # Get configuration settings
+            settings = get_settings()
             logger.info("Initializing VectorStoreIndex...")
 
             # Parse Redis URL
@@ -85,12 +85,12 @@ class IndexManager(metaclass=SingletonMeta):
             )
 
             logger.info(
-                f"HuggingFaceEmbedding initialized with model '{settings.EMBEDDING_MODEL_NAME}'."
+                f"HuggingFaceEmbedding initialized with model '{settings.EMBEDDING_MODEL_NAME}'"
             )
 
             # LLM settings
             LlamaSettings.llm = None
-            logger.info("LLM settings configured.")
+            logger.info("LLM settings configured")
 
             # Custom schema for RedisVectorStore
             custom_schema = IndexSchema.from_dict(
@@ -118,7 +118,7 @@ class IndexManager(metaclass=SingletonMeta):
                 schema=custom_schema,
                 redis_url=settings.REDIS_URL,
             )
-            logger.info("RedisVectorStore initialized.")
+            logger.info("RedisVectorStore initialized")
 
             # Setup ingestion cache
             cache = IngestionCache(
@@ -141,13 +141,13 @@ class IndexManager(metaclass=SingletonMeta):
                 cache=cache,
                 docstore_strategy=DocstoreStrategy.UPSERTS,
             )
-            logger.info("Ingestion pipeline configured.")
+            logger.info("Ingestion pipeline configured")
 
             # Initialize VectorStoreIndex
             self.index = VectorStoreIndex.from_vector_store(
                 pipeline.vector_store, embed_model=embed_model
             )
-            logger.info("VectorStoreIndex created from vector store.")
+            logger.info("VectorStoreIndex created from vector store")
 
             # Load documents from Google Drive
             service_account_path = Path(settings.GOOGLE_SERVICE_ACCOUNT_KEY_PATH)
@@ -165,26 +165,26 @@ class IndexManager(metaclass=SingletonMeta):
             loader = GoogleDriveReader(
                 service_account_key=google_creds_dict, folder_id=settings.FOLDER_ID
             )
-            logger.info("GoogleDriveReader initialized.")
+            logger.info("GoogleDriveReader initialized")
 
             docs = loader.load_data()
             if not docs:
-                logger.warning("No documents were loaded from Google Drive.")
+                logger.warning("No documents were loaded from Google Drive")
             else:
-                logger.info(f"Loaded {len(docs)} documents from Google Drive.")
+                logger.info(f"Loaded {len(docs)} documents from Google Drive")
 
             # Run ingestion pipeline
             nodes = pipeline.run(documents=docs)
-            logger.info(f"Ingested {len(nodes)} nodes into VectorStoreIndex.")
+            logger.info(f"Ingested {len(nodes)} nodes into VectorStoreIndex")
 
             # Check if index exists
             if vector_store.index_exists():
-                logger.info("Index 'gdrive' exists after ingestion.")
+                logger.info("Index 'gdrive' exists after ingestion")
             else:
-                logger.error("Index 'gdrive' does not exist after ingestion.")
+                logger.error("Index 'gdrive' does not exist after ingestion")
 
-        except Exception as e:
-            logger.exception("Failed to set up the ingestion pipeline.")
+        except Exception:
+            logger.exception("Failed to set up the ingestion pipeline")
             raise
 
     def get_index(self) -> VectorStoreIndex:
@@ -195,7 +195,7 @@ class IndexManager(metaclass=SingletonMeta):
             logger.info("Index not initialized. Initializing now...")
             self.initialize_index()
         else:
-            logger.info("Index already initialized. Returning existing index.")
+            logger.info("Index already initialized. Returning existing index")
         return self.index
 
 

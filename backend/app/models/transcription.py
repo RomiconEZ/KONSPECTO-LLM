@@ -8,4 +8,6 @@ class TranscriptionResponse(BaseModel):
     Модель ответа транскрипции.
     """
 
-    transcription: str = Field(..., example="Это пример транскрибированного текста.")
+    transcription: str = Field(
+        ..., examples=["Это пример транскрибированного текста."]
+    )

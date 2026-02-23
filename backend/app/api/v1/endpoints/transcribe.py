@@ -1,5 +1,3 @@
-# KONSPECTO/backend/app/api/v1/endpoints/transcribe.py
-
 import logging
 import os
 import tempfile
@@ -96,8 +94,8 @@ def get_transcription_model(request: Request) -> AbstractTranscriptionModel:
 
 @router.post("/", response_model=TranscriptionResponse)
 async def transcribe_audio(
-    file: UploadFile = File(...),
-    transcription_model: AbstractTranscriptionModel = Depends(get_transcription_model),
+        file: UploadFile = File(...),
+        transcription_model: AbstractTranscriptionModel = Depends(get_transcription_model),
 ):
     """
     Эндпойнт для транскрипции загруженного аудио файла.

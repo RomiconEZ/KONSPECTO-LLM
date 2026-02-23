@@ -1,5 +1,3 @@
-# KONSPECTO/backend/agent/tools/search.py
-
 import logging
 from typing import List
 

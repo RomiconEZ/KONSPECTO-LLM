@@ -1,5 +1,3 @@
-# KONSPECTO/backend/app/main.py
-
 import logging
 
 from fastapi import FastAPI
@@ -73,9 +71,7 @@ class KonspectoAPIApp:
                 f"Transcription model '{transcription_model_name}' loaded successfully."
             )
         else:
-            self.logger.error(
-                f"Unknown transcription model: {transcription_model_name}"
-            )
+            self.logger.error(f"Unknown transcription model: {transcription_model_name}")
             raise ValueError(f"Unknown transcription model: {transcription_model_name}")
 
         # Initialize query engine at startup

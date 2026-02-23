@@ -1,4 +1,3 @@
-# KONSPECTO/backend/app/services/redis_service.py
 import logging
 from typing import Optional
 
@@ -19,9 +18,7 @@ class RedisService:
         await self.redis_client.ping()
         logger.info("Connected to Redis successfully.")
 
-    async def set_key(
-        self, key: str, value: bytes, expire: Optional[int] = None
-    ) -> bool:
+    async def set_key(self, key: str, value: bytes, expire: Optional[int] = None) -> bool:
         """Set a key-value pair in Redis."""
         result = await self.redis_client.set(key, value, ex=expire)
         logger.debug(f"Set key '{key}' in Redis, result: {result}")
@@ -45,9 +42,7 @@ class RedisService:
         logger.debug(f"Exists key '{key}' in Redis: {result}")
         return result
 
-    async def set_file(
-        self, key: str, data: bytes, expire: Optional[int] = None
-    ) -> bool:
+    async def set_file(self, key: str, data: bytes, expire: Optional[int] = None) -> bool:
         """Save a file to Redis."""
         return await self.set_key(key, data, expire)
 

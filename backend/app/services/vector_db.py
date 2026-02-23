@@ -1,5 +1,3 @@
-# KONSPECTO/backend/app/services/vector_db.py
-
 import json
 import logging
 from pathlib import Path
@@ -7,8 +5,7 @@ from threading import Lock
 from urllib.parse import urlparse
 
 import torch
-from llama_index.core import Settings as LlamaSettings
-from llama_index.core import VectorStoreIndex
+from llama_index.core import Settings as LlamaSettings, VectorStoreIndex
 from llama_index.core.ingestion import (
     DocstoreStrategy,
     IngestionCache,
@@ -38,9 +35,7 @@ class SingletonMeta(type):
     def __call__(cls, *args, **kwargs):
         with cls._lock:
             if cls not in cls._instances:
-                cls._instances[cls] = super(SingletonMeta, cls).__call__(
-                    *args, **kwargs
-                )
+                cls._instances[cls] = super(SingletonMeta, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
 

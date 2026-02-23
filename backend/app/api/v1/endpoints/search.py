@@ -1,5 +1,3 @@
-# backend/app/api/v1/endpoints/search.py
-
 import logging
 from datetime import datetime
 from typing import List

@@ -1,16 +1,13 @@
-# tests/test_video_processor.py
-
 from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
-from fastapi import HTTPException
-
 from agent.tools.video_processor import (
     InvalidYouTubeURLException,
     SSIMImageDifferenceChecker,
     VideoProcessingError,
     youtube_to_docx,
 )
+from fastapi import HTTPException
 
 
 @pytest.mark.asyncio
@@ -55,9 +52,7 @@ async def test_youtube_to_docx_invalid_url(mock_converter_class):
     """
     # Configure the mock instance
     mock_converter_instance = mock_converter_class.return_value
-    mock_converter_instance.process = AsyncMock(
-        side_effect=InvalidYouTubeURLException()
-    )
+    mock_converter_instance.process = AsyncMock(side_effect=InvalidYouTubeURLException())
 
     # Define test inputs
     youtube_url = "invalid_url"

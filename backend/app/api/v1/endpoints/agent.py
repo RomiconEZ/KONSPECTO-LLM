@@ -1,12 +1,9 @@
-# KONSPECTO/backend/app/api/v1/endpoints/agent.py
-
 import logging
 from functools import lru_cache
 
+from agent.react_agent import ReactAgent
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-
-from agent.react_agent import ReactAgent
 
 router = APIRouter()
 logger = logging.getLogger("app.api.v1.endpoints.agent")
@@ -73,8 +70,8 @@ def get_agent_service() -> AgentService:
 
 @router.post("/", response_model=QueryResponse)
 async def interact_with_agent(
-    request: QueryRequest,
-    agent_service: AgentService = Depends(get_agent_service),
+        request: QueryRequest,
+        agent_service: AgentService = Depends(get_agent_service),
 ):
     """
     Эндпойнт для взаимодействия с агентом.

@@ -1,11 +1,8 @@
-# KONSPECTO/backend/tests/test_agent_endpoint.py
-
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import patch
 
 import pytest
-from httpx import AsyncClient
-
 from app.main import app
+from httpx import AsyncClient
 
 
 @pytest.fixture

@@ -63,12 +63,12 @@ KONSPECTO is an intelligent agent based on a local LLM model, offering the follo
 
 1. Download and install LM Studio from the official website
 2. In LM Studio:
-    - Go to "Search" tab
-    - Find and download `IlyaGusev/saiga_nemo_12b_gguf/saiga_nemo_12b.Q8_0.gguf` model
-    - Go to "Local Server" tab
-    - Select the downloaded model from the dropdown menu
-    - Start the server (it will run on http://localhost:1234/v1)
-    - Keep the server running while using KONSPECTO
+   - Go to "Search" tab
+   - Find and download `IlyaGusev/saiga_nemo_12b_gguf/saiga_nemo_12b.Q8_0.gguf` model
+   - Go to "Local Server" tab
+   - Select the downloaded model from the dropdown menu
+   - Start the server (it will run on http://localhost:1234/v1)
+   - Keep the server running while using KONSPECTO
 
 > ⚠️ Note: Make sure the LM Studio server is running before starting the application, as KONSPECTO relies on it for text
 > generation.
@@ -164,21 +164,21 @@ The application will be available at the following addresses:
 
 1. **Information Search**
 
-    - The user sends a request through the UI
-    - The agent analyzes the request and determines the necessary tools
-    - A search is performed across the knowledge base and a response is generated
+   - The user sends a request through the UI
+   - The agent analyzes the request and determines the necessary tools
+   - A search is performed across the knowledge base and a response is generated
 
 2. **Video Processing**
 
-    - Uploading a YouTube video
-    - Extracting frames every 5 seconds
-    - Filtering similar images
-    - Creating a DOCX document
+   - Uploading a YouTube video
+   - Extracting frames every 5 seconds
+   - Filtering similar images
+   - Creating a DOCX document
 
 3. **Voice Input**
-    - Recording audio via the browser
-    - Transcription using Whisper
-    - Adding the text to the current query
+   - Recording audio via the browser
+   - Transcription using Whisper
+   - Adding the text to the current query
 
 ## ✅ Validation
 

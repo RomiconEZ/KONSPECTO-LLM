@@ -1,5 +1,3 @@
-# KONSPECTO/backend/app/models/transcription.py
-
 from pydantic import BaseModel, Field
 
 
@@ -8,6 +6,4 @@ class TranscriptionResponse(BaseModel):
     Модель ответа транскрипции.
     """
 
-    transcription: str = Field(
-        ..., examples=["Это пример транскрибированного текста."]
-    )
+    transcription: str = Field(..., examples=["Это пример транскрибированного текста."])

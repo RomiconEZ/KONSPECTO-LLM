@@ -1,13 +1,15 @@
 from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
+
+from fastapi import HTTPException
+
 from agent.tools.video_processor import (
     InvalidYouTubeURLException,
     SSIMImageDifferenceChecker,
     VideoProcessingError,
     youtube_to_docx,
 )
-from fastapi import HTTPException
 
 
 @pytest.mark.asyncio

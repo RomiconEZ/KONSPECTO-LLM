@@ -3,6 +3,7 @@ import os
 import tempfile
 
 import aiofiles
+
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 
 from ....models.transcription import TranscriptionResponse
@@ -94,8 +95,8 @@ def get_transcription_model(request: Request) -> AbstractTranscriptionModel:
 
 @router.post("/", response_model=TranscriptionResponse)
 async def transcribe_audio(
-        file: UploadFile = File(...),
-        transcription_model: AbstractTranscriptionModel = Depends(get_transcription_model),
+    file: UploadFile = File(...),
+    transcription_model: AbstractTranscriptionModel = Depends(get_transcription_model),
 ):
     """
     Эндпойнт для транскрипции загруженного аудио файла.

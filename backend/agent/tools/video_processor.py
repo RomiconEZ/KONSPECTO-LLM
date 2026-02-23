@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import uuid
+
 from abc import ABC, abstractmethod
 from io import BytesIO
 from typing import Optional
@@ -10,15 +11,17 @@ from urllib.error import HTTPError
 
 import cv2
 import numpy as np
-from PIL import Image
-from app.exceptions import InvalidYouTubeURLException, VideoProcessingError
-from app.services.redis_service import RedisService
+
 from docx import Document
 from docx.shared import Inches
+from PIL import Image
 from pytubefix import YouTube
 from pytubefix.cli import on_progress
 from pytubefix.exceptions import RegexMatchError
 from skimage.metrics import structural_similarity as ssim
+
+from app.exceptions import InvalidYouTubeURLException, VideoProcessingError
+from app.services.redis_service import RedisService
 
 logger = logging.getLogger("agent.tools.video_processor")
 
@@ -86,11 +89,11 @@ class VideoToDocxConverter:
     FRAME_INTERVAL_SECONDS: int = 5
 
     def __init__(
-            self,
-            youtube_url: str,
-            redis_service: RedisService,
-            difference_checker: ImageDifferenceChecker,
-            expire_seconds: int,
+        self,
+        youtube_url: str,
+        redis_service: RedisService,
+        difference_checker: ImageDifferenceChecker,
+        expire_seconds: int,
     ):
         self.youtube_url: str = youtube_url
         self.redis_service: RedisService = redis_service
@@ -192,7 +195,7 @@ class VideoToDocxConverter:
 
                 if last_image_path:
                     if self.difference_checker.are_images_different(
-                            last_image_path, img_path
+                        last_image_path, img_path
                     ):
                         self.extracted_images.append(img_path)
                         last_image_path = img_path
@@ -256,10 +259,10 @@ class VideoToDocxConverter:
 
 
 async def youtube_to_docx(
-        youtube_url: str,
-        redis_service: RedisService,
-        difference_checker: Optional[ImageDifferenceChecker] = None,
-        expire_seconds: int = 86400,
+    youtube_url: str,
+    redis_service: RedisService,
+    difference_checker: Optional[ImageDifferenceChecker] = None,
+    expire_seconds: int = 86400,
 ) -> str:
     """
     Обертка для конвертации YouTube видео в DOCX документ и сохранения его в Redis.

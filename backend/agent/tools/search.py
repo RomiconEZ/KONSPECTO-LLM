@@ -1,4 +1,5 @@
 import logging
+
 from typing import List
 
 from app.services.index_service import get_query_engine

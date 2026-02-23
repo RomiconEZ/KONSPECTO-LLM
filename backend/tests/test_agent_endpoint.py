@@ -15,7 +15,9 @@ def mock_agent_service(app):
 
 @pytest.mark.asyncio
 async def test_agent_explain_terminology(mock_agent_service, async_client):
-    mock_agent_service.process_query.return_value = "Определение - Свёрточная нейронная сеть (CNN) — это вид глубокой нейронной сети."
+    mock_agent_service.process_query.return_value = (
+        "Определение - Свёрточная нейронная сеть (CNN) — это вид глубокой нейронной сети."
+    )
 
     query = {"query": "Объясни, что такое свёрточная нейронная сеть"}
     response = await async_client.post("/api/v1/agent/", json=query)

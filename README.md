@@ -1,9 +1,5 @@
 # 🎓 KONSPECTO - LLM Agent for Note Management
 
-## 👥 Authors
-
-- Neronov Roman
-
 ## 📋 Project Description
 
 KONSPECTO is an intelligent agent based on a local LLM model, offering the following capabilities:
@@ -28,7 +24,7 @@ KONSPECTO is an intelligent agent based on a local LLM model, offering the follo
 
 ## 📽️ Presentation
 
-[Presentation KONSPECTO](https://github.com/RomiconEZ/KONSPECTO-LLM/blob/develop/presentation/KONSPECTO_LLM_base.pdf)
+[Presentation KONSPECTO](https://github.com/RomiconEZ/KONSPECTO-LLM/blob/develop/presentation/KONSPECTO.pdf)
 
 ## 🛠 Tech Stack
 
@@ -63,12 +59,12 @@ KONSPECTO is an intelligent agent based on a local LLM model, offering the follo
 
 1. Download and install LM Studio from the official website
 2. In LM Studio:
-   - Go to "Search" tab
-   - Find and download `IlyaGusev/saiga_nemo_12b_gguf/saiga_nemo_12b.Q8_0.gguf` model
-   - Go to "Local Server" tab
-   - Select the downloaded model from the dropdown menu
-   - Start the server (it will run on http://localhost:1234/v1)
-   - Keep the server running while using KONSPECTO
+    - Go to "Search" tab
+    - Find and download `IlyaGusev/saiga_nemo_12b_gguf/saiga_nemo_12b.Q8_0.gguf` model
+    - Go to "Local Server" tab
+    - Select the downloaded model from the dropdown menu
+    - Start the server (it will run on http://localhost:1234/v1)
+    - Keep the server running while using KONSPECTO
 
 > ⚠️ Note: Make sure the LM Studio server is running before starting the application, as KONSPECTO relies on it for text
 > generation.
@@ -164,37 +160,21 @@ The application will be available at the following addresses:
 
 1. **Information Search**
 
-   - The user sends a request through the UI
-   - The agent analyzes the request and determines the necessary tools
-   - A search is performed across the knowledge base and a response is generated
+    - The user sends a request through the UI
+    - The agent analyzes the request and determines the necessary tools
+    - A search is performed across the knowledge base and a response is generated
 
 2. **Video Processing**
 
-   - Uploading a YouTube video
-   - Extracting frames every 5 seconds
-   - Filtering similar images
-   - Creating a DOCX document
+    - Uploading a YouTube video
+    - Extracting frames every 5 seconds
+    - Filtering similar images
+    - Creating a DOCX document
 
 3. **Voice Input**
-   - Recording audio via the browser
-   - Transcription using Whisper
-   - Adding the text to the current query
-
-## ✅ Validation
-
-It is not possible to produce a deterministic assessment of the agent’s performance because its effectiveness depends on
-the unique data serving as its knowledge base. In our case, this knowledge base consists of user-generated notes, which
-are different for every individual. Consequently, any quality measurement will vary significantly from one user’s
-environment to another.
-
-In this project, we tested the agent on two specific documents: one explaining gradient descent and another explaining
-stochastic gradient descent. The system demonstrated consistent accuracy in retrieving relevant information from these
-documents during the queries shown in the demo video. However, because user notes can differ in style, depth, and
-content, the same agent might show varied results when applied to an entirely different set of documents.
-
-This inherent reliance on specialized, user-specific data makes it impossible to generalize the agent’s quality or
-establish a uniform benchmark. The system’s performance is inseparable from the nuances of the data it is provided with,
-preventing any deterministic evaluation of its capabilities.
+    - Recording audio via the browser
+    - Transcription using Whisper
+    - Adding the text to the current query
 
 ## 📜 License
 
